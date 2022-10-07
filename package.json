@@ -1,0 +1,27 @@
+{
+	"name": "colloquial.studio-svelte",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"package": "svelte-kit package",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/adapter-static": "^1.0.0-next.32",
+		"@sveltejs/kit": "^1.0.0-next.398",
+		"@sveltejs/vite-plugin-svelte": "^1.0.1",
+		"sass": "^1.54.0",
+		"svelte": "^3.49.0",
+		"svelte-preprocess": "^4.10.7",
+		"vite": "^3.0.4"
+	},
+	"type": "module",
+	"dependencies": {
+		"jsoncrush": "^1.1.8",
+		"svelte-collapse": "^0.1.1",
+		"tmi.js": "^1.8.5"
+	}
+}

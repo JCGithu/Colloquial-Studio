@@ -1,0 +1,49 @@
+
+
+. Settings
+  -- Make save icons fade if you don't have a save.
+
+. Get all current chatter features working
+  -- Chat Direction
+  -- Need to add colouring options for username
+
+.Add Toast popups
+  Really easy actually, just make a div that has an each, then make an array of messages. 
+  Animate with svelte transitions in and out.
+  -- Reloaded
+  -- Settings Saved
+  -- Settings Loaded
+  -- Settings Defaulted;
+
+
+. Send dashboard to Fox + UI people 
+
+. Testing
+  -- Test Timeout
+  -- Test Block
+
+. Potential other 
+  -- Bubble border radius
+  -- Use user colour for bubble background colour
+  -- Pronoun styling?
+    -- font colour
+    -- font User colour
+    -- border
+    -- border colour
+    -- border User colour
+  -- Custom CSS
+    -- Tried pushing this to svelte Head and it doesn't work. Solution is probably to make a CSS parser? Slow but would only need to run on load.
+  -- Choose how bit and sub messages appear
+    -- Show Cheers
+    -- Show number after Emote
+    -- Custom background colour
+  -- Add prediction badges
+
+
+Changelog
+-- Emote Only gets bigger images.
+-- Preview style changes as you make them
+-- Save styles to the site
+-- Load styles from existing URLs
+-- Custom animation easing
+-- Choose animation time
