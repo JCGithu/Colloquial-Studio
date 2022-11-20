@@ -223,7 +223,7 @@ button {
   font-size: large;
   padding: 0.5rem;
   margin-right: 0.5rem;
-  border-radius: 0 0 0.5rem 0.5rem;
+  border-radius: 0.5rem;
   color: white;
   border: none;
   cursor: pointer;
@@ -238,6 +238,10 @@ button {
     transform: translateY(0rem);
     //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
   }
+}
+
+.tabbed {
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 //C: SIDES

@@ -95,9 +95,9 @@
       <img on:click={() => (saveMenu = !saveMenu)} id="save" alt="save" src="https://www.svgrepo.com/show/48810/floppy-disk-save-button.svg" />
       {#if showButtons}
         <div class="buttons" transition:fly={{ duration: 200, y: -50 }}>
-          <button id="go" on:click={() => window.open(urlFill)}><span>Open Link</span></button>
-          <button id="copy" on:click={() => navigator.clipboard.writeText(urlFill)}><span>Copy Link</span></button>
-          <button id="load" on:click={loadFromURL}><span>Load from existing URL</span></button>
+          <button id="go" class="tabbed" on:click={() => window.open(urlFill)}><span>Open Link</span></button>
+          <button id="copy" class="tabbed" on:click={() => navigator.clipboard.writeText(urlFill)}><span>Copy Link</span></button>
+          <button id="load" class="tabbed" on:click={loadFromURL}><span>Load from existing URL</span></button>
         </div>
       {/if}
     </div>
