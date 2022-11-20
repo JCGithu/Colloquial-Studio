@@ -61,7 +61,7 @@
     let urlData = new URLSearchParams(window.location.search);
     runApp = urlData.has("data");
 
-    params = await paramFunctions.check(defaultParams, paramReformat, runApp, "chatter", urlData);
+    params = await paramFunctions.check(defaultParams, paramReformat, runApp, "chatter", urlData, toastUpdate);
 
     console.log("Dashboard Init", defaultParams, params);
 

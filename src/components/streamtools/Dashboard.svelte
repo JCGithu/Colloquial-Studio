@@ -7,16 +7,18 @@
   let toastArray = [];
 
   import { fly, fade } from "svelte/transition";
+  import { flip } from "svelte/animate";
+  import { quintOut } from "svelte/easing";
+
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
 
-  import Toast from "../Toast.svelte";
+  let toastID = 0;
 
   function ToastQueue(message) {
-    console.log("TOASTING");
-    toastArray.push(message);
+    toastID++;
+    toastArray.push({ message: message, id: toastID });
     toastArray = toastArray;
-    console.log(toastArray);
     setTimeout(() => {
       if (toastArray.length > 0) {
         toastArray.shift();
@@ -34,6 +36,10 @@
     showInfo = !showInfo;
   }
 
+  function copyURL() {
+    navigator.clipboard.writeText(urlFill);
+    ToastQueue("URL copied to clipboard");
+  }
   function loadFromURL() {
     let urlData = window.prompt("Put in an existing URL", "URL here...");
     dispatch("loadURL", urlData);
@@ -42,12 +48,12 @@
   function saveData(num) {
     dispatch("saveData", num);
     saveMenu = !saveMenu;
-    ToastQueue("Saving to file " + (num + 1));
+    ToastQueue("Saved to File " + (num + 1));
   }
   function loadData(num) {
     dispatch("loadData", num);
     saveMenu = !saveMenu;
-    ToastQueue("Loaded from save " + (num + 1));
+    ToastQueue("Loaded from Save " + (num + 1));
   }
   onMount(async () => {
     console.log("wahoo", saves);
@@ -84,8 +90,10 @@
     </div>
   {/if}
   <div id="toastBox">
-    {#each toastArray as message}
-      <Toast {message} />
+    {#each toastArray as toasty (toasty.id)}
+      <div in:fade out:fly={{ x: -200, duration: 1000 }} id="toast">
+        {toasty.message}
+      </div>
     {/each}
   </div>
   <div class="dashLeft">
@@ -96,7 +104,7 @@
       {#if showButtons}
         <div class="buttons" transition:fly={{ duration: 200, y: -50 }}>
           <button id="go" class="tabbed" on:click={() => window.open(urlFill)}><span>Open Link</span></button>
-          <button id="copy" class="tabbed" on:click={() => navigator.clipboard.writeText(urlFill)}><span>Copy Link</span></button>
+          <button id="copy" class="tabbed" on:click={copyURL}><span>Copy Link</span></button>
           <button id="load" class="tabbed" on:click={loadFromURL}><span>Load from existing URL</span></button>
         </div>
       {/if}

@@ -34,7 +34,7 @@ export async function load(input, paramReformat, pastSave){
   return await paramReformat(parsedData);
 }
 
-export async function check(defaultParams, paramReformat, runApp, app, urlParams){
+export async function check(defaultParams, paramReformat, runApp, app, urlParams, toastUpdate){
   let initParams;
   if (runApp) {
     initParams = paramFunctions.uncrush(urlParams.get("data"));
@@ -48,25 +48,9 @@ export async function check(defaultParams, paramReformat, runApp, app, urlParams
     initParams['saves'] = defaultSettings;
     window.localStorage.setItem(app, JSON.stringify(defaultSettings));
   } else {
-    console.log('Saves found!');
     let parsedData = JSON.parse(storage);
-    var answer = window.confirm("Save data found, load now?");
-    if (answer) {
-      let pick = false
-      for (let i = 2; i > -1; i--){
-        if (parsedData[i].bgcolour) pick = i;
-        console.log(parsedData[i]);
-        console.log(pick);
-      }
-      if (pick === false) {
-        initParams = Object.assign({}, defaultParams);
-      } else {
-        initParams = parsedData[pick];
-      }
-    }
-    else {
-      initParams = Object.assign({}, defaultParams);
-    }
+    toastUpdate('Save Data Found!')
+    initParams = Object.assign({}, defaultParams);
     initParams['saves'] = parsedData;
   }
   return await paramReformat(initParams);
