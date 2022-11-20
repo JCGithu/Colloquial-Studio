@@ -4,10 +4,30 @@
   export let showButtons = true;
   export let saves = new Array(3);
   let saveArray = new Array(3);
+  let toastArray = [];
 
   import { fly, fade } from "svelte/transition";
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
+
+  import Toast from "../Toast.svelte";
+
+  function ToastQueue(message) {
+    console.log("TOASTING");
+    toastArray.push(message);
+    toastArray = toastArray;
+    console.log(toastArray);
+    setTimeout(() => {
+      if (toastArray.length > 0) {
+        toastArray.shift();
+        toastArray = toastArray;
+      }
+    }, 5000);
+  }
+
+  export const toastUpdate = (i) => {
+    ToastQueue(i);
+  };
 
   let saveMenu = false;
   function swapInfo() {
@@ -17,14 +37,17 @@
   function loadFromURL() {
     let urlData = window.prompt("Put in an existing URL", "URL here...");
     dispatch("loadURL", urlData);
+    ToastQueue("Settings loaded from URL");
   }
   function saveData(num) {
     dispatch("saveData", num);
     saveMenu = !saveMenu;
+    ToastQueue("Saving to file " + (num + 1));
   }
   function loadData(num) {
     dispatch("loadData", num);
     saveMenu = !saveMenu;
+    ToastQueue("Loaded from save " + (num + 1));
   }
   onMount(async () => {
     console.log("wahoo", saves);
@@ -52,14 +75,19 @@
         {#each saveArray as save, i}
           <span class={saves[save].channel ? "" : "blank"}>
             <p>Save {i + 1}:</p>
-            <button on:click={() => saveData(i)}>Overwrite</button>
+            <button on:click={() => saveData(i)}>{saves[save].channel ? "Overwrite" : "Save"}</button>
             <button on:click={() => loadData(i)}>Load</button>
           </span>
         {/each}
-        <button on:click={() => (saveMenu = !saveMenu)}>Close</button>
+        <button id="closeSave" on:click={() => (saveMenu = !saveMenu)}>Close</button>
       </div>
     </div>
   {/if}
+  <div id="toastBox">
+    {#each toastArray as message}
+      <Toast {message} />
+    {/each}
+  </div>
   <div class="dashLeft">
     <div id="dashTitle" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
       <span id="backlink"><a href="/">Colloquial.Studio</a></span>

@@ -1,12 +1,7 @@
 -- Sub messages have errors with the ID
 
 .Add Toast popups
-  Really easy actually, just make a div that has an each, then make an array of messages. 
-  Animate with svelte transitions in and out.
   -- Reloaded
-  -- Settings Saved
-  -- Settings Loaded
-  -- Settings Defaulted;
 
 . Send dashboard to Fox + UI people 
 

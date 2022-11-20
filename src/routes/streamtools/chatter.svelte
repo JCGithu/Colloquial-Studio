@@ -14,10 +14,9 @@
   let [params, updateSettings] = Array(2).fill(new Object());
   let urlFill, baseURL;
   let runApp = false;
-  let resetText = "Reload";
-  let resetted = false;
   let grouped = true;
   let targetUser;
+  let toastUpdate;
 
   async function valueChanger(v) {
     console.log("====== INPUT CHANGE =========");
@@ -30,13 +29,7 @@
   async function paramReload() {
     params = await paramReformat(params);
     targetUser = params.channel;
-    //GUI
-    resetText = "Reloaded!";
-    resetted = true;
-    setTimeout(() => {
-      resetText = "Reload";
-      resetted = false;
-    }, 2000);
+    toastUpdate("Channel reset");
   }
 
   async function loadURL({ detail }) {
@@ -47,6 +40,7 @@
   async function paramReset() {
     defaultParams.saves = params.saves;
     params = await paramReformat(defaultParams);
+    toastUpdate("Reset to default");
   }
 
   async function saveData({ detail }) {
@@ -97,7 +91,7 @@
     <Chatter {params} {targetUser} {runApp} />
   {/key}
 {:else}
-  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves}>
+  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves} bind:toastUpdate>
     <slot slot="title">Chatter</slot>
     <slot slot="subtitle">Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></slot>
     <slot slot="description">
@@ -111,7 +105,7 @@
     </slot>
     <slot id="dashControls" slot="settings">
       <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
-      <button class="testButton" on:click={paramReload}>{resetText}</button>
+      <button class="testButton" on:click={paramReload}>Reload</button>
       <DashInput
         {params}
         type="select"

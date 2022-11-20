@@ -371,6 +371,39 @@ button:active {
 .saveCollection {
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+.saveCollection #closeSave {
+  width: 60%;
+}
+
+#toastBox {
+  position: absolute;
+  width: 200px;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: column;
+}
+
+#toast {
+  background-color: rgba(40, 40, 40, 0.8);
+  color: #EAE5DB;
+  border-radius: 0.5em;
+  padding: 0.5em;
+  margin: 0.2em;
+  width: 90%;
+  text-align: center;
+  pointer-events: visible;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+#toast:hover {
+  background-color: #282828;
 }
 
 .flex-items:nth-child(1) {
