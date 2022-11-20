@@ -21,6 +21,7 @@
   async function valueChanger(v) {
     console.log("====== INPUT CHANGE =========");
     params[v.detail.id] = v.detail.value;
+    updateSettings = params;
     await paramReformat(params, v.detail.id);
     urlFill = paramFunctions.urlBuild(params, baseURL);
   }
@@ -28,6 +29,7 @@
   // This stays in here due to GUI.
   async function paramReload() {
     params = await paramReformat(params);
+    updateSettings = params;
     targetUser = params.channel;
     toastUpdate("Channel reset");
   }
@@ -35,6 +37,7 @@
   async function loadURL({ detail }) {
     params = await paramFunctions.load(detail, paramReformat, false);
     urlFill = paramFunctions.urlBuild(params, baseURL);
+    updateSettings = params;
   }
 
   async function paramReset() {
@@ -54,6 +57,7 @@
     }
     params = await paramFunctions.load(params.saves[detail], paramReformat, params.saves);
     urlFill = paramFunctions.urlBuild(params, baseURL);
+    updateSettings = params;
   }
 
   onMount(async () => {
