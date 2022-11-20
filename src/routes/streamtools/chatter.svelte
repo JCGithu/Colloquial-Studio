@@ -8,6 +8,7 @@
 
   import { paramReformat, defaultParams } from "../../components/streamtools/chatter/paramsChatter";
   import * as paramFunctions from "../../components/streamtools/params";
+  import { bubble, toggle_class } from "svelte/internal";
 
   //VARIABLES
   let [params, updateSettings] = Array(2).fill(new Object());
@@ -39,11 +40,12 @@
   }
 
   async function loadURL({ detail }) {
-    params = await paramFunctions.load(detail, paramReformat);
+    params = await paramFunctions.load(detail, paramReformat, false);
     urlFill = paramFunctions.urlBuild(params, baseURL);
   }
 
   async function paramReset() {
+    defaultParams.saves = params.saves;
     params = await paramReformat(defaultParams);
   }
 
@@ -56,7 +58,7 @@
     if (!params.saves) {
       let localStore = window.localStorage.getItem("chatter");
     }
-    params = await paramFunctions.load(params.saves[detail], paramReformat);
+    params = await paramFunctions.load(params.saves[detail], paramReformat, params.saves);
     urlFill = paramFunctions.urlBuild(params, baseURL);
   }
 
@@ -95,7 +97,7 @@
     <Chatter {params} {targetUser} {runApp} />
   {/key}
 {:else}
-  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData}>
+  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves}>
     <slot slot="title">Chatter</slot>
     <slot slot="subtitle">Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></slot>
     <slot slot="description">
@@ -134,19 +136,22 @@
         on:valueChange={valueChanger}
       />
       <DashGroup title="Font Settings">
-        <DashInput {params} type="text" name="Custom Font" subtitle="Currently: Poppins. You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
+        <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
         <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
+        <DashInput {params} {grouped} type="checkbox" name="Use Twitch Username Colours" id="nameCustom" on:valueChange={valueChanger} />
+        <DashInput {params} {grouped} faded={params.nameCustom} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
       </DashGroup>
       <DashGroup title="Chat Bubble">
-        <DashInput {params} {grouped} type="color" name="Default colour" id="chatcolour" on:valueChange={valueChanger} />
         <DashInput {params} type="range" name="Opacity" max="100" min="0" id="chatopacity" on:valueChange={valueChanger} />
+        <DashInput {params} type="range" name="Roundness" max="10" min="0" id="border" on:valueChange={valueChanger} />
+        <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
+        <DashInput {params} {grouped} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
         <DashInput {params} {grouped} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
       </DashGroup>
       {#if updateSettings.highlight}
         <DashGroup title="Bubble Drop Shadow">
           <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" on:valueChange={valueChanger} />
-          <DashInput {params} {grouped} type="color" name="Default colour" id="highcolour" on:valueChange={valueChanger} />
+          <DashInput {params} {grouped} type="color" name="Default colour" id="highcolour" faded={params.togglecol} on:valueChange={valueChanger} />
         </DashGroup>
       {/if}
       <DashGroup title="Background">
@@ -182,6 +187,15 @@
       <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
+      {#if updateSettings.pronouns}
+        <DashGroup title="Pronouns">
+          <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" on:valueChange={valueChanger} />
+          <DashInput {params} type="checkbox" name="Outline" id="proOutline" on:valueChange={valueChanger} />
+          <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
+          <DashInput {params} type="checkbox" name="Background" id="proBG" on:valueChange={valueChanger} />
+          <DashInput {params} {grouped} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
+        </DashGroup>
+      {/if}
       <button class="testButton" on:click={paramReset}>Reset to Default</button>
     </slot>
   </Dashboard>

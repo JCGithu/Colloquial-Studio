@@ -10,8 +10,11 @@
     if (!message.tags.badges) return;
     Object.keys(message.tags.badges).forEach((k) => {
       if (badgeData[k]) {
-        if (badgeData[k].versions[message.tags.badges[k]]) {
-          badges.push(badgeData[k].versions[message.tags.badges[k]]["image_url_4x"]);
+        let variations = badgeData[k].versions;
+        if (Object.keys(variations).length === 1) {
+          badges.push(variations[Object.keys(variations)[0]]["image_url_4x"]);
+        } else if (variations[message.tags.badges[k]]) {
+          badges.push(variations[message.tags.badges[k]]["image_url_4x"]);
         }
       }
     });
@@ -133,13 +136,17 @@
     }
     console.log(params, message);
 
-    message.message.forEach((el) => {
-      if (typeof el === "string") bigEmote = false;
-    });
+    if (params.emoteOnly) {
+      message.message.forEach((el) => {
+        if (typeof el === "string") bigEmote = false;
+      });
+    } else {
+      bigEmote = false;
+    }
   });
 </script>
 
-<div class="chatBubble {message.type}" style="font-family: {params.font}; background-colour: {params.chatcolour}" bind:this={bubble}>
+<div class="chatBubble {message.type}" style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolour}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
@@ -148,9 +155,9 @@
         {/each}
       {/if}
       {#if params.pronouns && pronoun}
-        <span class="pronoun" style="color: {message.tags.color}">{pronoun}</span>
+        <span class="pronoun" style="font-family:{params.proFont}; --proColour:{params.proUseCol ? message.tags.color : params.proColour}; border-width: {params.proOutline ? '2px' : '0px'}; background-color: {params.proBG ? 'var(--proColour)' : ''}; color: {params.proBG ? params.proColour : 'var(--proColour)'}">{pronoun}</span>
       {/if}
-      <b class="chatName">{message.user}{": "}</b>
+      <b class="chatName" style="color: {params.nameCustom ? message.tags.color : 'inherit'}">{message.tags["display-name"]}{": "}</b>
       {#each message.message as word}
         {#if typeof word == "string"}
           {word}{" "}

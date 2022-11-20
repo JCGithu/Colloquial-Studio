@@ -35,7 +35,7 @@
   let firstMessage = true;
 
   async function fetchPronoun(username) {
-    if (!params.pronouns) return;
+    if (!params.pronouns || !username) return;
     console.log(`...Looking for ${username} pronouns`);
     let lowerCase = username.toLowerCase();
     if (userPronouns.get(lowerCase)) return;
@@ -112,10 +112,21 @@
       type: type,
     };
     if (!params.togglecol) newChat.color = params.highcolour;
-    newChat.tags.id = `${message[0]}${messageIndex}`;
+    console.log(newChat, newChat.tags);
+    if ((type = "sub")) {
+      newChat.tags.id = messageIndex.toString();
+    } else {
+      newChat.tags.id = message[0] + messageIndex.toString();
+    }
     messageIndex++;
-    messageList.push(newChat);
-    if (messageList.length > 50) messageList.shift();
+    if (params.direction === "Down") {
+      messageList.push(newChat);
+      if (messageList.length > 50) messageList.shift();
+    }
+    if (params.direction === "Up") {
+      messageList.unshift(newChat);
+      if (messageList.length > 50) messageList.pop();
+    }
     messageList = messageList;
   }
 
@@ -136,7 +147,7 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage(false, { color: params.highcolour, username: "Chatter", testing: true }, `Connected to ${targetUser} ✅`, false, "announcement");
+      runMessage(false, { color: params.highcolour, "display-name": "Chatter", testing: true }, `Connected to ${targetUser} ✅`, false, "announcement");
     });
 
     client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, self, "chat"));
@@ -158,7 +169,7 @@
 </script>
 
 <section style={runApp ? "height:100vh" : ""}>
-  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align};">
+  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align}; {params.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {params} {message} {badgeData} {userPronouns} />
     {/each}

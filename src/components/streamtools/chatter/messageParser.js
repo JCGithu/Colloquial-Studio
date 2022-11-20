@@ -1,6 +1,7 @@
 const cheerTiers = [1, 100, 1000, 5000, 10000, 100000];
 const otherCheers = ['cheer', 'biblethump', 'cheerwhal', 'corgo', 'uni', 'showlove', 'party', 'seemsgood', 'pride', 'kappa', 'frankerz', 'heyguys', 'dansgame', 'elegiggle', 'trihard', 'kreygasm', '4head', 'swiftrage','notlikethis', 'failfish', 'vohiyo', 'pjsalt', 'mrdestructoid', 'bday', 'ripcheer', 'shamrock'];
 const cheerRex = new RegExp(otherCheers.join('\\d+|') + `\\d+`, 'gi');
+console.log(cheerRex);
 
 function checkEmotes(emotes, splitText, text){
   for (let i in emotes){
@@ -20,18 +21,26 @@ function checkEmotes(emotes, splitText, text){
 }
 
 function checkBits(splitText){
+  console.log('BITS RECIEVED');
   splitText.forEach((chunk, index) => {
-    if (!cheerRex.test(chunk)) return;
+    console.log(chunk,index);
+    let cheerTest = cheerRex.test(chunk.toLowerCase());
+    console.log(cheerTest);
+    if (!cheerTest) return;
+    console.log('cheerrex success');
     let title = chunk.match(/[a-zA-z]+/g)[0];
     title = title.toLowerCase();
     let num = parseInt(chunk.match(/\d+/g)[0]);
+    console.log(title,num);
     cheerTiers.forEach(rank => {
+      console.log(rank);
       if (num < rank) return;
       splitText[index] = {
         code: `https://d3aqoihi2n8ty8.cloudfront.net/actions/${title}/dark/animated/${rank}/2.gif`,
         num: num,
         text: chunk
       }
+      console.log(splitText[index]);
     })
   })
   return splitText;

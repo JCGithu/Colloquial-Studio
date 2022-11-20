@@ -1,5 +1,6 @@
 // // Colours
 $white: #fbf5eb;
+$white: #EAE5DB;
 $deepBlue: #525be1;
 $lightbeige: #FFECD2;
 $beige: #FED1B9;
@@ -10,8 +11,10 @@ $purple: #803cff;
 $palepurple: #d4d1ff;
 $palepurple2: #f1ecff;
 $pink: #FF769A;
+$pink: #fe5f55;
 $orange: #fcb69f;
 $black: #0a122a;
+$black: #282828;
 
 $titles : $white;
 
@@ -33,8 +36,8 @@ div{
   align-items: baseline;
   width: calc(100% - 3rem);
   p {
-    color: $deepBlue;
-    font-size: small;
+    color: $black;
+    font-size: 1rem;
     font-style: italic;
     line-height: initial;
     vertical-align: text-bottom;
@@ -45,7 +48,7 @@ div{
     position: absolute;
     width: 100%;
     height: calc(100% - 1.3rem);
-    margin-top: 1.5rem;
+    margin-top: 1.65rem;
     z-index: 2;
     justify-content: center;
     align-items: center;
@@ -70,18 +73,20 @@ input{
   border-radius: 1rem;
   border: none;
   font-family: 'Poppins';
-  background-color: $palepurple !important;
+  background-color: $white !important;
   background: white;
+  color: $black;
   width: 100%;
   transition: all 1s;
   opacity: 0.7;
   &:focus{
     outline: none;
-    color: white;
+    color: black;
     background-color: fade-out($deepBlue, 0.5)!important;
+    background-color: $white !important;
     opacity: 1;
   }
-  color: $deepBlue;
+  //color: $deepBlue;
   p {
     font-style: italic;
     color: $titles;
@@ -90,7 +95,7 @@ input{
   &:hover{
     opacity: 1;
   }
-  box-shadow: inset 0px 0px 0px -60px $pink
+  box-shadow: inset 0px 0px 0px -60px lighten($pink, 10)
 }
 ::-webkit-color-swatch {
   border: none;
@@ -103,16 +108,17 @@ input{
   padding: 0;
 }
 input[type='color']{
-  height: 2.5rem;
+  height: 3rem;
   padding: 0 !important;
   opacity: 1;
   cursor: pointer;
 }
 input[type='text'], input[type='number']{
   &:focus{
-    box-shadow: inset 0px -207px 0px -200px $pink
+    box-shadow: inset 0px -207px 0px -200px $black
   }
 }
+
 //CHECKBOXES
 label{
   color: $deepBlue;
@@ -134,7 +140,7 @@ label{
     position: relative;
     padding: 0rem 1rem;
     margin: 0 0.5rem;
-    background-color: $palepurple;
+    background-color: fade-out($white, 0.2);
     border-radius: 0.3rem;
     transition: 0.2s all;
     &:after{
@@ -148,8 +154,8 @@ label{
   }
   &:hover{
     input ~ span{
-      background-color: $fadedPurple;
-      box-shadow: 0px 0px 3px $white inset;
+      background-color: $white;
+      //box-shadow: 0px 0px 3px $white inset;
     }
   }
   input:checked ~ span {
@@ -157,6 +163,10 @@ label{
     justify-content: center;
     display: flex;
     align-content: center;
+    opacity: 0.8;
+    &:hover{
+      opacity: 1;
+    }
     &:after{
       display: flex;
       align-self: center;
@@ -169,18 +179,26 @@ select{
   margin: 0.4rem 1rem;
   padding: 0.5rem 0.5rem;
   border-radius: 0.5rem;
-  background-color: $palepurple;
+  border: none;
+  background-color: $white;
   opacity: 0.7;
   transition: 0.3s all;
-  color: $deepBlue;
+  color: $black;
   cursor: pointer;
   overflow-y: scroll;
+  font-family: "Poppins";
+  font-size: 1rem;
+  outline: none !important;
   &:hover{
     opacity: 1;
-    background-color: $deepBlue;
+    background-color: #008080;
     color: $white;
-  }  
+  }
+  &:focus{
+    outline: none;
+  }
 }
+
 
 //RANGE
 input[type='range']{
@@ -188,12 +206,16 @@ input[type='range']{
   height: 0.6rem !important;
   transition: opacity .2s;
   padding: 0.2rem !important;
-  margin: 0.5rem 1rem ;
+  margin: 0.5rem 1rem;
+  opacity: 1;
   cursor: pointer;
+  background-color: $black !important;
   &:focus{
     ::-webkit-slider-thumb {
-      background: white;
+      background: $white;
+
     }
+    background-color:$black !important;
   }
 }
 ::-webkit-slider-runnable-track{
@@ -201,16 +223,32 @@ input[type='range']{
 }
 ::-webkit-slider-thumb {
   appearance: none;
+  box-shadow: 0px 0px 0px $white;
   width: 25px;
   height: 25px;
   border-radius: 100%;
-  background: $purple;
+  background: $white;
   cursor: pointer;
-  transition: 1s all;
+  transition: 0.2s all;
+  margin-bottom: 0;
+  &:hover{
+    box-shadow: 0px 0.2rem 5px $black;
+    margin-bottom: 0.2rem;
+  }
 }
 input[type="range"]:focus::-webkit-slider-thumb {
-  background: $pink;
-  box-shadow: 0px 0px 10px inset fade-out($white, 0.5);
+  //background: $pink;
+}
+
+//GROUPING
+.groupBox{
+  align-items: center;
+  width: 100%;
+  h2 {
+    margin: 0;
+    margin-top: 1rem;
+    width: 65%;
+  }
 }
 
 .collapse {
@@ -219,8 +257,9 @@ input[type="range"]:focus::-webkit-slider-thumb {
   color: white;
   width: 80%;
   background-color: #525be1;
+  background-color: $pink;
   &:hover{
-    background-color: #656eeb;
+    background-color: lighten($pink, 5);
   }
   padding: 1rem;
   margin: 1rem;
@@ -232,23 +271,24 @@ input[type="range"]:focus::-webkit-slider-thumb {
 }
 
 .opened {
-  background-color: #424242;
-  width: 100%;
-  margin: 1rem;
-  margin-bottom: 0rem;
+  background-color: lighten($black,2);
+  //background-color: #525be1;
+  width: 80% !important;
+  margin: 0;
   &:hover{
-    background-color: #525252;
+    background-color: lighten($black, 5);
   }
 }
 
 .group{
-  background-color: #525be171;
+  background-color: #525be1;
+  background-color: $pink;
   padding-left: 2rem;
   padding-right: 2rem;
   padding-top: 3rem;
   padding-bottom: 1rem;
   border-radius: 1rem;
-  width: 100%;
+  width: 80%;
   margin-top: -2rem;
   display: flex;
   flex-direction: column;
@@ -257,6 +297,13 @@ input[type="range"]:focus::-webkit-slider-thumb {
     display: flex;
     flex-direction: row;
     background-color: red;
+    input[type='range']{
+      margin: 1rem 0rem;
+      width: 110%;
+    }
+  }
+  label input:checked ~ span {
+    background-color: $black;
   }
 }
 
@@ -280,6 +327,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
   padding-top: 0rem;
   padding-bottom: 0rem;
   height: 0;
+  width: 60%;
   //margin: 0;
 }
 
@@ -287,6 +335,7 @@ input[type="range"]:focus::-webkit-slider-thumb {
   margin-bottom: 2rem;
 }
 
+//CHECKMARKS
 .checkContainer{
   width: 100%;
   div {

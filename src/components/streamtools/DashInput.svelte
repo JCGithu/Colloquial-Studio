@@ -7,14 +7,15 @@
     max = null,
     ops = null,
     value = null,
-    grouped = null;
+    grouped = null,
+    faded = false;
   export let params;
   import { hexToHSL } from "../../js/hexToHSL";
 
   import { createEventDispatcher, afterUpdate } from "svelte";
   const dispatch = createEventDispatcher();
 
-  let style = "";
+  let style = {};
   let invert = false;
   let titleBlock = true;
   let dashInputValue = "";
@@ -30,19 +31,20 @@
     dispatch("valueChange", { value: value, id: id });
   };
 
-  if (grouped) style = "width: 100%; ";
+  //if (grouped) style.width = "100%";
+  let direction = "";
   if (type === "select") {
-    style = style + "flex-direction: row";
-    if (subtitle) style = style + "flex-direction: column";
-  }
-  if (type === "color") {
-    if (!value) value = "#ffffff";
-  }
-  if (type === "checkbox") {
-    titleBlock = false;
+    direction = "row";
+    if (subtitle) direction = "column";
   }
 
+  if (type === "color" && !value) value = "#ffffff";
+  if (type === "checkbox") titleBlock = false;
+  if (faded) style.opacity = 0.5;
+  //let styleString = style.stringify();
+
   afterUpdate(() => {
+    console.log("faded", faded);
     if (!params) return;
     dashInputValue = params[id];
     if (type === "color" && dashInputValue) {
@@ -51,10 +53,16 @@
       invert = false;
       if (hsl.l >= 70) invert = true;
     }
+    if (faded) {
+      style.opacity = 0.5;
+    } else {
+      style.opacity = 1;
+    }
+    //stringStyle = style.stringify();
   });
 </script>
 
-<div {style}>
+<div style="{grouped ? 'width:100%;' : ''} flex-direction: {direction}; opacity:{faded ? 0.5 : 1};">
   {#if titleBlock}
     <h2>{name}</h2>
     {#if subtitle}

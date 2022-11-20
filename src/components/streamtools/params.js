@@ -20,7 +20,7 @@ export function save(params, app, slot) {
   window.localStorage.setItem(app, JSON.stringify(params['saves']));
 }
 
-export async function load(input, paramReformat){
+export async function load(input, paramReformat, pastSave){
   let parsedData;
   if (typeof input === 'string'){
     let splitInput = input.split("?data=");
@@ -28,6 +28,9 @@ export async function load(input, paramReformat){
   } else {
     parsedData = Object.assign({}, input);
   }
+  console.log('loading!', parsedData);
+  parsedData.saves = pastSave;
+  console.log('loading! 222', parsedData);
   return await paramReformat(parsedData);
 }
 

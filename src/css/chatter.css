@@ -12,33 +12,28 @@
   justify-content: end;
 }
 
-$marginY: 2.5px;
-$paddingY: 5px;
-
-section{
+section {
   min-width: 100%;
   min-height: 100%;
-  //background-color: #262d36;
   border-radius: 1rem;
 }
 
-.chatBubble{
+.chatBubble {
   --fontCol: #fff;
   --userCol: #2fa578;
   --bubbleCol: #2fa578;
-
   --marginY: 2.5px;
   --paddingY: 5px;
-
   --marginX: 10px;
   --paddingX: 15px;
-
   position: relative;
   color: var(--fontCol);
   display: block;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-self: end;
+  width: -webkit-max-content;
+  width: -moz-max-content;
   width: max-content;
   max-width: calc(100% - 25px - 20px - 0.5rem);
   border-radius: 0.5rem;
@@ -51,32 +46,29 @@ section{
   padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
   margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
   --animName: fadeIn;
-  --animTime: 0.5s 
+  --animTime: 0.5s
   --animEase: ease-in;
   --animHeight: 35px;
-
-  b{
-    white-space: pre;
-  }
-
-  p {
-    display: block;
-    color: var(--fontCol);
-    margin: 0;
-  }
-  span {
-    display: contents;
-    align-items: center;
-  }
-  .twitchBadge:first-of-type{
-    margin-left: -0.2rem;
-  }
+}
+.chatBubble b {
+  white-space: pre;
+}
+.chatBubble p {
+  display: block;
+  color: var(--fontCol);
+  margin: 0;
+}
+.chatBubble span {
+  display: contents;
+  align-items: center;
+}
+.chatBubble .twitchBadge:first-of-type {
+  margin-left: -0.2rem;
 }
 
-#chatBackground{
+#chatBackground {
   --bgOpacity: 0;
   --bgColour: #262d36;
-  
   background-color: var(--bgColour);
   opacity: var(--bgOpacity);
   position: absolute;
@@ -86,17 +78,17 @@ section{
   min-width: calc(100% - 1rem);
   min-height: 100%;
   z-index: 0;
-} 
+}
 
-.emote{
+.emote {
   height: 1.1rem;
   padding-bottom: 0.2rem;
   vertical-align: middle;
 }
 
-.bigEmote{
+.bigEmote {
   height: 2rem;
-  margin: 0.2rem 0 ;
+  margin: 0.2rem 0;
   vertical-align: middle;
 }
 
@@ -114,12 +106,27 @@ section{
   font-size: 0.8rem;
   border-style: solid;
   display: inline !important;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
   width: fit-content;
   color: var(--proColour);
   border-color: var(--proColour);
 }
 
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 100%;}
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 100%;
+  }
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 100%;
+  }
+}/*# sourceMappingURL=chatter.css.map */

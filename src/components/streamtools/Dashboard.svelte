@@ -3,9 +3,10 @@
   export let showInfo = false;
   export let showButtons = true;
   export let saves = new Array(3);
-  import { fly, fade } from "svelte/transition";
+  let saveArray = new Array(3);
 
-  import { createEventDispatcher } from "svelte";
+  import { fly, fade } from "svelte/transition";
+  import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
 
   let saveMenu = false;
@@ -25,6 +26,12 @@
     dispatch("loadData", num);
     saveMenu = !saveMenu;
   }
+  onMount(async () => {
+    console.log("wahoo", saves);
+    setTimeout(() => {
+      saveArray = Object.keys(saves);
+    }, 1000);
+  });
 </script>
 
 {#if showInfo}
@@ -42,8 +49,8 @@
   {#if saveMenu}
     <div id="saveMenu" class="infoScreen" transition:fade>
       <div class="saveCollection">
-        {#each saves as save, i}
-          <span>
+        {#each saveArray as save, i}
+          <span class={saves[save].channel ? "" : "blank"}>
             <p>Save {i + 1}:</p>
             <button on:click={() => saveData(i)}>Overwrite</button>
             <button on:click={() => loadData(i)}>Load</button>
