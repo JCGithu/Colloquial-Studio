@@ -129,7 +129,7 @@
     if (params.animation === "FadeIn") FadeIn(bubble);
     if (params.animation === "Grow") Grow(bubble, size);
 
-    if (params.pronouns) {
+    if (params.pronouns && message.user) {
       let LC = message.user.toLowerCase();
       pronoun = userPronouns.get(LC);
       if (pronoun === "" || !pronoun) pronoun = false;
@@ -146,7 +146,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type}" style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolour}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
+<div class="chatBubble {message.type}" style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolourCalc}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}

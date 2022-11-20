@@ -44,7 +44,6 @@
   //let styleString = style.stringify();
 
   afterUpdate(() => {
-    console.log("faded", faded);
     if (!params) return;
     dashInputValue = params[id];
     if (type === "color" && dashInputValue) {

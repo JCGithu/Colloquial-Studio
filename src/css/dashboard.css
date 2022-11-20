@@ -392,6 +392,7 @@ button:active {
   align-items: center;
   justify-content: flex-end;
   flex-direction: column;
+  pointer-events: none;
 }
 
 #toast {
