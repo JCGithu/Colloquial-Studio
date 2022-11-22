@@ -40,10 +40,8 @@ let reformattedValues = ['hidebot', 'hidecom', 'chatcolour', 'chatopacity', 'tog
 export async function paramReformat(params, id){
   if (id && !reformattedValues.includes(id)) return;
 
-  if (id === 'align'){
-    if (params.align === 'left') params.align = 'flex-start';
-    if (params.align === 'right') params.align = 'flex-end';
-  }
+  if (params.align === 'left') params.align = 'flex-start';
+  if (params.align === 'right') params.align = 'flex-end';
 
   Object.keys(params).forEach((p) => {
     if (params[p] === "true" || params[p] === "false") params[p] = (params[p] === 'true');
