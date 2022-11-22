@@ -28,6 +28,15 @@ h2 {
   font-size: large;
 }
 
+.inputSubtitle{
+  color: $white;
+  font-size: 1rem;
+  font-style: italic;
+  line-height: initial;
+  vertical-align: text-bottom;
+  margin: 0.35em 0;
+}
+
 div{
   position: relative;
   display: flex;
@@ -35,14 +44,6 @@ div{
   padding: 0.2rem 0rem;
   align-items: baseline;
   width: calc(100% - 3rem);
-  p {
-    color: $black;
-    font-size: 1rem;
-    font-style: italic;
-    line-height: initial;
-    vertical-align: text-bottom;
-    padding-left: 0.5rem;
-  }
   .colourBlock{
     display: flex;
     position: absolute;
@@ -206,17 +207,11 @@ input[type='range']{
   height: 0.6rem !important;
   transition: opacity .2s;
   padding: 0.2rem !important;
-  margin: 0.5rem 1rem;
+  margin: 1rem 0rem;
   opacity: 1;
+  width: 115%;
   cursor: pointer;
-  background-color: $black !important;
-  &:focus{
-    ::-webkit-slider-thumb {
-      background: $white;
-
-    }
-    background-color:$black !important;
-  }
+  background-color: darken($black,5) !important;
 }
 ::-webkit-slider-runnable-track{
   margin: 0.2rem !important;
@@ -298,12 +293,14 @@ input[type="range"]:focus::-webkit-slider-thumb {
     flex-direction: row;
     background-color: red;
     input[type='range']{
-      margin: 1rem 0rem;
       width: 110%;
     }
   }
   label input:checked ~ span {
     background-color: $black;
+  }
+  div .inputSubtitle{
+    color: $black 
   }
 }
 

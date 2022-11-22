@@ -9,6 +9,15 @@ h2 {
   font-size: large;
 }
 
+.inputSubtitle {
+  color: #EAE5DB;
+  font-size: 1rem;
+  font-style: italic;
+  line-height: initial;
+  vertical-align: text-bottom;
+  margin: 0.35em 0;
+}
+
 div {
   position: relative;
   display: flex;
@@ -16,14 +25,6 @@ div {
   padding: 0.2rem 0rem;
   align-items: baseline;
   width: calc(100% - 3rem);
-}
-div p {
-  color: #282828;
-  font-size: 1rem;
-  font-style: italic;
-  line-height: initial;
-  vertical-align: text-bottom;
-  padding-left: 0.5rem;
 }
 div .colourBlock {
   display: flex;
@@ -186,16 +187,11 @@ input[type=range] {
   height: 0.6rem !important;
   transition: opacity 0.2s;
   padding: 0.2rem !important;
-  margin: 0.5rem 1rem;
+  margin: 1rem 0rem;
   opacity: 1;
+  width: 115%;
   cursor: pointer;
-  background-color: #282828 !important;
-}
-input[type=range]:focus {
-  background-color: #282828 !important;
-}
-input[type=range]:focus ::-webkit-slider-thumb {
-  background: #EAE5DB;
+  background-color: #1b1b1b !important;
 }
 
 ::-webkit-slider-runnable-track {
@@ -278,11 +274,13 @@ input[type=range]:focus ::-webkit-slider-thumb {
   background-color: red;
 }
 .group div input[type=range] {
-  margin: 1rem 0rem;
   width: 110%;
 }
 .group label input:checked ~ span {
   background-color: #282828;
+}
+.group div .inputSubtitle {
+  color: #282828;
 }
 
 .inner {
