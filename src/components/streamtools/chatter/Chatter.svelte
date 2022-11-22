@@ -36,9 +36,9 @@
 
   async function fetchPronoun(username) {
     if (!params.pronouns || !username) return;
-    console.log(`...Looking for ${username} pronouns`);
     let lowerCase = username.toLowerCase();
     if (userPronouns.get(lowerCase)) return;
+    console.log(`...Looking for ${username} pronouns`);
     fetch(`https://pronouns.alejo.io/api/users/${lowerCase}`)
       .then((res) => res.json())
       .then((proData) => {
@@ -46,6 +46,7 @@
           userPronouns.set(lowerCase, "");
           return;
         }
+        console.log(`${lowerCase} has been set ${proData[0].pronoun_id} pronouns`);
         userPronouns.set(lowerCase, pronouns[proData[0].pronoun_id]);
         return;
       });
@@ -67,6 +68,7 @@
 
   function runMessage(channel, tags, message, self, type) {
     if (self) return;
+    if (message === null) message = "";
     if (typeof params.hidebot === "object") {
       if (params.hidebot.includes(tags.username)) return;
     }
@@ -74,6 +76,7 @@
       let comCheck = message.split(" ")[0];
       if (params.hidecom.includes(comCheck)) return;
     }
+    if (params.replies && tags["reply-parent-display-name"]) return;
     if (firstMessage && !tags.testing) {
       fetch(`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`)
         .then((response) => response.json())
@@ -104,6 +107,7 @@
     message = formatEmotes(message, tags.emotes, bttvEmoteCache, tags.bits, params);
 
     fetchPronoun(tags.username);
+    userPronouns = userPronouns;
     let newChat = {
       message: message,
       user: tags.username,
@@ -113,7 +117,9 @@
     };
     if (!params.togglecol) newChat.color = params.highcolour;
     console.log(newChat, newChat.tags);
-    if ((type = "sub")) {
+    if (type === "sub") {
+      console.log("NEW SUB");
+      console.log(newChat);
       newChat.tags.id = messageIndex.toString();
     } else {
       newChat.tags.id = message[0] + messageIndex.toString();
@@ -153,9 +159,11 @@
     client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, self, "chat"));
     client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, self, "action"));
     client.on("cheer", (channel, tags, message, self) => runMessage(channel, tags, message, self, "cheer"));
-    client.on("subscription", (channel, tags, method, message, userstate) => runMessage(channel, tags, message, "sub"));
-    client.on("resub", (channel, tags, months, message) => runMessage(channel, tags, message, false, "sub"));
-    client.on("subanniversary", (channel, tags, months, message) => runMessage(channel, tags, message, false, "sub"));
+    client.on("subscription", (channel, username, method, message, tags) => {
+      console.log(channel, username, method, message, tags);
+      runMessage(channel, tags, message, "sub");
+    });
+    client.on("resub", (channel, username, months, message, tags, methods) => runMessage(channel, tags, message, false, "sub"));
     client.on("announcement", (channel, tags, message) => runMessage(channel, tags, message, false, "announcement"));
     client.on("clearchat", () => (messageList = []));
     client.on("timeout", (channel, block) => removeUser(block));

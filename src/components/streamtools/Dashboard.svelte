@@ -7,9 +7,6 @@
   let toastArray = [];
 
   import { fly, fade } from "svelte/transition";
-  import { flip } from "svelte/animate";
-  import { quintOut } from "svelte/easing";
-
   import { createEventDispatcher, onMount } from "svelte";
   const dispatch = createEventDispatcher();
 
@@ -56,7 +53,6 @@
     ToastQueue("Loaded from Save " + (num + 1));
   }
   onMount(async () => {
-    console.log("wahoo", saves);
     setTimeout(() => {
       saveArray = Object.keys(saves);
     }, 1000);

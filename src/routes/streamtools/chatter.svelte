@@ -8,7 +8,6 @@
 
   import { paramReformat, defaultParams } from "../../components/streamtools/chatter/paramsChatter";
   import * as paramFunctions from "../../components/streamtools/params";
-  import { bubble, toggle_class } from "svelte/internal";
 
   //VARIABLES
   let [params, updateSettings] = Array(2).fill(new Object());
@@ -35,7 +34,7 @@
   }
 
   async function loadURL({ detail }) {
-    params = await paramFunctions.load(detail, paramReformat, false);
+    params = await paramFunctions.load(detail, paramReformat, defaultParams, false);
     urlFill = paramFunctions.urlBuild(params, baseURL);
     updateSettings = params;
   }
@@ -184,6 +183,7 @@
       </DashGroup>
       <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
       {#if updateSettings.pronouns}
         <DashGroup title="Pronouns">

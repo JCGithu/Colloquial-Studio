@@ -30,6 +30,7 @@ export const defaultParams = {
   proUseCol: "true",
   proColour: "#f7f7ff",
   proBG: "false",
+  replies: "false",
   version: 2,
 };
 

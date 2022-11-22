@@ -20,17 +20,24 @@ export function save(params, app, slot) {
   window.localStorage.setItem(app, JSON.stringify(params['saves']));
 }
 
-export async function load(input, paramReformat, pastSave){
+export async function load(input, paramReformat, defaultParams, pastSave){
   let parsedData;
   if (typeof input === 'string'){
     let splitInput = input.split("?data=");
     parsedData = uncrush(splitInput[1]);
+    let allDefaults = Object.keys(defaultParams);
+    if (!parsedData.version || parsedData.version === 1){
+      if (parsedData.fontsize) parsedData.fontsize = parsedData.fontsize * 8;
+    }
+    allDefaults.forEach((def)=>{
+      if(!parsedData[def]){
+        parsedData[def] = defaultParams[def];
+      }
+    });
   } else {
     parsedData = Object.assign({}, input);
   }
-  console.log('loading!', parsedData);
   parsedData.saves = pastSave;
-  console.log('loading! 222', parsedData);
   return await paramReformat(parsedData);
 }
 

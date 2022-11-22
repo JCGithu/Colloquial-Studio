@@ -63,9 +63,9 @@
 
 <div style="{grouped ? 'width:100%;' : ''} flex-direction: {direction}; opacity:{faded ? 0.5 : 1};">
   {#if titleBlock}
-    <h2>{name}</h2>
+    <h2 class="inputName">{name}</h2>
     {#if subtitle}
-      <p>{subtitle}</p>
+      <p class="inputSubtitle">{subtitle}</p>
     {/if}
   {/if}
   {#if type === "select"}
