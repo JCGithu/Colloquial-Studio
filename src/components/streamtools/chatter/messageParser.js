@@ -33,14 +33,12 @@ function checkBits(splitText){
     let num = parseInt(chunk.match(/\d+/g)[0]);
     console.log(title,num);
     cheerTiers.forEach(rank => {
-      console.log(rank);
       if (num < rank) return;
       splitText[index] = {
         code: `https://d3aqoihi2n8ty8.cloudfront.net/actions/${title}/dark/animated/${rank}/2.gif`,
         num: num,
         text: chunk
       }
-      console.log(splitText[index]);
     })
   })
   return splitText;
