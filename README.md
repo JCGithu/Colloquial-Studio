@@ -7,6 +7,7 @@ A work in progress.
 -- Sub messages have errors with the ID
 -- Fine tune the sliders for range inputs
 -- Preload pronouns?
+-- Background opacity does not auto update after loading from a URL
 
 ### To Do
 
