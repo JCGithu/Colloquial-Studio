@@ -146,7 +146,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type}" style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolourCalc}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
+<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolourCalc}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
