@@ -8,6 +8,7 @@ A work in progress.
 -- Fine tune the styles for range input sliders
 -- Preload pronouns?
 -- Background opacity does not auto update after loading from a URL
+-- 'Save Data found' triggers when there is no save data
 
 ### To Do
 
