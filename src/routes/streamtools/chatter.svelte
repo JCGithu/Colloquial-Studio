@@ -107,6 +107,7 @@
       {/key}
     </slot>
     <slot id="dashControls" slot="settings">
+      <h1>Chatter</h1>
       <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
       <button class="testButton" on:click={paramReload}>Reload</button>
       <DashInput
