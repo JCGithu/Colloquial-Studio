@@ -89,7 +89,7 @@ section{
 } 
 
 .emote{
-  height: 1.1rem;
+  height: 1.1em;
   padding-bottom: 0.2rem;
   vertical-align: middle;
 }
@@ -102,7 +102,7 @@ section{
 
 .twitchBadge {
   padding: 0.1rem;
-  height: 1.1rem;
+  height: 1.1em;
   vertical-align: middle;
   padding-bottom: 0.2rem;
 }
@@ -111,7 +111,7 @@ section{
   --proColour: #ffffff;
   border-radius: 0.5rem;
   padding: 0 0.3rem;
-  font-size: 0.8rem;
+  //font-size: 0.8rem;
   border-style: solid;
   display: inline !important;
   width: fit-content;
