@@ -5,7 +5,7 @@
   import "../../css/default.scss";
   import { onMount } from "svelte";
 
-  import { paramReformat, defaultParams } from "../../components/streamtools/emotedrop/paramsEmotedrop";
+  import { paramReformat, defaultParams } from "../../components/streamtools/emotedrop/paramsEmoteDrop";
   import * as paramFunctions from "../../components/streamtools/params";
   import EmoteDrop from "../../components/streamtools/emotedrop/EmoteDrop.svelte";
 
