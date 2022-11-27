@@ -20,20 +20,24 @@ export function save(params, app, slot) {
   window.localStorage.setItem(app, JSON.stringify(params['saves']));
 }
 
+export function updateV1URLs(input, defaultParams){
+  if (!input.version || input.version === 1){
+    if (input.fontsize) input.fontsize = input.fontsize * 8;
+  }
+  Object.keys(defaultParams).forEach((def)=>{
+    if(!input[def]){
+      input[def] = defaultParams[def];
+    }
+  });
+  return input;
+}
+
 export async function load(input, paramReformat, defaultParams, pastSave){
   let parsedData;
   if (typeof input === 'string'){
     let splitInput = input.split("?data=");
-    parsedData = uncrush(splitInput[1]);
-    let allDefaults = Object.keys(defaultParams);
-    if (!parsedData.version || parsedData.version === 1){
-      if (parsedData.fontsize) parsedData.fontsize = parsedData.fontsize * 8;
-    }
-    allDefaults.forEach((def)=>{
-      if(!parsedData[def]){
-        parsedData[def] = defaultParams[def];
-      }
-    });
+    //parsedData = uncrush(splitInput[1]);
+    parsedData = updateV1URLs(uncrush(splitInput[1]), defaultParams);
   } else {
     parsedData = Object.assign({}, input);
   }
@@ -45,8 +49,8 @@ export async function check(defaultParams, paramReformat, runApp, app, urlParams
   let initParams;
   if (runApp) {
     initParams = paramFunctions.uncrush(urlParams.get("data"));
-    console.log(initParams);
-    return await paramReformat(initParams);
+    let updatedData = updateV1URLs(initParams, defaultParams);
+    return await paramReformat(updatedData);
   }
   let storage = window.localStorage.getItem(app);
   if (storage === null) {
