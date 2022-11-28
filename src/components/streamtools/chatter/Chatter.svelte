@@ -181,7 +181,7 @@
     {#each messageList as message (message.tags.id)}
       <ChatBubble {params} {message} {badgeData} {userPronouns} />
     {/each}
-    <div style:--bgOpacity={params.bgopacity / 10} style:--bgColour={params.bgcolour} id="chatBackground" />
+    <div style="--bgOpacity:{params.bgopacity / 10}; --bgColour:{params.bgcolour}" id="chatBackground" />
   </div>
 </section>
 

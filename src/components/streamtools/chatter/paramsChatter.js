@@ -35,13 +35,16 @@ export const defaultParams = {
 };
 
 let arrays = ['hidebot', 'hidecom'];
-let reformattedValues = ['hidebot', 'hidecom', 'chatcolour', 'chatopacity', 'togglecol', 'badges', 'bttv', 'pronouns', 'emoteonly', 'align'];
+let reformattedValues = ['hidebot', 'hidecom', 'chatcolour', 'chatopacity', 'bgopacity', 'bgcolour', 'togglecol', 'badges', 'bttv', 'pronouns', 'emoteonly', 'align'];
 
 export async function paramReformat(params, id){
   if (id && !reformattedValues.includes(id)) return;
 
   if (params.align === 'left') params.align = 'flex-start';
   if (params.align === 'right') params.align = 'flex-end';
+
+  params.bgopacity = parseInt(params.bgopacity);
+  if (params.bgcolour.indexOf('#') < 0) params.bgcolour = '#' + params.bgcolour;
 
   Object.keys(params).forEach((p) => {
     if (params[p] === "true" || params[p] === "false") params[p] = (params[p] === 'true');
@@ -52,7 +55,7 @@ export async function paramReformat(params, id){
     params[v] = params[v].trim().split(',');
   })
   //CHAT COLOUR
-  if (params.chatcolour.indexOf('#') <= 0){
+  if (params.chatcolour.indexOf('#') < 0){
     params.chatcolourCalc = `rgba(${parseInt(params.chatcolour.slice(-6, -4), 16)},${parseInt(params.chatcolour.slice(-4, -2), 16)},${parseInt(params.chatcolour.slice(-2), 16)},${params.chatopacity / 100})`;
   }
   console.log('Params Reformatted', params);
