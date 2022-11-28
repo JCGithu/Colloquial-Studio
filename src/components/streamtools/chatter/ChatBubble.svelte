@@ -118,10 +118,15 @@
     if (!params.animEase) params.animEase = "ease-in-out";
     params.animation = params.animation.replace(" ", "");
     if (params.animation === "SlideIn") params.animation = "SlideInLeft";
+
+    let userCol = params.chatcolourCalc;
+    if (params.bubbleCustom) {
+      userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)},${parseInt(message.color.slice(-4, -2), 16)},${parseInt(message.color.slice(-2), 16)},${params.chatopacity / 100})`;
+    }
+
     bubble.style.setProperty("--animTime", `${params.animTime}s`);
     bubble.style.setProperty("--animEase", params.animEase);
-    bubble.style.setProperty("--userCol", message.color);
-    bubble.style.setProperty("--bubbleCol", params.chatcolourCalc);
+    bubble.style.setProperty("--userCol", userCol);
 
     if (params.animation === "PopIn") PopIn(bubble, size);
     if (params.animation === "SlideInLeft") SlideInLeft(bubble, size);
@@ -146,7 +151,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: {params.bubbleCustom ? message.tags.color : params.chatcolourCalc}; border-radius: {params.border / 10}rem;" bind:this={bubble}>
+<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: var(--userCol); border-radius: {params.border / 10}rem;" bind:this={bubble}>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
