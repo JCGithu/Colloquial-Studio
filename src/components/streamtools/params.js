@@ -60,7 +60,7 @@ export async function check(defaultParams, paramReformat, runApp, app, urlParams
     window.localStorage.setItem(app, JSON.stringify(defaultSettings));
   } else {
     let parsedData = JSON.parse(storage);
-    toastUpdate('Save Data Found!')
+    if (Object.keys(parsedData[0]).length) toastUpdate('Save Data Found!')
     initParams = Object.assign({}, defaultParams);
     initParams['saves'] = parsedData;
   }
