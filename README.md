@@ -11,6 +11,7 @@ A work in progress.
 
 ### To Do
 
+- Info screen (when you click on the name and on inital load)
 - Send dashboard to Fox + UI people
 
 ### To Test
