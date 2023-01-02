@@ -76,6 +76,9 @@
       let comCheck = message.split(" ")[0];
       if (params.hidecom.includes(comCheck)) return;
     }
+    if (params.links) {
+      if (message.includes("http://") || message.includes("https://")) return;
+    }
     if (params.replies && tags["reply-parent-display-name"]) return;
     if (firstMessage && !tags.testing) {
       fetch(`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`)
@@ -133,6 +136,12 @@
       messageList.unshift(newChat);
       if (messageList.length > 50) messageList.pop();
     }
+    if (params.removeChats) {
+      setTimeout(() => {
+        messageList.shift();
+        messageList = messageList;
+      }, params.removeTime * 1000);
+    }
     messageList = messageList;
   }
 
@@ -186,5 +195,5 @@
 </section>
 
 <style lang="scss">
-  @import "../../../css/chatter.scss";
+  @import "./chatter.scss";
 </style>

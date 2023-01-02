@@ -31,6 +31,9 @@ export const defaultParams = {
   proColour: "#f7f7ff",
   proBG: "false",
   replies: "false",
+  links: "false",
+  removeChats: 'false',
+  removeTime: 60,
   version: 2,
 };
 
@@ -43,7 +46,11 @@ export async function paramReformat(params, id){
   if (params.align === 'left') params.align = 'flex-start';
   if (params.align === 'right') params.align = 'flex-end';
 
-  params.bgopacity = parseInt(params.bgopacity);
+  if (params.bgopacity === '0') {
+    params.bgopacity = 0;
+  } else {
+    params.bgopacity = parseInt(params.bgopacity);
+  }
   if (params.bgcolour.indexOf('#') < 0) params.bgcolour = '#' + params.bgcolour;
 
   Object.keys(params).forEach((p) => {

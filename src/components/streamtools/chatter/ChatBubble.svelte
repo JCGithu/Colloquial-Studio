@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
   export let params, message, badgeData, userPronouns;
   let bubble, animHeight, size, pronoun;
   let badges = [];
@@ -151,7 +152,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: var(--userCol); border-radius: {params.border / 10}rem;" bind:this={bubble}>
+<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: var(--userCol); border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
@@ -179,5 +180,5 @@
 </div>
 
 <style lang="scss">
-  @import "../../../css/chatter.scss";
+  @import "./chatter.scss";
 </style>

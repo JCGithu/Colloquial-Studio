@@ -34,5 +34,5 @@
 </section>
 
 <style lang="scss">
-  @import "../../../css/emotedrop.scss";
+  @import "./emotedrop.scss";
 </style>

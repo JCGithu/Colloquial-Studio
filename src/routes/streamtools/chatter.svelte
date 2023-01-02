@@ -185,6 +185,11 @@
       <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
+      {#if updateSettings.removeChats}
+        <DashInput {params} type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" on:valueChange={valueChanger} />
+      {/if}
       <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
       {#if updateSettings.pronouns}
         <DashGroup title="Pronouns">

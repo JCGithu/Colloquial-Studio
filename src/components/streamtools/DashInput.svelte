@@ -98,5 +98,5 @@
   .invert {
     color: black;
   }
-  @import "../../css/dashinput.scss";
+  @import "./dashinput.scss";
 </style>

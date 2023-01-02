@@ -25,8 +25,9 @@ export function updateV1URLs(input, defaultParams){
     if (input.fontsize) input.fontsize = input.fontsize * 8;
   }
   Object.keys(defaultParams).forEach((def)=>{
-    if(!input[def]){
+    if(input[def] === null || input[def] === undefined){
       input[def] = defaultParams[def];
+      console.log(def + ' was changed to ' + defaultParams[def]);
     }
   });
   return input;
@@ -36,8 +37,8 @@ export async function load(input, paramReformat, defaultParams, pastSave){
   let parsedData;
   if (typeof input === 'string'){
     let splitInput = input.split("?data=");
-    //parsedData = uncrush(splitInput[1]);
-    parsedData = updateV1URLs(uncrush(splitInput[1]), defaultParams);
+    let uncrushedData = uncrush(splitInput[1]);
+    parsedData = updateV1URLs(uncrushedData, defaultParams);
   } else {
     parsedData = Object.assign({}, input);
   }
