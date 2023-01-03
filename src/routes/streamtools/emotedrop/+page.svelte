@@ -1,13 +1,13 @@
 <script>
-  import Dashboard from "../../components/streamtools/Dashboard.svelte";
-  import DashInput from "../../components/streamtools/DashInput.svelte";
-  import DashGroup from "../../components/streamtools/DashGroup.svelte";
-  import "../../css/default.scss";
+  import Dashboard from "../../../components/streamtools/Dashboard.svelte";
+  import DashInput from "../../../components/streamtools/DashInput.svelte";
+  import DashGroup from "../../../components/streamtools/DashGroup.svelte";
+  import "../../../css/default.scss";
   import { onMount } from "svelte";
 
-  import { paramReformat, defaultParams } from "../../components/streamtools/emotedrop/paramsEmoteDrop";
-  import * as paramFunctions from "../../components/streamtools/params";
-  import EmoteDrop from "../../components/streamtools/emotedrop/EmoteDrop.svelte";
+  import { paramReformat, defaultParams } from "../../../components/streamtools/emotedrop/paramsEmoteDrop";
+  import * as paramFunctions from "../../../components/streamtools/params";
+  import EmoteDrop from "../../../components/streamtools/emotedrop/EmoteDrop.svelte";
 
   //VARIABLES
   let [params, updateSettings] = Array(2).fill(new Object());

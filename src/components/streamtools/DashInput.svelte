@@ -1,24 +1,28 @@
-<script>
-  export let name = null,
-    subtitle = null,
-    id = null,
-    type = null,
-    min = null,
-    max = null,
-    ops = null,
-    value = null,
-    grouped = null,
-    faded = false;
-  export let params;
+<script lang="ts">
+  export let name: string | null = null;
+  export let subtitle: string | null = null;
+  export let id = "";
+  export let type = "";
+  export let min: number | null = null;
+  export let max: number | null = null;
+  interface Option {
+    value: string;
+    name: string;
+  }
+  export let ops: Array<Option> = [];
+  export let value: any = null;
+  export let grouped = false;
+  export let faded = false;
+  export let params: object;
   import { hexToHSL } from "../../js/hexToHSL";
 
   import { createEventDispatcher, afterUpdate } from "svelte";
   const dispatch = createEventDispatcher();
 
-  let style = {};
+  let style: { opacity: number } = { opacity: 1 };
   let invert = false;
   let titleBlock = true;
-  let dashInputValue = "";
+  let dashInputValue: any = "";
 
   let valueUpdate = (e) => {
     value = e.target.value;

@@ -1,20 +1,28 @@
-<script>
+<script lang="ts">
   import "../css/default.scss";
   import { slide } from "svelte/transition";
 
-  let structure = {
-    games: {
+  interface Folder {
+    title: String;
+    sub: String;
+    list: Array<String>;
+    on: Boolean;
+  }
+
+  let structure: Array<Folder> = [
+    {
+      title: "Games",
+      sub: "games",
       list: ["twordle"],
       on: false,
     },
-    streamtools: {
+    {
+      title: "Stream Tools",
+      sub: "streamtools",
       list: ["chatter", "emotedrop"],
       on: false,
     },
-  };
-  let folders = Object.keys(structure);
-
-  let test = true;
+  ];
 </script>
 
 <svelte:head>
@@ -23,21 +31,21 @@
 
 <div>
   <h1>Colloquial Studios</h1>
-  {#each folders as folder, i}
+  {#each structure as folder, i}
     <h2
       class="category"
       on:click={() => {
-        structure[folder].on = !structure[folder].on;
+        folder.on = !folder.on;
       }}
     >
-      {folder.replace("_", " ")}
+      {folder.title}
     </h2>
-    {#if structure[folder].on}
+    {#if folder.on}
       <ul transition:slide|local>
-        {#each structure[folder].list as page}
+        {#each folder.list as page}
           <li>
-            <a href={`/${folder}/${page}`}>
-              {page.replace("_", " ")}
+            <a href={`/${folder.sub}/${page}`}>
+              {page}
             </a>
           </li>
         {/each}

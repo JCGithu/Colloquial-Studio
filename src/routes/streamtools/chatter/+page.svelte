@@ -1,19 +1,19 @@
-<script>
-  import Dashboard from "../../components/streamtools/Dashboard.svelte";
-  import DashInput from "../../components/streamtools/DashInput.svelte";
-  import DashGroup from "../../components/streamtools/DashGroup.svelte";
-  import Chatter from "../../components/streamtools/chatter/Chatter.svelte";
-  import "../../css/default.scss";
+<script lang="ts">
+  import Dashboard from "../../../components/streamtools/Dashboard.svelte";
+  import DashInput from "../../../components/streamtools/DashInput.svelte";
+  import DashGroup from "../../../components/streamtools/DashGroup.svelte";
+  import Chatter from "../../../components/streamtools/chatter/Chatter.svelte";
+  import "../../../css/default.scss";
   import { onMount } from "svelte";
 
-  import { paramReformat, defaultParams } from "../../components/streamtools/chatter/paramsChatter";
-  import * as paramFunctions from "../../components/streamtools/params";
+  import { paramReformat, defaultParams } from "../../../components/streamtools/chatter/paramsChatter";
+  import * as paramFunctions from "../../../components/streamtools/params";
 
   //VARIABLES
   let [params, updateSettings] = Array(2).fill(new Object());
   let urlFill, baseURL;
   let runApp = false;
-  let grouped = true;
+  let grouped: boolean = true;
   let targetUser;
   let toastUpdate;
 
@@ -206,5 +206,5 @@
 {/if}
 
 <style lang="scss">
-  @import "../../css/dashboard.scss";
+  @import "../../../css/dashboard.scss";
 </style>
