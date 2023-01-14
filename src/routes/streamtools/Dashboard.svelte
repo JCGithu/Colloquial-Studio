@@ -59,6 +59,14 @@
   });
 </script>
 
+<svelte:head>
+  <style>
+    body {
+      overflow: hidden;
+    }
+  </style>
+</svelte:head>
+
 {#if showInfo}
   <div id="introMenu" class="infoScreen">
     <div class="infoBox">
