@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { createEventDispatcher, afterUpdate, getContext } from "svelte";
+  import { hexToHSL } from "../../js/hexToHSL";
+
   export let name: string | null = null;
   export let subtitle: string | null = null;
   export let id = "";
@@ -11,14 +14,11 @@
   }
   export let ops: Array<Option> = [];
   export let value: any = null;
-  export let grouped = false;
   export let faded = false;
   export let params: object;
-  import { hexToHSL } from "../../js/hexToHSL";
-
-  import { createEventDispatcher, afterUpdate } from "svelte";
   const dispatch = createEventDispatcher();
 
+  let grouped = getContext("grouped");
   let style: { opacity: number } = { opacity: 1 };
   let invert = false;
   let titleBlock = true;
