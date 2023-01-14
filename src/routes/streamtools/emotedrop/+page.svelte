@@ -1,7 +1,7 @@
 <script>
-  import Dashboard from "../../../components/streamtools/Dashboard.svelte";
-  import DashInput from "../../../components/streamtools/DashInput.svelte";
-  import DashGroup from "../../../components/streamtools/DashGroup.svelte";
+  import Dashboard from "../Dashboard.svelte";
+  import DashInput from "../DashInput.svelte";
+  import DashGroup from "../DashGroup.svelte";
   import "../../../css/default.scss";
   import { onMount } from "svelte";
 

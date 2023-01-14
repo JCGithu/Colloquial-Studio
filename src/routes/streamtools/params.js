@@ -1,5 +1,4 @@
 import JSONCrush from "jsoncrush";
-import * as paramFunctions from "../../components/streamtools/params";
 
 export function urlBuild(params, baseURL) {
   let toCrush = Object.assign({}, params);
@@ -49,7 +48,7 @@ export async function load(input, paramReformat, defaultParams, pastSave){
 export async function check(defaultParams, paramReformat, runApp, app, urlParams, toastUpdate){
   let initParams;
   if (runApp) {
-    initParams = paramFunctions.uncrush(urlParams.get("data"));
+    initParams = uncrush(urlParams.get("data"));
     let updatedData = updateV1URLs(initParams, defaultParams);
     return await paramReformat(updatedData);
   }

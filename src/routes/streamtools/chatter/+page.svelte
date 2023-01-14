@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Dashboard from "../../../components/streamtools/Dashboard.svelte";
-  import DashInput from "../../../components/streamtools/DashInput.svelte";
-  import DashGroup from "../../../components/streamtools/DashGroup.svelte";
-  import Chatter from "../../../components/streamtools/chatter/Chatter.svelte";
+  import Dashboard from "../Dashboard.svelte";
+  import DashInput from "../DashInput.svelte";
+  import DashGroup from "../DashGroup.svelte";
+  import Chatter from "./Chatter.svelte";
   import "../../../css/default.scss";
   import { onMount } from "svelte";
 
-  import { paramReformat, defaultParams } from "../../../components/streamtools/chatter/paramsChatter";
-  import * as paramFunctions from "../../../components/streamtools/params";
+  import { paramReformat, defaultParams } from "./paramsChatter";
+  import * as paramFunctions from "../params";
 
   //VARIABLES
   let [params, updateSettings] = Array(2).fill(new Object());
