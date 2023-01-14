@@ -37,7 +37,7 @@
 
   //if (grouped) style.width = "100%";
   let direction = "column";
-  if (type === "select" && subtitle) direction = "row";
+  if (type === "select" && !subtitle) direction = "row";
   if (type === "color" && !value) value = "#ffffff";
   if (type === "checkbox") titleBlock = false;
   if (faded) style.opacity = 0.5;
