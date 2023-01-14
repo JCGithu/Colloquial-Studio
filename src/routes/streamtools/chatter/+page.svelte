@@ -13,7 +13,6 @@
   let [params, updateSettings] = Array(2).fill(new Object());
   let urlFill, baseURL;
   let runApp = false;
-  let grouped: boolean = true;
   let targetUser;
   let toastUpdate;
 
