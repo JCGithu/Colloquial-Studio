@@ -4,12 +4,15 @@
   import DashGroup from "../DashGroup.svelte";
   import Chatter from "./Chatter.svelte";
   import "../../../css/default.scss";
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
 
   import { paramReformat, defaultParams } from "./paramsChatter";
   import * as paramFunctions from "../params";
 
   //VARIABLES
+  let appName = "chatter";
+  setContext("appName", appName);
+
   let [params, updateSettings] = Array(2).fill(new Object());
   let urlFill, baseURL;
   let runApp = false;
@@ -79,14 +82,6 @@
     updateSettings = params;
   });
 </script>
-
-<svelte:head>
-  <style>
-    body {
-      overflow: hidden;
-    }
-  </style>
-</svelte:head>
 
 {#if runApp}
   {#key targetUser}
@@ -186,7 +181,9 @@
       <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
       {#if updateSettings.removeChats}
-        <DashInput {params} type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" on:valueChange={valueChanger} />
+        <DashGroup title="Remove Chats">
+          <DashInput {params} type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" on:valueChange={valueChanger} />
+        </DashGroup>
       {/if}
       <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
       {#if updateSettings.pronouns}
