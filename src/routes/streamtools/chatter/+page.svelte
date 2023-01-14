@@ -136,30 +136,29 @@
       <DashGroup title="Font Settings">
         <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
         <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} type="checkbox" name="Use Twitch Username Colours" id="nameCustom" on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} faded={params.nameCustom} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Use Twitch Username Colours" id="nameCustom" on:valueChange={valueChanger} />
+        <DashInput {params} faded={params.nameCustom} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
       </DashGroup>
       <DashGroup title="Chat Bubble">
         <DashInput {params} type="range" name="Opacity" max="100" min="0" id="chatopacity" on:valueChange={valueChanger} />
         <DashInput {params} type="range" name="Roundness" max="10" min="0" id="border" on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
-        <DashInput {params} {grouped} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
+        <DashInput {params} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
       </DashGroup>
       {#if updateSettings.highlight}
         <DashGroup title="Bubble Drop Shadow">
-          <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" on:valueChange={valueChanger} />
-          <DashInput {params} {grouped} type="color" name="Default colour" id="highcolour" faded={params.togglecol} on:valueChange={valueChanger} />
+          <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" on:valueChange={valueChanger} />
+          <DashInput {params} type="color" name="Default colour" id="highcolour" faded={params.togglecol} on:valueChange={valueChanger} />
         </DashGroup>
       {/if}
       <DashGroup title="Background">
-        <DashInput {params} {grouped} type="color" name="Background Colour" id="bgcolour" on:valueChange={valueChanger} />
+        <DashInput {params} type="color" name="Background Colour" id="bgcolour" on:valueChange={valueChanger} />
         <DashInput {params} type="range" name="Opacity" max="10" min="0" id="bgopacity" on:valueChange={valueChanger} />
       </DashGroup>
       <DashGroup title="Animation">
         <DashInput
           {params}
-          {grouped}
           type="select"
           name="Animation"
           id="animation"
@@ -179,7 +178,7 @@
         <DashInput {params} type="text" name="Hide these commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" on:valueChange={valueChanger} />
       </DashGroup>
       <DashGroup title="Advanced">
-        <DashInput {grouped} {params} type="checkbox" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
         <!--         <DashInput {params} type="text" name="Custom CSS" subtitle="Tutorial coming soon" id="customCSS" on:valueChange={valueChanger} /> -->
       </DashGroup>
       <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
@@ -195,9 +194,9 @@
         <DashGroup title="Pronouns">
           <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" on:valueChange={valueChanger} />
           <DashInput {params} type="checkbox" name="Outline" id="proOutline" on:valueChange={valueChanger} />
-          <DashInput {params} {grouped} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
+          <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
           <DashInput {params} type="checkbox" name="Background" id="proBG" on:valueChange={valueChanger} />
-          <DashInput {params} {grouped} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
+          <DashInput {params} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
         </DashGroup>
       {/if}
       <button class="testButton" on:click={paramReset}>Reset to Default</button>
