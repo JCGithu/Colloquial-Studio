@@ -195,5 +195,24 @@
 </section>
 
 <style lang="scss">
-  @import "./chatter.scss";
+  #chatBoundary {
+    position: relative;
+    --flex: column;
+    --align: flex-start;
+    display: flex;
+    width: calc(100% - 1rem);
+    height: calc(100% - 2rem);
+    padding: 1rem;
+    flex-direction: var(--flex);
+    overflow: hidden;
+    align-items: var(--align);
+    justify-content: end;
+  }
+
+  section {
+    min-width: 100%;
+    min-height: 100%;
+    //background-color: #262d36;
+    border-radius: 1rem;
+  }
 </style>
