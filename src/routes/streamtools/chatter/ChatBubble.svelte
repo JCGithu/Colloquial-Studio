@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  export let params, message, badgeData, userPronouns;
-  let bubble, animHeight, size, pronoun;
-  let badges = [];
+  export let params, message: Message, badgeData: BadgeData;
+  let bubble: HTMLElement;
+  let badges: Array<string> = [];
   let bigEmote = true;
 
   //PARSING
@@ -121,13 +121,12 @@
     if (params.animation === "SlideIn") params.animation = "SlideInLeft";
 
     let userCol = params.chatcolourCalc;
-    if (params.bubbleCustom) {
-      userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)},${parseInt(message.color.slice(-4, -2), 16)},${parseInt(message.color.slice(-2), 16)},${params.chatopacity / 100})`;
-    }
+    let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
 
     bubble.style.setProperty("--animTime", `${params.animTime}s`);
     bubble.style.setProperty("--animEase", params.animEase);
-    bubble.style.setProperty("--userCol", userCol);
+    bubble.style.setProperty("--userCol", params.bubbleCustom ? userCol : params.chatcolourCalc);
+    bubble.style.setProperty("--shadowCol", params.togglecol ? userColAlpha : params.highcolour);
 
     if (params.animation === "PopIn") PopIn(bubble, size);
     if (params.animation === "SlideInLeft") SlideInLeft(bubble, size);
@@ -135,11 +134,6 @@
     if (params.animation === "FadeIn") FadeIn(bubble);
     if (params.animation === "Grow") Grow(bubble, size);
 
-    if (params.pronouns && message.user) {
-      let LC = message.user.toLowerCase();
-      pronoun = userPronouns.get(LC);
-      if (pronoun === "" || !pronoun) pronoun = false;
-    }
     console.log(params, message);
 
     if (params.emoteOnly) {
@@ -152,7 +146,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.bits ? 'bitMessage' : ''} " style="font-family: {params.font}; background-color: var(--userCol); border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {message.type}" class:bitMessage={message.tags.bits} style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
@@ -160,18 +154,18 @@
           <img src={badge} alt="badge" class="twitchBadge" />
         {/each}
       {/if}
-      {#if params.pronouns && pronoun}
-        <span class="pronoun" style="font-family:{params.proFont}; --proColour:{params.proUseCol ? message.tags.color : params.proColour}; border-width: {params.proOutline ? '2px' : '0px'}; background-color: {params.proBG ? 'var(--proColour)' : ''}; color: {params.proBG ? params.proColour : 'var(--proColour)'}">{pronoun}</span>
+      {#if params.pronouns && message.pronoun}
+        <span class="pronoun" style="font-family:{params.proFont}; --proColour:{params.proUseCol ? message.tags.color : params.proColour}; border-width: {params.proOutline ? '2px' : '0px'}; background-color: {params.proBG ? 'var(--proColour)' : ''}; color: {params.proBG ? params.proColour : 'var(--proColour)'}">{message.pronoun}</span>
       {/if}
       <b class="chatName" style="color: {params.nameCustom ? message.tags.color : 'inherit'}">{message.tags["display-name"]}{": "}</b>
       {#each message.message as word}
-        {#if typeof word == "string"}
-          {word}{" "}
-        {:else if word.num}
+        {#if word.code}
           <img src={word.code} alt={word.text} class={bigEmote ? "bigEmote" : "emote"} />
-          <i>{" "}{word.num}{" "}</i>
+          {#if word.num}
+            <i>{" "}{word.num}{" "}</i>
+          {/if}
         {:else}
-          <img src={word.code} alt={word.text} class={bigEmote ? "bigEmote" : "emote"} />
+          {word.text}{" "}
         {/if}
       {/each}
     </span>
@@ -203,7 +197,7 @@
   font-weight: normal;
   opacity: 0;
   overflow-wrap: break-word;
-  background-color: var(--bubbleCol);
+  background-color: var(--userCol);
   color: var(--userCol);
   z-index: 1;
   padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
@@ -230,21 +224,6 @@
     margin-left: -0.2rem;
   }
 }
-
-#chatBackground{
-  --bgOpacity: 0;
-  --bgColour: #262d36;
-  
-  background-color: var(--bgColour);
-  opacity: var(--bgOpacity);
-  position: absolute;
-  border-radius: 1rem;
-  left: 0;
-  top: 0;
-  min-width: calc(100% - 1rem);
-  min-height: 100%;
-  z-index: 0;
-} 
 
 .emote{
   height: 1.1em;

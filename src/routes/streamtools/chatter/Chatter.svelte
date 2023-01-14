@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import "../../../js/tmi";
   import { onMount, afterUpdate } from "svelte";
   import ChatBubble from "./ChatBubble.svelte";
@@ -7,14 +7,14 @@
   export let runApp = false;
   let messageIndex = 0;
 
-  let viewport, viewportHeight, bttvEmoteCache;
+  let viewport, viewportHeight, bttvEmoteCache: Array<bttvEmoteIndividual>;
 
   import { formatEmotes } from "./messageParser";
   import { badge_sets } from "./badges.json";
 
-  let userPronouns = new Map();
-  let messageList = [];
-  const pronouns = {
+  let userPronouns = new Map<string, string>();
+  let messageList: Array<Message> = [];
+  const pronouns: { [key: string]: string } = {
     aeaer: "Ae/Aer",
     any: "Any",
     eem: "E/Em",
@@ -34,20 +34,21 @@
   };
   let firstMessage = true;
 
-  async function fetchPronoun(username) {
-    if (!params.pronouns || !username) return;
-    let lowerCase = username.toLowerCase();
-    if (userPronouns.get(lowerCase)) return;
+  async function fetchPronoun(username: string) {
     console.log(`...Looking for ${username} pronouns`);
-    fetch(`https://pronouns.alejo.io/api/users/${lowerCase}`)
+    fetch(`https://pronouns.alejo.io/api/users/${username}`)
       .then((res) => res.json())
       .then((proData) => {
         if (!proData.length) {
-          userPronouns.set(lowerCase, "");
-          return;
+          userPronouns.set(username, "");
+        } else {
+          userPronouns.set(username, pronouns[proData[0].pronoun_id]);
         }
-        console.log(`${lowerCase} has been set ${proData[0].pronoun_id} pronouns`);
-        userPronouns.set(lowerCase, pronouns[proData[0].pronoun_id]);
+        let newPronoun = userPronouns.get(username);
+        if (newPronoun && newPronoun.length > 1) console.log(`${username} has been set ${newPronoun} pronouns`);
+        messageList.forEach((msg) => {
+          if (msg.user === username) msg.pronoun = newPronoun;
+        });
         return;
       });
   }
@@ -61,14 +62,13 @@
       console.log(error);
     });
 
-  let badgeData = {};
+  let badgeData: BadgeData = {};
   Object.keys(badge_sets).forEach((k) => {
-    badgeData[k] = badge_sets[k];
+    badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
 
-  function runMessage(channel, tags, message, self, type) {
+  function runMessage(channel: string, tags: Tags, message = "", self: boolean, type: string) {
     if (self) return;
-    if (message === null) message = "";
     if (typeof params.hidebot === "object") {
       if (params.hidebot.includes(tags.username)) return;
     }
@@ -109,16 +109,23 @@
 
     message = formatEmotes(message, tags.emotes, bttvEmoteCache, tags.bits, params);
 
-    fetchPronoun(tags.username);
-    userPronouns = userPronouns;
-    let newChat = {
+    //fetchPronoun(tags.username);
+    //userPronouns = userPronouns;
+
+    let newChat: Message = {
       message: message,
-      user: tags.username,
-      color: tags.color ? tags.color : params.highcolour,
+      user: tags.username || "",
+      color: tags.color || params.highcolour,
       tags: tags,
       type: type,
+      pronoun: undefined,
     };
-    if (!params.togglecol) newChat.color = params.highcolour;
+
+    let lowerCase = newChat.user.toLowerCase();
+    newChat.pronoun = userPronouns.get(lowerCase);
+    if (params.pronouns && !newChat.pronoun) fetchPronoun(lowerCase);
+
+    //if (!params.togglecol) newChat.color = params.highcolour;
     console.log(newChat, newChat.tags);
     if (type === "sub") {
       console.log("NEW SUB");
@@ -188,7 +195,7 @@
 <section style={runApp ? "height:100vh" : ""}>
   <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align}; {params.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
-      <ChatBubble {params} {message} {badgeData} {userPronouns} />
+      <ChatBubble {params} {message} {badgeData} />
     {/each}
     <div style="--bgOpacity:{params.bgopacity / 10}; --bgColour:{params.bgcolour}" id="chatBackground" />
   </div>
@@ -214,5 +221,20 @@
     min-height: 100%;
     //background-color: #262d36;
     border-radius: 1rem;
+  }
+
+  #chatBackground {
+    --bgOpacity: 0;
+    --bgColour: #262d36;
+
+    background-color: var(--bgColour);
+    opacity: var(--bgOpacity);
+    position: absolute;
+    border-radius: 1rem;
+    left: 0;
+    top: 0;
+    min-width: calc(100% - 1rem);
+    min-height: 100%;
+    z-index: 0;
   }
 </style>
