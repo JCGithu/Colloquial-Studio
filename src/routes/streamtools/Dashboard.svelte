@@ -1,18 +1,19 @@
-<script>
+<script lang="ts">
   export let urlFill = "";
   export let showInfo = false;
   export let showButtons = true;
   export let saves = new Array(3);
   let saveArray = new Array(3);
-  let toastArray = [];
+  let toastArray: Array<{ message: string; id: number }> = [];
 
   import { fly, fade } from "svelte/transition";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { createEventDispatcher, onMount, getContext } from "svelte";
   const dispatch = createEventDispatcher();
 
   let toastID = 0;
+  let appDetails: appDetails = getContext("appDetails");
 
-  function ToastQueue(message) {
+  function ToastQueue(message: string) {
     toastID++;
     toastArray.push({ message: message, id: toastID });
     toastArray = toastArray;
@@ -24,7 +25,7 @@
     }, 5000);
   }
 
-  export const toastUpdate = (i) => {
+  export const toastUpdate = (i: string) => {
     ToastQueue(i);
   };
 
@@ -53,6 +54,8 @@
     ToastQueue("Loaded from Save " + (num + 1));
   }
   onMount(async () => {
+    let localStore = window.localStorage.getItem(appDetails.name);
+    if (!localStore) showInfo = true;
     setTimeout(() => {
       saveArray = Object.keys(saves);
     }, 1000);
@@ -70,11 +73,14 @@
 {#if showInfo}
   <div id="introMenu" class="infoScreen">
     <div class="infoBox">
-      <button on:click={swapInfo}>Close</button>
       <slot name="info" />
-      <h1><slot name="title" /></h1>
-      <h3><slot name="subtitle" /></h3>
-      <p><slot name="description" /></p>
+      <h1>{appDetails.title}</h1>
+      <p><slot name="description" /><span>{appDetails.description}</span></p>
+      <div id="credits">
+        <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
+        <a href="https://ko-fi.com/K3K2231Z8" target="_blank"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" border="0" alt="Buy Me a Coffee at ko-fi.com" /></a>
+      </div>
+      <button on:click={swapInfo} on:submit={swapInfo}>Close</button>
     </div>
   </div>
 {/if}
@@ -119,10 +125,59 @@
     <slot name="testing" />
   </div>
   <div id="dashControls" class="dashRight">
+    <h1 on:click={swapInfo}>{appDetails.title}</h1>
     <slot name="settings" />
   </div>
 </main>
 
 <style lang="scss">
+  @import "../../css/colours.scss";
   @import "../../css/dashboard.scss";
+
+  .infoBox {
+    border-radius: 1rem;
+    position: relative;
+    padding: 1rem;
+    padding-top: 2rem;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    white-space: pre-wrap;
+    background-color: $black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p {
+      margin: 0;
+    }
+    button {
+      margin-top: 1rem;
+      position: relative;
+      background-color: $black;
+
+      z-index: 2;
+    }
+  }
+
+  #credits {
+    border: 0.2rem solid $white;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    white-space: normal;
+    width: max-content;
+    padding: 0.5rem 1rem;
+    background-color: fade-out($white, 0.9);
+    img {
+      margin-top: 0.5rem;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+      &:hover {
+        transform: scale(1.05) rotate(2deg);
+      }
+    }
+    a {
+      color: $pink;
+    }
+  }
 </style>

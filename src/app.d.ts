@@ -56,3 +56,9 @@ interface bttvEmoteIndividual {
 	imageType: string,
 	userId: string
 }
+
+interface appDetails {
+	title: string,
+	name: string,
+	description: string
+}

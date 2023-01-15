@@ -10,16 +10,22 @@
   import * as paramFunctions from "../params";
 
   //VARIABLES
-  let appName = "chatter";
-  setContext("appName", appName);
+  let appDetails = {
+    name: "chatter",
+    title: "Chatter",
+    description: `Chatter is an on-screen chat for OBS/SLOBS. \n
+    To start put in a Twitch channel name and click the reload button, the app will load on the left. Changing any settings on the right should be reflected in the app, so you can style it how you like! \n
+    At the top you can find the URL to put into OBS.`,
+  };
+  setContext("appDetails", appDetails);
 
   let [params, updateSettings] = Array(2).fill(new Object());
-  let urlFill, baseURL;
+  let urlFill: string, baseURL: string;
   let runApp = false;
-  let targetUser;
-  let toastUpdate;
+  let targetUser: string;
+  let toastUpdate: Function;
 
-  async function valueChanger(v) {
+  async function valueChanger(v: { detail: HTMLInputElement }) {
     console.log("====== INPUT CHANGE =========");
     params[v.detail.id] = v.detail.value;
     updateSettings = params;
@@ -89,19 +95,12 @@
   {/key}
 {:else}
   <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves} bind:toastUpdate>
-    <slot slot="title">Chatter</slot>
-    <slot slot="subtitle">Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></slot>
-    <slot slot="description">
-      Please input the channel of the Twitch chat you want to read. After picking your settings you can find the URL to put into OBS at the bottom!<br />
-      <i>Channel Name is the only info required for it to work!</i>
-    </slot>
     <slot slot="app">
       {#key targetUser}
         <Chatter {params} {targetUser} />
       {/key}
     </slot>
     <slot id="dashControls" slot="settings">
-      <h1>Chatter</h1>
       <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
       <button class="testButton" on:click={paramReload}>Reload</button>
       <DashInput
