@@ -1,5 +1,45 @@
-export const defaultParams = {
-  channel: false,
+export interface ChatterParameters {
+  [x: string]: any;
+  channel: string | undefined;
+  font: string;
+  fontsize: any;
+  align: string;
+  chatcolour: string;
+  chatcolourCalc: string;
+  highcolour: string;
+  bgcolour: string;
+  fontcolour: string;
+  bgopacity: any;
+  chatopacity: any;
+  togglecol: any;
+  animation: string;
+  badges: string;
+  border: any;
+  bttv: string;
+  hidebot: any;
+  hidecom: any;
+  pronouns: string;
+  direction: string;
+  customCSS: string;
+  animTime: string;
+  animEase: string;
+  emoteOnly: string;
+  nameCustom: string;
+  bubbleCustom: string;
+  proFont: string;
+  proOutline: any;
+  proUseCol: any;
+  proColour: string;
+  proBG: any;
+  replies: boolean | string;
+  links: boolean | string;
+  removeChats: boolean | string;
+  removeTime: any;
+  version: number;
+}
+
+export const defaultParams:ChatterParameters = {
+  channel: undefined,
   font: "Poppins",
   fontsize: 16,
   align: "flex-start",
@@ -40,7 +80,7 @@ export const defaultParams = {
 let arrays = ['hidebot', 'hidecom'];
 let reformattedValues = ['hidebot', 'hidecom', 'chatcolour', 'chatopacity', 'bgopacity', 'bgcolour', 'togglecol', 'badges', 'bttv', 'pronouns', 'emoteonly', 'align'];
 
-export async function paramReformat(params, id){
+export async function paramReformat(params:ChatterParameters, id:string){
   if (id && !reformattedValues.includes(id)) return;
 
   if (params.align === 'left') params.align = 'flex-start';
