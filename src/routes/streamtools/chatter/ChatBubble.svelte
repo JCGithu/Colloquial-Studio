@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  export let params, message: Message, badgeData: BadgeData;
+  import type { ChatterParameters } from "./paramsChatter";
+  export let params: ChatterParameters, message: Message, badgeData: BadgeData;
   let bubble: HTMLElement;
   let badges: Array<string> = [];
   let bigEmote = true;
@@ -23,17 +24,17 @@
   if (params.badges) runBadge();
 
   //ANIMATIONS
-  function PopIn(el, size) {
+  function PopIn(el: HTMLElement, size: DOMRect) {
     el.style.margin = `0px var(--marginX) 0px var(--marginX)`;
     el.style.padding = `0px var(--paddingX) 0px var(--paddingX)`;
     el.style.visibility = "hidden";
-    el.style.maxHeight = 0;
+    el.style.maxHeight = "0";
     setTimeout(() => {
       el.style.transition = "all var(--animTime) var(--animEase)";
       el.style.visibility = "visible";
       el.style.padding = `var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX)`;
       el.style.margin = `var(--marginY) var(--marginX) var(--marginY) var(--marginX)`;
-      el.style.opacity = 1;
+      el.style.opacity = "1";
       el.style.maxHeight = `${size.height + 30}px`;
       if (params.highlight) {
         el.style.transform = `translateX(-8px) translateY(-8px)`;
@@ -42,7 +43,19 @@
     }, 100);
   }
 
-  function SlideInLeft(el, size) {
+  function slideInBoth(el: HTMLElement) {
+    el.style.opacity = "1";
+    setTimeout(() => {
+      el.style.transition = "all var(--animTime) var(--animEase)";
+      if (params.highlight) {
+        el.style.transform = `translateX(-8px) translateY(-8px)`;
+      } else {
+        el.style.transform = `translateX(-8px)`;
+      }
+    }, 100);
+  }
+
+  function SlideInLeft(el: HTMLElement, size: DOMRect) {
     if (params.align === "center") size.width = size.width * 2.5;
     let negative = "* -1";
     if (params.align === "flex-end") negative = " * 1.2";
@@ -51,51 +64,35 @@
       el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)) ${negative})) translateY(-8px)`;
       el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
     }
-    el.style.opacity = 1;
-    setTimeout(() => {
-      el.style.transition = "all var(--animTime) var(--animEase)";
-      if (params.highlight) {
-        el.style.transform = `translateX(-8px) translateY(-8px)`;
-      } else {
-        el.style.transform = `translateX(-8px)`;
-      }
-    }, 100);
+    slideInBoth(el);
   }
 
-  function SlideInRight(el, size) {
+  function SlideInRight(el: HTMLElement, size: DOMRect) {
     el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX))))`;
     if (params.highlight) {
       el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)))) translateY(-8px)`;
       el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
     }
-    el.style.opacity = 1;
-    setTimeout(() => {
-      el.style.transition = "all var(--animTime) var(--animEase)";
-      if (params.highlight) {
-        el.style.transform = `translateX(-8px) translateY(-8px)`;
-      } else {
-        el.style.transform = `translateX(-8px)`;
-      }
-    }, 100);
+    slideInBoth(el);
   }
 
-  function FadeIn(el) {
-    el.style.opacity = 0;
+  function FadeIn(el: HTMLElement) {
+    el.style.opacity = "0";
     if (params.highlight) {
       el.style.transform = `translateX(-8px) translateY(-8px)`;
       el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
     }
     setTimeout(() => {
       el.style.transition = "all var(--animTime) var(--animEase)";
-      el.style.opacity = 1;
+      el.style.opacity = "1";
     }, 100);
   }
 
-  function Grow(el, size) {
+  function Grow(el: HTMLElement, size: DOMRect) {
     el.style.margin = `0px var(--marginX) 0px var(--marginX)`;
     el.style.padding = `0px var(--paddingX) 0px var(--paddingX)`;
     el.style.transform = `scale(0)`;
-    el.style.maxHeight = 0;
+    el.style.maxHeight = "0";
     if (params.highlight) {
       el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
       el.style.transform = `translateX(-8px) translateY(-8px) scale(0)`;
@@ -106,7 +103,7 @@
       el.style.margin = `var(--marginY) var(--marginX) var(--marginY) var(--marginX)`;
       el.style.maxHeight = `${size.height + 30}px`;
       el.style.transform = `scale(1)`;
-      el.style.opacity = 1;
+      el.style.opacity = "1";
       if (params.highlight) {
         el.style.transform = `translateX(-8px) translateY(-8px) scale(1)`;
       }
