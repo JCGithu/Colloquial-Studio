@@ -6,8 +6,8 @@
   export let subtitle: string | null = null;
   export let id = "";
   export let type = "";
-  export let min: number | null = null;
-  export let max: number | null = null;
+  export let min: string | null = null;
+  export let max: string | null = null;
   interface Option {
     value: string;
     name: string;
