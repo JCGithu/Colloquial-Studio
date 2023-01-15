@@ -1,8 +1,11 @@
 <script lang="ts">
+  import type { ChatterParameters } from "./paramsChatter";
   import "../../../js/tmi";
   import { onMount, afterUpdate } from "svelte";
   import ChatBubble from "./ChatBubble.svelte";
-  export let params = { test: true };
+  import { defaultParams } from "./paramsChatter";
+
+  export let params: ChatterParameters = defaultParams;
   export let targetUser = "";
   export let runApp = false;
   let messageIndex = 0;
@@ -67,7 +70,7 @@
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
 
-  function runMessage(channel: string, tags: Tags, message = "", self: boolean, type: string) {
+  function runMessage(channel: ChatterParameters["channel"], tags: Tags, message = "", self: boolean, type: string) {
     if (self) return;
     if (typeof params.hidebot === "object") {
       if (params.hidebot.includes(tags.username)) return;
@@ -152,9 +155,9 @@
     messageList = messageList;
   }
 
-  function removeUser(block) {
+  function removeUser(userToBlock: string) {
     messageList.forEach((msg, msgI) => {
-      if (msg.user === block) messageList.splice(msgI, 1);
+      if (msg.user === userToBlock) messageList.splice(msgI, 1);
     });
     messageList = messageList;
   }
@@ -169,21 +172,21 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage(false, { color: params.highcolour, "display-name": "Chatter", testing: true }, `Connected to ${targetUser} ✅`, false, "announcement");
+      runMessage(undefined, { color: params.highcolour, "display-name": "Chatter", testing: true } as Tags, `Connected to ${targetUser} ✅`, false, "announcement");
     });
 
-    client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, self, "chat"));
-    client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, self, "action"));
-    client.on("cheer", (channel, tags, message, self) => runMessage(channel, tags, message, self, "cheer"));
-    client.on("subscription", (channel, username, method, message, tags) => {
+    client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
+    client.on("action", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "action"));
+    client.on("cheer", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "cheer"));
+    client.on("subscription", (channel: ChatterParameters["channel"], username: string, method: string, message: string, tags: Tags) => {
       console.log(channel, username, method, message, tags);
-      runMessage(channel, tags, message, "sub");
+      runMessage(channel, tags, message, false, "sub");
     });
-    client.on("resub", (channel, username, months, message, tags, methods) => runMessage(channel, tags, message, false, "sub"));
-    client.on("announcement", (channel, tags, message) => runMessage(channel, tags, message, false, "announcement"));
+    client.on("resub", (channel: ChatterParameters["channel"], username: string, months: number, message: string, tags: Tags, methods: string) => runMessage(channel, tags, message, false, "sub"));
+    client.on("announcement", (channel: ChatterParameters["channel"], tags: Tags, message: string) => runMessage(channel, tags, message, false, "announcement"));
     client.on("clearchat", () => (messageList = []));
-    client.on("timeout", (channel, block) => removeUser(block));
-    client.on("ban", (channel, block) => removeUser(block));
+    client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
+    client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
 
     if (params.channel) {
       console.log("Attempting Twitch Connection...");
