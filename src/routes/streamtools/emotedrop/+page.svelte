@@ -116,5 +116,5 @@
 {/if}
 
 <style lang="scss">
-  @import "../../css/dashboard.scss";
+  @import "../../../css/dashboard.scss";
 </style>
