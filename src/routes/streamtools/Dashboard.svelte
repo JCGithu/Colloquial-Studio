@@ -3,6 +3,7 @@
   export let showInfo = false;
   export let showButtons = true;
   export let saves = new Array(3);
+  let userBackground = "#eae5db";
   let saveArray = new Array(3);
   let toastArray: Array<{ message: string; id: number }> = [];
 
@@ -71,7 +72,7 @@
 </svelte:head>
 
 {#if showInfo}
-  <div id="introMenu" class="infoScreen">
+  <div id="introMenu" class="infoScreen" transition:fade>
     <div class="infoBox">
       <slot name="info" />
       <h1>{appDetails.title}</h1>
@@ -84,7 +85,7 @@
     </div>
   </div>
 {/if}
-<main>
+<main style:--userBackground={userBackground}>
   {#if saveMenu}
     <div id="saveMenu" class="infoScreen" transition:fade>
       <div class="saveCollection">
@@ -110,7 +111,13 @@
     <div id="dashTitle" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
       <span id="backlink"><a href="/">Colloquial.Studio</a></span>
       <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={urlFill} />
-      <img on:click={() => (saveMenu = !saveMenu)} id="save" alt="save" src="https://www.svgrepo.com/show/48810/floppy-disk-save-button.svg" />
+      <div id="barButtons">
+        <img class="hoverBump" on:click={() => (saveMenu = !saveMenu)} id="save" alt="save" src="https://www.svgrepo.com/show/48810/floppy-disk-save-button.svg" />
+        <div class="hoverBump">
+          <span>BG</span>
+          <input type="color" bind:value={userBackground} />
+        </div>
+      </div>
       {#if showButtons}
         <div class="buttons" transition:fly={{ duration: 200, y: -50 }}>
           <button id="go" class="tabbed" on:click={() => window.open(urlFill)}><span>Open Link</span></button>
@@ -133,6 +140,59 @@
 <style lang="scss">
   @import "../../css/colours.scss";
   @import "../../css/dashboard.scss";
+
+  main {
+    --userBackground: #eae5db;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    background-color: var(--userBackground);
+    background-image: radial-gradient(at 18% 25%, rbga(255, 255, 255, 0.5) 0px, transparent 50%), radial-gradient(at 91% 63%, rbga(0, 0, 0, 0.5) 0px, transparent 50%), radial-gradient(at 35% 29%, hsla(0, 0%, 15%, 0.2) 0px, transparent 50%), radial-gradient(at 48% 44%, hsla(0, 0%, 48%, 0.2) 0px, transparent 50%), radial-gradient(at 34% 77%, hsla(0, 0%, 100%, 0.2) 0px, transparent 50%), radial-gradient(at 63% 54%, hsla(0, 0%, 100%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 72% 11%, hsla(0, 0%, 0%, 1) 0px, transparent 50%);
+  }
+
+  #dashControls,
+  #dashTitle {
+    &::-webkit-scrollbar-track {
+      background-clip: padding-box;
+      border-radius: 100px;
+      background-color: $white;
+      padding-right: 0.5rem;
+      margin: 1rem;
+      width: 10px;
+      border: 8px solid rgba(0, 0, 0, 0);
+    }
+
+    &::-webkit-scrollbar {
+      width: 25px;
+      background-color: rgba(0, 0, 0, 0);
+      margin-right: 1rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 100px;
+      border: 8px solid rgba(0, 0, 0, 0);
+      background-color: $pink;
+      background-clip: padding-box;
+    }
+  }
+
+  #dashApp {
+    display: flex;
+    position: relative;
+    flex-grow: 1;
+    overflow: none;
+    max-height: calc(100% - 5rem);
+    width: calc(100% - 2rem);
+    padding: 1rem;
+  }
 
   .infoBox {
     border-radius: 1rem;
@@ -179,5 +239,80 @@
     a {
       color: $pink;
     }
+  }
+
+  .hoverBump {
+    transform: translateY(0.5rem);
+    transition: all 0.3s;
+    &:hover {
+      transform: translateY(-0.1rem) rotate(3deg);
+    }
+  }
+
+  #barButtons {
+    img {
+      position: relative;
+      cursor: pointer;
+      filter: invert(100%);
+      border-radius: 0.5rem;
+      background-color: invert($black);
+      padding: 0.8rem;
+      height: 2rem;
+      margin-right: 0.3rem;
+    }
+    input {
+      position: relative;
+      cursor: pointer;
+      border-radius: 0.5rem;
+      height: 2.8rem;
+      width: 2.8rem;
+      padding: 0;
+      box-shadow: none !important;
+      border: 0.2rem $black solid;
+      background-color: rgba(0, 0, 0, 0);
+    }
+    div {
+      position: relative;
+      display: flex;
+      justify-items: center;
+      justify-content: center;
+      align-items: center;
+
+      span {
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        font-weight: bold;
+      }
+      input {
+        z-index: 1;
+      }
+    }
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+    position: absolute;
+    padding: 0.8rem;
+    display: flex;
+  }
+  ::-webkit-color-swatch,
+  ::-webkit-color-swatch-wrapper {
+    border: none;
+    padding: 0;
+    border-radius: 0.3rem;
+  }
+  #appBG {
+    min-height: 100vh;
+    min-width: 100vw;
+  }
+  #noise {
+    position: absolute;
+    left: 0;
+    top: 0;
+    min-width: 100%;
+    min-height: 100%;
+    mix-blend-mode: overlay;
+    opacity: 0.2;
+    pointer-events: none;
   }
 </style>

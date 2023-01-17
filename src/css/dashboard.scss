@@ -25,31 +25,6 @@ $background: $black;
 
 $breakpoint: 900px;
 
-main{
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 2.5fr 1fr;
-  grid-template-rows: 1fr;
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
-/*   background-color: #0a122a;
-  background-color:hsla(225,61%,10%,1);
-  background-image:
-  radial-gradient(at 18% 25%, hsla(220,76%,71%,0.3) 0px, transparent 50%),
-  radial-gradient(at 91% 63%, hsla(331,64%,70%,0.3) 0px, transparent 50%),
-  radial-gradient(at 35% 29%, hsla(268,93%,64%,0.2) 0px, transparent 50%),
-  radial-gradient(at 48% 44%, hsla(233,65%,70%,0.2) 0px, transparent 50%),
-  radial-gradient(at 34% 77%, hsla(279,68%,61%,0.2) 0px, transparent 50%),
-  radial-gradient(at 63% 54%, hsla(162,85%,64%,0.1) 0px, transparent 50%),
-  radial-gradient(at 72% 11%, hsla(4,71%,74%,0.1) 0px, transparent 50%); */
-  background-color: #EAE5DB;
-  //background-color: $pink;
-}
-
 input{
   outline: none;
   border: none;
@@ -99,43 +74,6 @@ input{
   }
 }
 
-#dashControls, #dashTitle {
-  &::-webkit-scrollbar-track {
-    background-clip: padding-box;
-    border-radius: 100px;
-    background-color: $white;
-    padding-right: 0.5rem;
-    margin: 1rem;
-    width: 10px;
-    border: 8px solid rgba(0, 0, 0, 0);
-  }
-  
-  &::-webkit-scrollbar {
-    width: 25px;
-    background-color: rgba(0,0,0,0);
-    margin-right: 1rem;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    border-radius: 100px;
-    border: 8px solid rgba(0, 0, 0, 0);
-    background-color: $pink;
-    background-clip: padding-box;
-  }  
-}
-
-@function makelongshadow($color, $num) {
-  $val: 0px 0px $color;
-  @for $i from 1 through $num {
-    $val: #{$val}, #{$i}px #{$i}px #{$color};
-  }
-  @return $val;
-}
-
-@mixin longshadow($color, $num) {
-  text-shadow: makelongshadow($color, $num);
-}
-
 //C: DEFAULTS
 
 h1, h2, h3, h4 {
@@ -162,7 +100,6 @@ h1 {
     color: white;
     transform: scale(1.05);
   }
-  //@include longshadow($deepBlue, 5);
 }
 h2{
   font-size: large;
@@ -196,24 +133,6 @@ h3 {
     &:hover{
       text-decoration: underline;
     }
-  }
-}
-
-#save{
-  cursor: pointer;
-  height: 2rem;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
-  position: absolute;
-  filter: invert(100%);
-  background-color: invert($black);
-  border-radius: 0.5rem;
-  padding: 0.8rem;
-  transform: translateY(0.5rem);
-  transition: all .3s;
-  &:hover{
-    transform: translateY(-0.1rem) rotate(3deg);
   }
 }
 
@@ -298,15 +217,6 @@ button {
   @media only screen and (max-width: $breakpoint) {
     padding: 1rem 1rem 2rem 1rem;
   }
-}
-
-#dashApp{
-  display: flex;
-  position: relative;
-  flex-grow: 1;
-  overflow: none;
-  max-height: calc(100% - 3rem);
-  width: 100%;
 }
 
 #testingButtons{
