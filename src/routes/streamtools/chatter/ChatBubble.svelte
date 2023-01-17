@@ -7,6 +7,8 @@
   let badges: Array<string> = [];
   let bigEmote = true;
 
+  let fullShadow = `1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol)`;
+
   //PARSING
   function runBadge() {
     if (!message.tags.badges) return;
@@ -38,7 +40,7 @@
       el.style.maxHeight = `${size.height + 30}px`;
       if (params.highlight) {
         el.style.transform = `translateX(-8px) translateY(-8px)`;
-        el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
+        el.style.boxShadow = fullShadow;
       }
     }, 100);
   }
@@ -62,7 +64,7 @@
     el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)) ${negative}))`;
     if (params.highlight) {
       el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)) ${negative})) translateY(-8px)`;
-      el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
+      el.style.boxShadow = fullShadow;
     }
     slideInBoth(el);
   }
@@ -71,7 +73,7 @@
     el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX))))`;
     if (params.highlight) {
       el.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)))) translateY(-8px)`;
-      el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
+      el.style.boxShadow = fullShadow;
     }
     slideInBoth(el);
   }
@@ -80,7 +82,7 @@
     el.style.opacity = "0";
     if (params.highlight) {
       el.style.transform = `translateX(-8px) translateY(-8px)`;
-      el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
+      el.style.boxShadow = fullShadow;
     }
     setTimeout(() => {
       el.style.transition = "all var(--animTime) var(--animEase)";
@@ -94,7 +96,7 @@
     el.style.transform = `scale(0)`;
     el.style.maxHeight = "0";
     if (params.highlight) {
-      el.style.boxShadow = `1px 1px, 2px 2px, 3px 3px, 4px 4px, 5px 5px, 6px 6px, 7px 7px`;
+      el.style.boxShadow = fullShadow;
       el.style.transform = `translateX(-8px) translateY(-8px) scale(0)`;
     }
     setTimeout(() => {
@@ -117,7 +119,7 @@
     params.animation = params.animation.replace(" ", "");
     if (params.animation === "SlideIn") params.animation = "SlideInLeft";
 
-    let userCol = params.chatcolourCalc;
+    let userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${params.chatopacity / 100})`;
     let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
 
     bubble.style.setProperty("--animTime", `${params.animTime}s`);

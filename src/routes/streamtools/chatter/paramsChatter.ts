@@ -48,7 +48,7 @@ export const defaultParams:ChatterParameters = {
   highcolour: "#525be1",
   bgcolour: "#262d36",
   fontcolour: "#f7f7ff",
-  bgopacity: 1,
+  bgopacity: 3,
   chatopacity: 90,
   togglecol: "true",
   animation: "Pop In",
@@ -102,9 +102,7 @@ export async function paramReformat(params:ChatterParameters, id:string){
     params[v] = params[v].trim().split(',');
   })
   //CHAT COLOUR
-  if (params.chatcolour.indexOf('#') < 0){
-    params.chatcolourCalc = `rgba(${parseInt(params.chatcolour.slice(-6, -4), 16)},${parseInt(params.chatcolour.slice(-4, -2), 16)},${parseInt(params.chatcolour.slice(-2), 16)},${params.chatopacity / 100})`;
-  }
+  params.chatcolourCalc = `rgba(${parseInt(params.chatcolour.slice(-6, -4), 16)},${parseInt(params.chatcolour.slice(-4, -2), 16)},${parseInt(params.chatcolour.slice(-2), 16)},${params.chatopacity / 100})`;
   console.log('Params Reformatted', params);
   if (!id) return params;
   return;
