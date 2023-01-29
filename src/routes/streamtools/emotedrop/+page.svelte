@@ -3,13 +3,20 @@
   import DashInput from "../DashInput.svelte";
   import DashGroup from "../DashGroup.svelte";
   import "../../../css/default.scss";
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
 
   import { paramReformat, defaultParams } from "./paramsEmoteDrop";
   import * as paramFunctions from "../params";
   import EmoteDrop from "./EmoteDrop.svelte";
 
   //VARIABLES
+  let appDetails = {
+    name: "emotedrop",
+    title: "Emote Drop",
+    description: `This is an example`,
+  };
+  setContext("appDetails", appDetails);
+
   let [params, updateSettings] = Array(2).fill(new Object());
   let urlFill, baseURL;
   let runApp = false;
