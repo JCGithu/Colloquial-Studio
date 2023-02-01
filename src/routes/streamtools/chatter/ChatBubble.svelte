@@ -145,7 +145,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type}" class:bitMessage={message.tags.bits} style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first={message.tags["first-msg"]} class:bitMessage={message.tags.bits} class:mod={message.tags.mod} class:vip={message.tags.badges.vip} style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}

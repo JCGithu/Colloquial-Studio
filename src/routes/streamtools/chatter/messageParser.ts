@@ -3,7 +3,6 @@
 const cheerTiers = [1, 100, 1000, 5000, 10000, 100000];
 const otherCheers = ['cheer', 'biblethump', 'cheerwhal', 'corgo', 'uni', 'showlove', 'party', 'seemsgood', 'pride', 'kappa', 'frankerz', 'heyguys', 'dansgame', 'elegiggle', 'trihard', 'kreygasm', '4head', 'swiftrage','notlikethis', 'failfish', 'vohiyo', 'pjsalt', 'mrdestructoid', 'bday', 'ripcheer', 'shamrock'];
 const cheerRex = new RegExp(otherCheers.join('\\d+|') + `\\d+`, 'gi');
-console.log(cheerRex);
 
 function checkEmotes(emotes:{[key:number]:Array<string>}, splitText:Array<MessageChunk>, text:string){
   for (let i in emotes){

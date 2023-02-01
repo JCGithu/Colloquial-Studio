@@ -28,13 +28,16 @@ interface Tags {
   bits: number | undefined;
   testing: boolean;
   username: string | undefined;
-  "reply-parent-display-name": string | undefined;
+  "reply-parent-display-name"?: string | undefined;
   "room-id": string | undefined;
 	"display-name": string;
 	color: string | undefined;
 	id: string;
 	emotes:{[key:number]:Array<string>} | null;
 	badges:{[key:string]:number};
+	'first-msg': boolean,
+	mod: boolean,
+	"custom-reward-id"?: string
 }
 
 interface BadgeData {

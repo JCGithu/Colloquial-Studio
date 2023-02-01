@@ -2,6 +2,7 @@
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
   import DashGroup from "../DashGroup.svelte";
+  import DashButton from "../DashButton.svelte";
   import Chatter from "./Chatter.svelte";
   import "../../../css/default.scss";
   import { onMount, setContext } from "svelte";
@@ -102,7 +103,7 @@
     </slot>
     <slot id="dashControls" slot="settings">
       <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
-      <button class="testButton" on:click={paramReload}>Reload</button>
+      <DashButton text="Reload!" on:click={paramReload} />
       <DashInput
         {params}
         type="select"
@@ -178,6 +179,7 @@
       <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Hide point redeems" id="points" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
       {#if updateSettings.removeChats}
         <DashGroup title="Remove Chats">
@@ -194,11 +196,10 @@
           <DashInput {params} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
         </DashGroup>
       {/if}
-      <button class="testButton" on:click={paramReset}>Reset to Default</button>
+      <DashButton text="Reset to Default" on:click={paramReload} />
     </slot>
   </Dashboard>
 {/if}
 
 <style lang="scss">
-  @import "../../../css/dashboard.scss";
 </style>

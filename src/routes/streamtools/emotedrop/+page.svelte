@@ -2,6 +2,7 @@
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
   import DashGroup from "../DashGroup.svelte";
+  import DashButton from "../DashGroup.svelte";
   import "../../../css/default.scss";
   import { onMount, setContext } from "svelte";
 
@@ -111,17 +112,15 @@
     </slot>
     <slot id="dashControls" slot="settings">
       <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
-      <button class="testButton" on:click={paramReload}>Reload</button>
+      <DashButton text="Reload!" on:click={paramReload} />
       <DashInput {params} type="number" name="Ball Limit *" id="blimit" on:valueChange={valueChanger} />
       <DashInput {params} type="range" subtitle="This is limited to three sizes due to how emotes are hosted on Twitch" name="Emote Size" id="esize" min="1" max="3" on:valueChange={valueChanger} />
       <DashInput {params} type="range" name="Bounce" id="bounce" min="0" max="10" on:valueChanger={valueChanger} />
       <DashInput {params} type="number" name="Expiration Time" subtitle="(in seconds)" id="etime" on:valueChange={valueChanger} />
-
-      <button class="testButton" on:click={paramReset}>Reset to Default</button>
+      <DashButton text="Reset to Default" on:click={paramReload} />
     </slot>
   </Dashboard>
 {/if}
 
 <style lang="scss">
-  @import "../../../css/dashboard.scss";
 </style>

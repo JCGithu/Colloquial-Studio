@@ -139,7 +139,10 @@
 
 <style lang="scss">
   @import "../../css/colours.scss";
-  @import "../../css/dashboard.scss";
+
+  $breakpoint: 900px;
+  $titles: $deepBlue;
+  $sideB: $black;
 
   main {
     --userBackground: #eae5db;
@@ -156,6 +159,65 @@
     background-color: var(--userBackground);
     background-image: radial-gradient(at 18% 25%, rbga(255, 255, 255, 0.5) 0px, transparent 50%), radial-gradient(at 91% 63%, rbga(0, 0, 0, 0.5) 0px, transparent 50%), radial-gradient(at 35% 29%, hsla(0, 0%, 15%, 0.2) 0px, transparent 50%), radial-gradient(at 48% 44%, hsla(0, 0%, 48%, 0.2) 0px, transparent 50%), radial-gradient(at 34% 77%, hsla(0, 0%, 100%, 0.2) 0px, transparent 50%), radial-gradient(at 63% 54%, hsla(0, 0%, 100%, 0.1) 0px, transparent 50%),
       radial-gradient(at 72% 11%, hsla(0, 0%, 0%, 1) 0px, transparent 50%);
+  }
+
+  h1 {
+    color: $titles;
+    font-weight: bold;
+    margin: 0;
+    font-size: 2.5rem;
+    margin: 0;
+    padding: 0;
+    margin-top: -1.5rem;
+    margin-bottom: 0.3rem;
+    text-decoration: underline;
+    //font-size: clamp(1rem, -0.1475rem + 2.623vw, 3rem);
+    color: $white;
+    text-decoration-color: $pink;
+    text-underline-offset: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s all;
+    &:hover {
+      color: white;
+      transform: scale(1.05);
+    }
+  }
+
+  #dashTitle {
+    border-color: $pink;
+    border-style: solid;
+    border-width: 0px 0px 3px 0px;
+    text-align: left;
+    position: relative;
+    z-index: 5;
+    height: 3rem;
+    min-height: 3rem;
+    input {
+      z-index: 6;
+    }
+    .buttons {
+      position: absolute;
+      bottom: -2.5rem;
+      left: 11%;
+      z-index: 5;
+      button {
+        background-color: $pink;
+      }
+    }
+  }
+
+  #dashControls {
+    display: flex;
+    flex-direction: column;
+    width: calc(35vw - 3rem);
+    padding: 3rem 1.5rem 2rem 1.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: $sideB;
+    @media only screen and (max-width: $breakpoint) {
+      padding: 1rem 1rem 2rem 1rem;
+    }
   }
 
   #dashControls,
@@ -194,6 +256,28 @@
     padding: 1rem;
   }
 
+  .dashLeft {
+    height: 100vh;
+    width: 65vw;
+    display: flex;
+    flex-direction: column;
+  }
+
+  //INFO
+  .infoScreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    position: absolute;
+    z-index: 20;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
   .infoBox {
     border-radius: 1rem;
     position: relative;
@@ -207,6 +291,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: fit-content;
+    color: $white;
     p {
       margin: 0;
     }
@@ -249,6 +335,31 @@
     }
   }
 
+  input {
+    outline: none;
+    border: none;
+    font-family: "Poppins";
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: $black;
+    background-color: white;
+    width: calc(100% - 130px - 3rem);
+    height: calc(100% - 2rem);
+    padding: 1rem 3rem 1rem 130px;
+    transition: all 1s;
+    opacity: 1;
+    color: $black;
+    &::selection {
+      background-color: $deepBlue !important;
+    }
+    box-shadow: inset 0px 0px 0px -60px $deepBlue;
+    &:hover {
+      box-shadow: inset 0px -207px 0px -200px $pink !important;
+      //background-color: $black;
+    }
+  }
+  //BUTTONS
   #barButtons {
     img {
       position: relative;
@@ -295,24 +406,137 @@
     padding: 0.8rem;
     display: flex;
   }
+
+  #backlink {
+    font-size: 0.7rem;
+    color: white;
+    font-style: bold;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    height: fit-content;
+    width: fit-content;
+    padding: 0.5rem;
+    padding-right: 1rem;
+    border-radius: 0 0 1rem 0;
+    background-color: #fe5f55;
+    a {
+      color: white;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  button {
+    font-family: "Poppins";
+    //font-weight: bold;
+    font-size: large;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+    transition: all 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
+    transform: translateY(-0.1rem);
+    &:hover {
+      transform: translateY(-0.2rem);
+      //box-shadow: 0px 3px 0px 0px rgba(255, 255, 255, 1);
+    }
+    &:active {
+      transform: translateY(0rem);
+      //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+    }
+  }
+  .tabbed {
+    border-radius: 0 0 0.5rem 0.5rem;
+  }
+
   ::-webkit-color-swatch,
   ::-webkit-color-swatch-wrapper {
     border: none;
     padding: 0;
     border-radius: 0.3rem;
   }
-  #appBG {
-    min-height: 100vh;
-    min-width: 100vw;
+  .blank {
+    opacity: 0.3;
+    transition: 1s all;
+    &:hover {
+      opacity: 0.7;
+    }
   }
-  #noise {
+  //SAVES
+  .saveCollection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    #closeSave {
+      width: 60%;
+    }
+  }
+
+  #saveMenu {
+    display: flex;
+    flex-direction: column;
+    div {
+      padding: 1rem;
+      border-radius: 1rem;
+      border: $pink 3px solid;
+      background-color: $black;
+    }
+    p {
+      margin-right: 0.5rem;
+    }
+    button {
+      background-color: $pink;
+      border-radius: 0.5rem;
+      margin: 0.25rem;
+    }
+    span {
+      display: flex;
+      align-items: center;
+      color: white;
+      margin: 1rem;
+      padding: 0.2rem 2rem;
+      //border-radius: 1rem;
+      border-width: 0px 0px 3px 0px;
+      border-color: $white;
+      border-style: solid;
+    }
+  }
+
+  //TOAST
+  #toastBox {
     position: absolute;
+    width: 200px;
+    height: 100%;
     left: 0;
-    top: 0;
-    min-width: 100%;
-    min-height: 100%;
-    mix-blend-mode: overlay;
-    opacity: 0.2;
+    bottom: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: column;
     pointer-events: none;
+  }
+
+  #toast {
+    background-color: fade-out($black, 0.2);
+    color: $white;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    margin: 0.2em;
+    width: 90%;
+    text-align: center;
+    pointer-events: visible;
+    cursor: pointer;
+    transition: all 0.3s;
+    &:hover {
+      background-color: $black;
+    }
   }
 </style>

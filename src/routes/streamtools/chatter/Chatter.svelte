@@ -82,6 +82,7 @@
     if (params.links) {
       if (message.includes("http://") || message.includes("https://")) return;
     }
+    if (params.points && tags["custom-reward-id"]) return;
     if (params.replies && tags["reply-parent-display-name"]) return;
     if (firstMessage && !tags.testing) {
       fetch(`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`)
