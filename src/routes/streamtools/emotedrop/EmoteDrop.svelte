@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import "../../../js/tmi";
   import { onMount } from "svelte";
   export let params = { test: true };
