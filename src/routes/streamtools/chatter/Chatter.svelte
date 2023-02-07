@@ -15,6 +15,19 @@
   import { formatEmotes } from "./messageParser";
   import { badge_sets } from "./badges.json";
 
+  let exampleTags: Tags = {
+    color: params.highcolour,
+    "display-name": "Chatter",
+    testing: true,
+    id: "C0",
+    username: "Chatter",
+    "room-id": undefined,
+    emotes: null,
+    badges: {},
+    "first-msg": false,
+    mod: false,
+  };
+
   let userPronouns = new Map<string, string>();
   let messageList: Array<Message> = [];
   const pronouns: { [key: string]: string } = {
@@ -70,7 +83,7 @@
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
 
-  function runMessage(channel: ChatterParameters["channel"], tags: Tags, message = "", self: boolean, type: string) {
+  function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
     if (self) return;
     if (typeof params.hidebot === "object") {
       if (params.hidebot.includes(tags.username)) return;
@@ -111,13 +124,13 @@
       firstMessage = false;
     }
 
-    message = formatEmotes(message, tags.emotes, bttvEmoteCache, tags.bits, params);
+    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, tags.bits, params);
 
     //fetchPronoun(tags.username);
     //userPronouns = userPronouns;
 
     let newChat: Message = {
-      message: message,
+      message: messageArray,
       user: tags.username || "",
       color: tags.color || params.highcolour,
       tags: tags,
@@ -132,15 +145,14 @@
     //if (!params.togglecol) newChat.color = params.highcolour;
     console.log(newChat, newChat.tags);
     if (type === "sub") {
-      console.log("NEW SUB");
-      console.log(newChat);
+      console.log("NEW SUB ^^");
       newChat.tags.id = messageIndex.toString();
     } else {
       newChat.tags.id = message[0] + messageIndex.toString();
     }
     messageIndex++;
     if (params.direction === "Down") {
-      messageList.push(newChat);
+      messageList = messageList.concat(newChat);
       if (messageList.length > 50) messageList.shift();
     }
     if (params.direction === "Up") {
@@ -153,7 +165,7 @@
         messageList = messageList;
       }, params.removeTime * 1000);
     }
-    messageList = messageList;
+    //messageList = messageList;
   }
 
   function removeUser(userToBlock: string) {
@@ -173,7 +185,7 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage(undefined, { color: params.highcolour, "display-name": "Chatter", testing: true } as Tags, `Connected to ${targetUser} ✅`, false, "announcement");
+      runMessage(undefined, exampleTags, `Connected to ${targetUser} ✅`, false, "announcement");
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
@@ -195,6 +207,14 @@
     }
   });
 </script>
+
+<svelte:head>
+  <style>
+    body {
+      overflow: hidden;
+    }
+  </style>
+</svelte:head>
 
 <section style={runApp ? "height:100vh" : ""}>
   <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align}; {params.direction === 'Up' ? 'height:auto' : ''}">
