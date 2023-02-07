@@ -58,7 +58,7 @@ function checkBTTV(bttvEmoteCache:Array<{ code: string; id: string; }>, splitTex
   return splitText;
 }
   
-export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmoteIndividual>, bits:number|undefined, params) {
+export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmoteIndividual>, bits:number|undefined, params):Array<MessageChunk> {
   var splitText:Array<any> = text.split(' ');
   for (let i in splitText){
     splitText[i] = {

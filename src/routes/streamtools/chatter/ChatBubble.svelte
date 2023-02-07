@@ -7,6 +7,11 @@
   let badges: Array<string> = [];
   let bigEmote = true;
 
+  let vip = false;
+  let mod = false;
+  let first = false;
+  let bits = false;
+
   let fullShadow = `1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol)`;
 
   //PARSING
@@ -114,6 +119,7 @@
 
   //MOUNTED
   onMount(async () => {
+    console.log(message);
     let size = bubble.getBoundingClientRect();
     if (!params.animEase) params.animEase = "ease-in-out";
     params.animation = params.animation.replace(" ", "");
@@ -133,6 +139,11 @@
     if (params.animation === "FadeIn") FadeIn(bubble);
     if (params.animation === "Grow") Grow(bubble, size);
 
+    if (message.tags.badges.vip) vip = true;
+    if (message.tags.mod) mod = true;
+    if (message.tags["first-msg"]) first = true;
+    if (message.tags.bits) bits = true;
+
     console.log(params, message);
 
     if (params.emoteOnly) {
@@ -145,7 +156,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first={message.tags["first-msg"]} class:bitMessage={message.tags.bits} class:mod={message.tags.mod} class:vip={message.tags.badges.vip} style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}

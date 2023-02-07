@@ -12,12 +12,12 @@ declare namespace App {
 interface MessageChunk {
   code: string | null;
   text: string;
-  num: number | undefined;
+  num?: number | undefined;
 }
 
 interface Message {
   pronoun: string | undefined;
-	message: Array<MessageChunk>;
+	message: string | Array<MessageChunk>;
 	user: string;
 	color: string;
 	tags: Tags;
@@ -25,7 +25,7 @@ interface Message {
 }
 
 interface Tags {
-  bits: number | undefined;
+  bits?: number | undefined;
   testing: boolean;
   username: string | undefined;
   "reply-parent-display-name"?: string | undefined;
