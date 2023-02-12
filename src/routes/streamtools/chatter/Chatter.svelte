@@ -185,7 +185,7 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage(undefined, exampleTags, `Connected to ${targetUser} ✅`, false, "announcement");
+      runMessage("", exampleTags, `Connected to ${targetUser} ✅`, false, "announcement");
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
@@ -216,7 +216,7 @@
   </style>
 </svelte:head>
 
-<section style={runApp ? "height:100vh" : ""}>
+<section class:runApp>
   <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align}; {params.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {params} {message} {badgeData} />
@@ -226,6 +226,10 @@
 </section>
 
 <style lang="scss">
+  .runApp {
+    height: 100vh;
+  }
+
   #chatBoundary {
     position: relative;
     --flex: column;
