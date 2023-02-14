@@ -1,4 +1,4 @@
-//import type { ChatterParameters } from "../streamToolFunctions";
+import type { ChatterParameters } from "./paramsChatter";
 
 const cheerTiers = [1, 100, 1000, 5000, 10000, 100000];
 const otherCheers = ['cheer', 'biblethump', 'cheerwhal', 'corgo', 'uni', 'showlove', 'party', 'seemsgood', 'pride', 'kappa', 'frankerz', 'heyguys', 'dansgame', 'elegiggle', 'trihard', 'kreygasm', '4head', 'swiftrage','notlikethis', 'failfish', 'vohiyo', 'pjsalt', 'mrdestructoid', 'bday', 'ripcheer', 'shamrock'];
@@ -58,7 +58,7 @@ function checkBTTV(bttvEmoteCache:Array<{ code: string; id: string; }>, splitTex
   return splitText;
 }
   
-export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmoteIndividual>, bits:number|undefined, params):Array<MessageChunk> {
+export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmoteIndividual>, bits:number|undefined, params:ChatterParameters):Array<MessageChunk> {
   var splitText:Array<any> = text.split(' ');
   for (let i in splitText){
     splitText[i] = {
