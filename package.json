@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
+		"preinstall": "npx only-allow pnpm",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -12,6 +13,8 @@
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^2.0.0",
 		"@sveltejs/kit": "^1.5.0",
+		"@types/matter-js": "^0.18.2",
+		"@types/tmi.js": "^1.8.3",
 		"sass": "^1.57.1",
 		"svelte": "^3.55.0",
 		"svelte-check": "^2.10.3",
@@ -22,6 +25,7 @@
 	"type": "module",
 	"dependencies": {
 		"jsoncrush": "^1.1.8",
+		"matter-js": "^0.18.0",
 		"svelte-collapse": "^0.1.1"
 	}
 }
