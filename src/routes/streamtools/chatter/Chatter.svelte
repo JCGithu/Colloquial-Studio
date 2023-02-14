@@ -200,11 +200,15 @@
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
     client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
 
-    console.log(params.channel);
-    setTimeout(() => {
+    if (params.version != 2) {
+      runMessage("", exampleTags, `Chatter has had a major update! Please go back to the site and update your URL.`, false, "announcement");
+    }
+    if (params.channel === "") {
+      runMessage("", exampleTags, `Give me a Twitch channel name to test! 📺`, false, "announcement");
+    } else {
       console.log("Attempting Twitch Connection...");
       client.connect();
-    }, 1000);
+    }
   });
 </script>
 
