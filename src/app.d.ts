@@ -9,6 +9,10 @@ declare namespace App {
 	// interface Platform {}
 }
 
+interface standardObject {
+	[x:string]: any
+}
+
 interface MessageChunk {
   code: string | null;
   text: string;
