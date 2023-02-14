@@ -1,126 +1,90 @@
-<script>
-  import Dashboard from "../Dashboard.svelte";
-  import DashInput from "../DashInput.svelte";
-  import DashGroup from "../DashGroup.svelte";
-  import DashButton from "../DashGroup.svelte";
-  import "../../../css/default.scss";
-  import { onMount, setContext } from "svelte";
+<script lang="ts">
+  // FOR NEW APP //
+  // Change the details below
+  // Add any app specific param settings in onMount
+  // Add the dashboard options
 
-  import { paramReformat, defaultParams } from "./paramsEmoteDrop";
-  import * as paramFunctions from "../params";
-  import EmoteDrop from "./EmoteDrop.svelte";
-
-  //VARIABLES
   let appDetails = {
     name: "emotedrop",
     title: "Emote Drop",
-    description: `This is an example`,
+    description: `Make emotes fall from the sky.`,
   };
+
+  import { onMount, setContext } from "svelte";
+  import "../../../css/default.scss";
+
+  import Dashboard from "../Dashboard.svelte";
+  import DashInput from "../DashInput.svelte";
+  import DashGroup from "../DashGroup.svelte";
+  import DashButton from "../DashButton.svelte";
+  import EmoteDrop from "./EmoteDrop.svelte";
+
+  import { paramReformat, defaultParams } from "./paramsEmoteDrop";
+  import { appInit, urlBuild } from "../params";
   setContext("appDetails", appDetails);
 
-  let [params, updateSettings] = Array(2).fill(new Object());
-  let urlFill, baseURL;
-  let runApp = false;
-  let grouped = true;
-  let targetUser;
-  let toastUpdate;
+  let params = defaultParams;
+  let updateSettings = defaultParams;
+  let urlFill: string, baseURL: string, channelName: string;
+  let toastUpdate: (i: string) => void;
 
-  async function valueChanger(v) {
+  async function valueChanger(v: { detail: HTMLInputElement }) {
     console.log("====== INPUT CHANGE =========");
+    if (v.detail.id === "channel") {
+      urlFill = urlBuild(params, baseURL, channelName);
+      return;
+    }
     params[v.detail.id] = v.detail.value;
     updateSettings = params;
     await paramReformat(params, v.detail.id);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
+    urlFill = urlBuild(params, baseURL, channelName);
   }
 
   // This stays in here due to GUI.
   async function paramReload() {
+    params["channel"] = channelName;
     params = await paramReformat(params);
     updateSettings = params;
-    targetUser = params.channel;
+    urlFill = urlBuild(params, baseURL, channelName);
     toastUpdate("Channel reset");
-  }
-
-  async function loadURL({ detail }) {
-    params = await paramFunctions.load(detail, paramReformat, false);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
-    updateSettings = params;
-  }
-
-  async function paramReset() {
-    defaultParams.saves = params.saves;
-    params = await paramReformat(defaultParams);
-    toastUpdate("Reset to default");
-  }
-
-  async function saveData({ detail }) {
-    paramFunctions.save(params, "emotedrop", detail);
-  }
-
-  async function loadData({ detail }) {
-    params = await paramFunctions.load(params.saves[detail], paramReformat, params.saves);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
-    updateSettings = params;
   }
 
   onMount(async () => {
     baseURL = window.location.href;
     let urlData = new URLSearchParams(window.location.search);
-    runApp = urlData.has("data");
-
-    params = await paramFunctions.check(defaultParams, paramReformat, runApp, "emotedrop", urlData, toastUpdate);
-
+    if (urlData.has("data")) window.location.replace(`${baseURL.split("?data")[0]}/app` + document.location.search);
+    params = await appInit(appDetails.name, toastUpdate);
     console.log("Dashboard Init", defaultParams, params);
 
     // APP SPECIFIC
-    if (!params.version) params.fontsize = params.fontsize * 16;
-    if (!params["chatcolourCalc"]) params["chatcolourCalc"] = params.chatcolour;
-    //
-    if (params.channel) {
-      targetUser = params.channel;
-    } else {
-      targetUser = "";
-    }
+
+    // KEEP
     updateSettings = params;
   });
 </script>
 
-<svelte:head>
-  <style>
-    body {
-      overflow: hidden;
-    }
-  </style>
-</svelte:head>
+<Dashboard {urlFill} bind:runningParams={updateSettings} bind:dashboardParams={params} bind:toastUpdate>
+  <slot slot="app">
+    {#key params.channel}
+      <EmoteDrop {params} />
+    {/key}
+  </slot>
+  <slot id="dashControls" slot="settings">
+    <DashInput {params} type="text" name="Channel Name *" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
+    <DashButton text="Reload!" on:click={paramReload} />
+    <!-- Insert from here -->
+    <DashInput {params} type="number" name="Ball Limit *" id="blimit" on:valueChange={valueChanger} />
+    <DashInput {params} type="range" name="Emote Size" id="esize" min="1" max="10" on:valueChange={valueChanger} />
+    <DashInput {params} type="range" name="Bounce" id="bounce" min="0" max="10" on:valueChange={valueChanger} />
+    <DashInput {params} type="number" name="Expiration Time" subtitle="(in seconds)" id="etime" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Randomise Size" id="random" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Adaptive Mode" subtitle="This stops the 'jelly' effect and makes the app run more effeciently. I'd recommend." id="sleep" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Let Mods Reset" subtitle="Allow mods to clear the screen with the command !emotewipe" id="modWipe" on:valueChange={valueChanger} />
 
-{#if runApp}
-  {#key targetUser}
-    <EmoteDrop {params} {targetUser} {runApp} />
-  {/key}
-{:else}
-  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves} bind:toastUpdate>
-    <slot slot="title">Emote Drop</slot>
-    <slot slot="subtitle">Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></slot>
-    <slot slot="description">
-      Please input the channel of the Twitch chat you want to read. After picking your settings you can find the URL to put into OBS at the bottom!<br />
-      <i>Channel Name is the only info required for it to work!</i>
-    </slot>
-    <slot slot="app">
-      {#key targetUser}
-        <EmoteDrop {params} {targetUser} {runApp} />
-      {/key}
-    </slot>
-    <slot id="dashControls" slot="settings">
-      <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
-      <DashButton text="Reload!" on:click={paramReload} />
-      <DashInput {params} type="number" name="Ball Limit *" id="blimit" on:valueChange={valueChanger} />
-      <DashInput {params} type="range" subtitle="This is limited to three sizes due to how emotes are hosted on Twitch" name="Emote Size" id="esize" min="1" max="3" on:valueChange={valueChanger} />
-      <DashInput {params} type="range" name="Bounce" id="bounce" min="0" max="10" on:valueChanger={valueChanger} />
-      <DashInput {params} type="number" name="Expiration Time" subtitle="(in seconds)" id="etime" on:valueChange={valueChanger} />
-      <DashButton text="Reset to Default" on:click={paramReload} />
-    </slot>
-  </Dashboard>
-{/if}
+    <!-- Insert to here -->
+    <DashButton text="Reset to Default" on:click={paramReload} />
+  </slot>
+</Dashboard>
 
 <style lang="scss">
 </style>

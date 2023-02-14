@@ -1,16 +1,9 @@
 <script lang="ts">
-  import Dashboard from "../Dashboard.svelte";
-  import DashInput from "../DashInput.svelte";
-  import DashGroup from "../DashGroup.svelte";
-  import DashButton from "../DashButton.svelte";
-  import Chatter from "./Chatter.svelte";
-  import "../../../css/default.scss";
-  import { onMount, setContext } from "svelte";
+  // FOR NEW APP //
+  // Change the details below
+  // Add any app specific param settings in onMount
+  // Add the dashboard options
 
-  import { paramReformat, defaultParams } from "./paramsChatter";
-  import * as paramFunctions from "../params";
-
-  //VARIABLES
   let appDetails = {
     name: "chatter",
     title: "Chatter",
@@ -18,188 +11,165 @@
     To start put in a Twitch channel name and click the reload button, the app will load on the left. Changing any settings on the right should be reflected in the app, so you can style it how you like! \n
     At the top you can find the URL to put into OBS.`,
   };
+
+  import { onMount, setContext } from "svelte";
+  import "../../../css/default.scss";
+
+  import Dashboard from "../Dashboard.svelte";
+  import DashInput from "../DashInput.svelte";
+  import DashGroup from "../DashGroup.svelte";
+  import DashButton from "../DashButton.svelte";
+  import Chatter from "./Chatter.svelte";
+
+  import { paramReformat, defaultParams } from "./paramsChatter";
+  import { appInit, urlBuild } from "../params";
   setContext("appDetails", appDetails);
 
   let [params, updateSettings] = Array(2).fill(new Object());
-  let urlFill: string, baseURL: string;
-  let runApp = false;
-  let targetUser: string;
-  let toastUpdate: Function;
+  let urlFill: string, baseURL: string, channelName: string;
+  let toastUpdate: (i: string) => void;
 
   async function valueChanger(v: { detail: HTMLInputElement }) {
     console.log("====== INPUT CHANGE =========");
+    if (v.detail.id === "channel") {
+      urlFill = urlBuild(params, baseURL, channelName);
+      return;
+    }
     params[v.detail.id] = v.detail.value;
     updateSettings = params;
     await paramReformat(params, v.detail.id);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
+    urlFill = urlBuild(params, baseURL, channelName);
   }
 
   // This stays in here due to GUI.
   async function paramReload() {
-    params = await paramReformat(params);
+    params["channel"] = channelName;
+    params = await paramReformat(params, null);
     updateSettings = params;
-    targetUser = params.channel;
+    urlFill = urlBuild(params, baseURL, channelName);
     toastUpdate("Channel reset");
-  }
-
-  async function loadURL({ detail }) {
-    params = await paramFunctions.load(detail, paramReformat, defaultParams, false);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
-    updateSettings = params;
-  }
-
-  async function paramReset() {
-    defaultParams.saves = params.saves;
-    params = await paramReformat(defaultParams);
-    toastUpdate("Reset to default");
-  }
-
-  async function saveData({ detail }) {
-    paramFunctions.save(params, "chatter", detail);
-  }
-
-  async function loadData({ detail }) {
-    let toLoad;
-    if (!params.saves) {
-      let localStore = window.localStorage.getItem("chatter");
-    }
-    params = await paramFunctions.load(params.saves[detail], paramReformat, params.saves);
-    urlFill = paramFunctions.urlBuild(params, baseURL);
-    updateSettings = params;
   }
 
   onMount(async () => {
     baseURL = window.location.href;
     let urlData = new URLSearchParams(window.location.search);
-    runApp = urlData.has("data");
-
-    params = await paramFunctions.check(defaultParams, paramReformat, runApp, "chatter", urlData, toastUpdate);
-
+    if (urlData.has("data")) window.location.replace(`${baseURL.split("?data")[0]}/app` + document.location.search);
+    params = await appInit(appDetails.name, toastUpdate);
     console.log("Dashboard Init", defaultParams, params);
 
     // APP SPECIFIC
     if (!params.version) params.fontsize = params.fontsize * 16;
     if (!params["chatcolourCalc"]) params["chatcolourCalc"] = params.chatcolour;
-    //
-    if (params.channel) {
-      targetUser = params.channel;
-    } else {
-      targetUser = "";
-    }
+
+    // KEEP
     updateSettings = params;
   });
 </script>
 
-{#if runApp}
-  {#key targetUser}
-    <Chatter {params} {targetUser} {runApp} />
-  {/key}
-{:else}
-  <Dashboard {urlFill} on:loadURL={loadURL} on:loadData={loadData} on:saveData={saveData} saves={params.saves} bind:toastUpdate>
-    <slot slot="app">
-      {#key targetUser}
-        <Chatter {params} {targetUser} />
-      {/key}
-    </slot>
-    <slot id="dashControls" slot="settings">
-      <DashInput {params} type="text" name="Channel Name *" id="channel" on:valueChange={valueChanger} />
-      <DashButton text="Reload!" on:click={paramReload} />
+<Dashboard {urlFill} bind:runningParams={updateSettings} bind:dashboardParams={params} bind:toastUpdate>
+  <slot slot="app">
+    {#key params.channel}
+      <Chatter {params} />
+    {/key}
+  </slot>
+  <slot id="dashControls" slot="settings">
+    <DashInput {params} type="text" name="Channel Name *" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
+    <DashButton text="Reload!" on:click={paramReload} />
+    <DashInput
+      {params}
+      type="select"
+      name="Align"
+      id="align"
+      ops={[
+        { name: "Left", value: "flex-start" },
+        { name: "Center", value: "center" },
+        { name: "Right", value: "flex-end" },
+      ]}
+      on:valueChange={valueChanger}
+    />
+    <DashInput
+      {params}
+      type="select"
+      name="Chat Direction"
+      id="direction"
+      ops={[
+        { name: "From Bottom", value: "Down" },
+        { name: "From Top", value: "Up" },
+      ]}
+      on:valueChange={valueChanger}
+    />
+    <DashGroup title="Font Settings">
+      <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
+      <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Use Twitch Username Colours" id="nameCustom" on:valueChange={valueChanger} />
+      <DashInput {params} faded={params.nameCustom} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
+    </DashGroup>
+    <DashGroup title="Chat Bubble">
+      <DashInput {params} type="range" name="Opacity" max="100" min="0" id="chatopacity" on:valueChange={valueChanger} />
+      <DashInput {params} type="range" name="Roundness" max="10" min="0" id="border" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
+      <DashInput {params} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
+    </DashGroup>
+    {#if updateSettings.highlight}
+      <DashGroup title="Bubble Drop Shadow">
+        <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" on:valueChange={valueChanger} />
+        <DashInput {params} type="color" name="Default colour" id="highcolour" faded={params.togglecol} on:valueChange={valueChanger} />
+      </DashGroup>
+    {/if}
+    <DashGroup title="Background">
+      <DashInput {params} type="color" name="Background Colour" id="bgcolour" on:valueChange={valueChanger} />
+      <DashInput {params} type="range" name="Opacity" max="10" min="0" id="bgopacity" on:valueChange={valueChanger} />
+    </DashGroup>
+    <DashGroup title="Animation">
       <DashInput
         {params}
         type="select"
-        name="Align"
-        id="align"
+        name="Animation"
+        id="animation"
         ops={[
-          { name: "Left", value: "flex-start" },
-          { name: "Center", value: "center" },
-          { name: "Right", value: "flex-end" },
+          { name: "Pop In", value: "Pop In" },
+          { name: "Slide In", value: "Slide In" },
+          { name: "Fade In", value: "Fade In" },
+          { name: "Grow", value: "Grow" },
         ]}
         on:valueChange={valueChanger}
       />
-      <DashInput
-        {params}
-        type="select"
-        name="Chat Direction"
-        id="direction"
-        ops={[
-          { name: "From Bottom", value: "Down" },
-          { name: "From Top", value: "Up" },
-        ]}
-        on:valueChange={valueChanger}
-      />
-      <DashGroup title="Font Settings">
-        <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
-        <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />
-        <DashInput {params} type="checkbox" name="Use Twitch Username Colours" id="nameCustom" on:valueChange={valueChanger} />
-        <DashInput {params} faded={params.nameCustom} type="color" name="Font Colour" id="fontcolour" on:valueChange={valueChanger} />
+      <DashInput {params} type="number" name="Speed" subtitle="In seconds. Accepts decimals." id="animTime" on:valueChange={valueChanger} />
+      <DashInput {params} type="text" name="CSS Easing" id="animEase" on:valueChange={valueChanger} />
+    </DashGroup>
+    <DashGroup title="Moderation">
+      <DashInput {params} type="text" name="Hide these bots" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" on:valueChange={valueChanger} />
+      <DashInput {params} type="text" name="Hide these commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" on:valueChange={valueChanger} />
+    </DashGroup>
+    <DashGroup title="Advanced">
+      <DashInput {params} type="checkbox" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
+      <!--         <DashInput {params} type="text" name="Custom CSS" subtitle="Tutorial coming soon" id="customCSS" on:valueChange={valueChanger} /> -->
+    </DashGroup>
+    <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Hide point redeems" id="points" on:valueChange={valueChanger} />
+    <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
+    {#if updateSettings.removeChats}
+      <DashGroup title="Remove Chats">
+        <DashInput {params} type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" on:valueChange={valueChanger} />
       </DashGroup>
-      <DashGroup title="Chat Bubble">
-        <DashInput {params} type="range" name="Opacity" max="100" min="0" id="chatopacity" on:valueChange={valueChanger} />
-        <DashInput {params} type="range" name="Roundness" max="10" min="0" id="border" on:valueChange={valueChanger} />
-        <DashInput {params} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
-        <DashInput {params} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
-        <DashInput {params} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
+    {/if}
+    <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
+    {#if updateSettings.pronouns}
+      <DashGroup title="Pronouns">
+        <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Outline" id="proOutline" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
+        <DashInput {params} type="checkbox" name="Background" id="proBG" on:valueChange={valueChanger} />
+        <DashInput {params} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
       </DashGroup>
-      {#if updateSettings.highlight}
-        <DashGroup title="Bubble Drop Shadow">
-          <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" on:valueChange={valueChanger} />
-          <DashInput {params} type="color" name="Default colour" id="highcolour" faded={params.togglecol} on:valueChange={valueChanger} />
-        </DashGroup>
-      {/if}
-      <DashGroup title="Background">
-        <DashInput {params} type="color" name="Background Colour" id="bgcolour" on:valueChange={valueChanger} />
-        <DashInput {params} type="range" name="Opacity" max="10" min="0" id="bgopacity" on:valueChange={valueChanger} />
-      </DashGroup>
-      <DashGroup title="Animation">
-        <DashInput
-          {params}
-          type="select"
-          name="Animation"
-          id="animation"
-          ops={[
-            { name: "Pop In", value: "Pop In" },
-            { name: "Slide In", value: "Slide In" },
-            { name: "Fade In", value: "Fade In" },
-            { name: "Grow", value: "Grow" },
-          ]}
-          on:valueChange={valueChanger}
-        />
-        <DashInput {params} type="number" name="Speed" subtitle="In seconds. Accepts decimals." id="animTime" on:valueChange={valueChanger} />
-        <DashInput {params} type="text" name="CSS Easing" id="animEase" on:valueChange={valueChanger} />
-      </DashGroup>
-      <DashGroup title="Moderation">
-        <DashInput {params} type="text" name="Hide these bots" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" on:valueChange={valueChanger} />
-        <DashInput {params} type="text" name="Hide these commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" on:valueChange={valueChanger} />
-      </DashGroup>
-      <DashGroup title="Advanced">
-        <DashInput {params} type="checkbox" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
-        <!--         <DashInput {params} type="text" name="Custom CSS" subtitle="Tutorial coming soon" id="customCSS" on:valueChange={valueChanger} /> -->
-      </DashGroup>
-      <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
-      <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
-      <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
-      <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
-      <DashInput {params} type="checkbox" name="Hide point redeems" id="points" on:valueChange={valueChanger} />
-      <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
-      {#if updateSettings.removeChats}
-        <DashGroup title="Remove Chats">
-          <DashInput {params} type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" on:valueChange={valueChanger} />
-        </DashGroup>
-      {/if}
-      <DashInput {params} type="checkbox" name="Show Pronouns" id="pronouns" on:valueChange={valueChanger} />
-      {#if updateSettings.pronouns}
-        <DashGroup title="Pronouns">
-          <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" on:valueChange={valueChanger} />
-          <DashInput {params} type="checkbox" name="Outline" id="proOutline" on:valueChange={valueChanger} />
-          <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
-          <DashInput {params} type="checkbox" name="Background" id="proBG" on:valueChange={valueChanger} />
-          <DashInput {params} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
-        </DashGroup>
-      {/if}
-      <DashButton text="Reset to Default" on:click={paramReload} />
-    </slot>
-  </Dashboard>
-{/if}
+    {/if}
+    <DashButton text="Reset to Default" on:click={paramReload} />
+  </slot>
+</Dashboard>
 
 <style lang="scss">
 </style>

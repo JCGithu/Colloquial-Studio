@@ -1,12 +1,11 @@
 <script lang="ts">
   import type { ChatterParameters } from "./paramsChatter";
   import "../../../js/tmi";
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount } from "svelte";
   import ChatBubble from "./ChatBubble.svelte";
   import { defaultParams } from "./paramsChatter";
 
   export let params: ChatterParameters = defaultParams;
-  export let targetUser = "";
   export let runApp = false;
   let messageIndex = 0;
 
@@ -144,13 +143,11 @@
 
     //if (!params.togglecol) newChat.color = params.highcolour;
     console.log(newChat, newChat.tags);
-    if (type === "sub") {
-      console.log("NEW SUB ^^");
+    if (type === "sub" || type === "announcement" || type === "test") {
       newChat.tags.id = messageIndex.toString();
     } else {
       newChat.tags.id = message[0] + messageIndex.toString();
     }
-    messageIndex++;
     if (params.direction === "Down") {
       messageList = messageList.concat(newChat);
       if (messageList.length > 50) messageList.shift();
@@ -165,7 +162,8 @@
         messageList = messageList;
       }, params.removeTime * 1000);
     }
-    //messageList = messageList;
+    messageIndex++;
+    messageList = messageList;
   }
 
   function removeUser(userToBlock: string) {
@@ -179,13 +177,14 @@
     console.log("Chatter has Loaded", params);
 
     firstMessage = true;
-    const client = new tmi.Client({
-      channels: [targetUser],
+    // @ts-ignore
+    let client = new tmi.Client({
+      channels: [params.channel],
     });
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage("", exampleTags, `Connected to ${targetUser} ✅`, false, "announcement");
+      runMessage("", exampleTags, `Connected to ${params.channel} ✅`, false, "announcement");
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
@@ -201,10 +200,11 @@
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
     client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
 
-    if (params.channel) {
+    console.log(params.channel);
+    setTimeout(() => {
       console.log("Attempting Twitch Connection...");
       client.connect();
-    }
+    }, 1000);
   });
 </script>
 
@@ -226,10 +226,6 @@
 </section>
 
 <style lang="scss">
-  .runApp {
-    height: 100vh;
-  }
-
   #chatBoundary {
     position: relative;
     --flex: column;

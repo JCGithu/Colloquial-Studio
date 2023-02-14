@@ -2,14 +2,14 @@
   // Add app and name
   import Chatter from "../Chatter.svelte";
   let appName = "chatter";
+  import { defaultParams } from "../paramsChatter";
   //
 
   import "../../../../css/default.scss";
   import { onMount } from "svelte";
   import { runningApp } from "../../params";
-
-  let [params, updateSettings] = Array(2).fill(new Object());
   let runApp = true;
+  let params = defaultParams;
 
   onMount(async () => {
     let urlData = new URLSearchParams(window.location.search);
@@ -19,11 +19,9 @@
     // APP SPECIFIC
     if (!params.version) params.fontsize = params.fontsize * 16;
     if (!params["chatcolourCalc"]) params["chatcolourCalc"] = params.chatcolour;
-
-    //KEEP
-    updateSettings = params;
-    console.log(params);
   });
 </script>
 
-<Chatter {params} {runApp} />
+{#key params.channel}
+  <Chatter {params} {runApp} />
+{/key}

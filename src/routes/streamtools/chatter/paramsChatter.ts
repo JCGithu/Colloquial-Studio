@@ -1,6 +1,6 @@
 export interface ChatterParameters {
   [x: string]: any;
-  channel: string | undefined;
+  channel: string;
   font: string;
   fontsize: any;
   align: string;
@@ -9,26 +9,26 @@ export interface ChatterParameters {
   highcolour: string;
   bgcolour: string;
   fontcolour: string;
-  bgopacity: any;
+  bgopacity: number;
   chatopacity: any;
-  togglecol: any;
+  togglecol: string | boolean;
   animation: string;
-  badges: string;
+  badges: string | boolean;
   border: any;
-  bttv: string;
+  bttv: string | boolean;
   hidebot: any;
   hidecom: any;
-  pronouns: string;
+  pronouns: string | boolean;
   direction: string;
   customCSS: string;
   animTime: string;
   animEase: string;
-  emoteOnly: string;
-  nameCustom: string;
-  bubbleCustom: string;
+  emoteOnly: string | boolean;
+  nameCustom: string | boolean;
+  bubbleCustom: string | boolean;
   proFont: string;
-  proOutline: any;
-  proUseCol: any;
+  proOutline: boolean | string;
+  proUseCol: boolean | string;
   proColour: string;
   proBG: any;
   replies: boolean | string;
@@ -37,10 +37,11 @@ export interface ChatterParameters {
   points: boolean | string;
   removeTime: any;
   version: number;
+  saves:Array<boolean>;
 }
 
 export const defaultParams:ChatterParameters = {
-  channel: undefined,
+  channel: '',
   font: "Poppins",
   fontsize: 16,
   align: "flex-start",
@@ -77,36 +78,59 @@ export const defaultParams:ChatterParameters = {
   removeChats: 'false',
   removeTime: 60,
   version: 2,
+  saves: [false,false,false]
 };
 
 let arrays = ['hidebot', 'hidecom'];
-let reformattedValues = ['hidebot', 'hidecom', 'chatcolour', 'chatopacity', 'bgopacity', 'bgcolour', 'togglecol', 'badges', 'bttv', 'pronouns', 'emoteonly', 'align'];
+let booleans = ['togglecol', 'badges', 'bttv', 'pronouns', 'emoteOnly', 'nameCustom', 'bubbleCustom', 'points', 'proOutline', 'proUseCol', 'proBG', 'replies', 'links', 'removeChats'];
 
-export async function paramReformat(params:ChatterParameters, id:string){
-  if (id && !reformattedValues.includes(id)) return;
-
+// INDIVIDUAL FUNCTIONS
+function alignConvert(params:ChatterParameters){
   if (params.align === 'left') params.align = 'flex-start';
   if (params.align === 'right') params.align = 'flex-end';
-
-  if (params.bgopacity === '0') {
-    params.bgopacity = 0;
-  } else {
-    params.bgopacity = parseInt(params.bgopacity);
-  }
+}
+function chatColourCalculation(params:ChatterParameters){
+  params.chatcolourCalc = `rgba(${parseInt(params.chatcolour.slice(-6, -4), 16)},${parseInt(params.chatcolour.slice(-4, -2), 16)},${parseInt(params.chatcolour.slice(-2), 16)},${params.chatopacity / 100})`;
+}
+function backgroundOpacity(params:ChatterParameters){
+  if (typeof params.bgopacity === 'string') params.bgopacity = parseInt(params.bgopacity);
+}
+function backgroundColour(params:ChatterParameters){
   if (params.bgcolour.indexOf('#') < 0) params.bgcolour = '#' + params.bgcolour;
+}
 
-  Object.keys(params).forEach((p) => {
-    if (params[p] === "true" || params[p] === "false") params[p] = (params[p] === 'true');
+// FULL REFORMATTER
+export async function paramReformat(params:ChatterParameters, id:string | null){
+  // If the function is provided an ID it only changes that value then returns nothing
+  if (id) {
+    //ARRAYS
+    if (arrays.includes(id) && typeof params[id] === 'string') params[id] = params[id].trim().split(',');
+    //BOOLEANS
+    if (booleans.includes(id) && typeof params[id] === 'string') params[id] = (params[id] === 'true');
+    //ALIGN
+    if (id === 'align') alignConvert(params);
+    if (id === 'chatcolour') chatColourCalculation(params);
+    if (id === 'bgopacity') backgroundOpacity(params);
+    if (id === 'bgcolour') backgroundColour(params);
+    console.log (`"${id} reformatted to "${params[id]}"`);
+    return;
+  };
+
+  // Otherwise it changes everything it can and returns params
+  alignConvert(params);
+  chatColourCalculation(params);
+  backgroundOpacity(params);
+  backgroundColour(params)
+
+  booleans.forEach((b) => {
+    if (typeof params[b] === 'string') params[b] = (params[b] === 'true');
   });
-
   arrays.forEach((v, i)=>{
     if (typeof params[v] != 'string') return;
     params[v] = params[v].trim().split(',');
-  })
-  //CHAT COLOUR
-  params.chatcolourCalc = `rgba(${parseInt(params.chatcolour.slice(-6, -4), 16)},${parseInt(params.chatcolour.slice(-4, -2), 16)},${parseInt(params.chatcolour.slice(-2), 16)},${params.chatopacity / 100})`;
+  });
+
   console.log('Params Reformatted', params);
-  if (!id) return params;
-  return;
+  return params;
 }
 

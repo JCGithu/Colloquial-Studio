@@ -7,6 +7,7 @@ export interface EmoteDropParameters {
   etime: number;
   sleep: boolean;
   random: boolean;
+  modWipe: boolean;
   version: number;
   saves:Array<boolean>;
 }
@@ -20,6 +21,7 @@ export const defaultParams:EmoteDropParameters = {
   bounce: 5,
   random: false,
   sleep: true,
+  modWipe: true,
   saves: [false, false, false]
 };
 

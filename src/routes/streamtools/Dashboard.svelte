@@ -2,18 +2,27 @@
   export let urlFill = "";
   export let showInfo = false;
   export let showButtons = true;
-  export let saves = new Array(3);
+  export let saves = [false, false, false];
+
+  export let dashboardParams: standardObject;
+  export let runningParams: standardObject;
+
+  let baseURL = "";
+
   let userBackground = "#eae5db";
-  let saveArray = new Array(3);
   let toastArray: Array<{ message: string; id: number }> = [];
+
+  import { loadURL, loadSave, urlBuild, save } from "./params";
 
   import { fly, fade } from "svelte/transition";
   import { createEventDispatcher, onMount, getContext } from "svelte";
   const dispatch = createEventDispatcher();
 
-  let toastID = 0;
+  //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
 
+  //TOAST
+  let toastID = 0;
   function ToastQueue(message: string) {
     toastID++;
     toastArray.push({ message: message, id: toastID });
@@ -25,41 +34,53 @@
       }
     }, 5000);
   }
-
   export const toastUpdate = (i: string) => {
     ToastQueue(i);
   };
 
   let saveMenu = false;
-  function swapInfo() {
+  function toggleInfoScreen() {
     showInfo = !showInfo;
   }
 
+  //URL FUNCTIONS
   function copyURL() {
     navigator.clipboard.writeText(urlFill);
     ToastQueue("URL copied to clipboard");
   }
-  function loadFromURL() {
+
+  async function loadFromURL() {
     let urlData = window.prompt("Put in an existing URL", "URL here...");
-    dispatch("loadURL", urlData);
+    dashboardParams = await loadURL(urlData || "", appDetails.name);
+    urlFill = urlBuild(dashboardParams, baseURL);
+    runningParams = dashboardParams;
     ToastQueue("Settings loaded from URL");
   }
-  function saveData(num) {
-    dispatch("saveData", num);
+
+  //DATA FUNCTIONS
+  function saveData(num: number) {
     saveMenu = !saveMenu;
+    save(dashboardParams, appDetails.name, num);
     ToastQueue("Saved to File " + (num + 1));
   }
-  function loadData(num) {
-    dispatch("loadData", num);
+  async function loadData(num: number) {
+    dashboardParams = await loadSave(num, appDetails.name);
     saveMenu = !saveMenu;
+    urlFill = urlBuild(dashboardParams, baseURL);
     ToastQueue("Loaded from Save " + (num + 1));
   }
+
   onMount(async () => {
-    let localStore = window.localStorage.getItem(appDetails.name);
-    if (!localStore) showInfo = true;
+    //Pulling actual base URL
+    baseURL = window.location.href.split("?data=")[0];
+
+    //Pulling Localstorage info for saves
     setTimeout(() => {
-      saveArray = Object.keys(saves);
-    }, 1000);
+      dashboardParams.saves.forEach((s: boolean) => {
+        if (s) showInfo = false;
+      });
+      saves = dashboardParams.saves;
+    }, 500);
   });
 </script>
 
@@ -79,9 +100,9 @@
       <p><slot name="description" /><span>{appDetails.description}</span></p>
       <div id="credits">
         <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
-        <a href="https://ko-fi.com/K3K2231Z8" target="_blank"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" border="0" alt="Buy Me a Coffee at ko-fi.com" /></a>
+        <a href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
       </div>
-      <button on:click={swapInfo} on:submit={swapInfo}>Close</button>
+      <button on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>Close</button>
     </div>
   </div>
 {/if}
@@ -89,10 +110,10 @@
   {#if saveMenu}
     <div id="saveMenu" class="infoScreen" transition:fade>
       <div class="saveCollection">
-        {#each saveArray as save, i}
-          <span class={saves[save].channel ? "" : "blank"}>
+        {#each saves as save, i}
+          <span class:blank={!saves[i]}>
             <p>Save {i + 1}:</p>
-            <button on:click={() => saveData(i)}>{saves[save].channel ? "Overwrite" : "Save"}</button>
+            <button on:click={() => saveData(i)}>{saves[i] ? "Overwrite" : "Save"}</button>
             <button on:click={() => loadData(i)}>Load</button>
           </span>
         {/each}
@@ -132,7 +153,7 @@
     <slot name="testing" />
   </div>
   <div id="dashControls" class="dashRight">
-    <h1 on:click={swapInfo}>{appDetails.title}</h1>
+    <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
     <slot name="settings" />
   </div>
 </main>
