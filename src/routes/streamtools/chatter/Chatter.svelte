@@ -9,7 +9,10 @@
   export let runApp = false;
   let messageIndex = 0;
 
-  let viewport, viewportHeight, bttvEmoteCache: Array<bttvEmoteIndividual>;
+  let viewport,
+    viewportHeight,
+    bttvEmoteCache: Array<bttvEmote>,
+    ffzCache: Array<ffzEmote> = [];
 
   import { formatEmotes } from "./messageParser";
   import { badge_sets } from "./badges.json";
@@ -17,14 +20,13 @@
   let exampleTags: Tags = {
     color: params.highcolour,
     "display-name": "Chatter",
-    testing: true,
     id: "C0",
+    badges: {},
     username: "Chatter",
     "room-id": undefined,
-    emotes: null,
-    badges: {},
     "first-msg": false,
     mod: false,
+    turbo: false,
   };
 
   let userPronouns = new Map<string, string>();
@@ -67,6 +69,28 @@
         return;
       });
   }
+  async function fetchBadges(tags: Tags) {
+    const urls = [`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`, `https://api.betterttv.net/3/cached/users/twitch/${tags["room-id"]}`];
+
+    try {
+      const responses = await Promise.all(urls.map((url) => fetch(url)));
+      const data = await Promise.all(responses.map((response) => response.json()));
+      // Process the badge data
+      Object.keys(data[0]["badge_sets"]).forEach((k) => {
+        badgeData[k] = data[0]["badge_sets"][k];
+      });
+      console.log(badgeData);
+      // Process the BTTV emotes
+      for (let i in data[1].channelEmotes) {
+        bttvEmoteCache.push(data[1].channelEmotes[i]);
+      }
+      for (let i in data[1].sharedEmotes) {
+        bttvEmoteCache.push(data[1].sharedEmotes[i]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   fetch("https://api.betterttv.net/3/cached/emotes/global")
     .then((response) => response.json())
@@ -77,10 +101,85 @@
       console.log(error);
     });
 
+  fetch(`https://api.frankerfacez.com/v1/set/global`)
+    .then((response) => response.json())
+    .then((data) => {
+      for (let [key, value] of Object.entries(data.sets as ffzData)) {
+        ffzCache = ffzCache.concat(value.emoticons);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  function ffzChannel(name: string) {
+    fetch(`https://api.frankerfacez.com/v1/room/${name}`)
+      .then((response) => response.json())
+      .then((data) => {
+        for (let [key, value] of Object.entries(data.sets as ffzData)) {
+          ffzCache = ffzCache.concat(value.emoticons);
+        }
+        console.log(ffzCache);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   let badgeData: BadgeData = {};
   Object.keys(badge_sets).forEach((k) => {
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
+
+  // This is broken out because the test and regular message use this.
+  function messageWrap(newChat: Message) {
+    newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
+    messageIndex++;
+    console.log(newChat.tags.id);
+    if (params.direction === "Down") {
+      messageList = messageList.concat(newChat);
+      if (messageList.length > 50) messageList.shift();
+    }
+    if (params.direction === "Up") {
+      messageList.unshift(newChat);
+      if (messageList.length > 50) messageList.pop();
+    }
+    if (params.removeChats) {
+      setTimeout(() => {
+        messageList.shift();
+        messageList = messageList;
+      }, params.removeTime * 1000);
+    }
+    messageList = messageList;
+  }
+
+  function testMessage(message: string, type: string) {
+    console.log("Test Message:", message, type);
+    let messageArray = formatEmotes(message, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits, params);
+    let newChat: Message = {
+      message: messageArray,
+      user: "Test_User",
+      color: params.highcolour,
+      tags: Object.assign({}, exampleTags),
+      type: type,
+      pronoun: "Any",
+    };
+    if (type === "sub") Object.assign(newChat.tags, { badges: { subscriber: 0 } });
+    if (type === "vip") Object.assign(newChat.tags, { badges: { vip: 1 } });
+    if (type === "partner") Object.assign(newChat.tags, { badges: { partner: 1 } });
+    if (type === "bits") newChat.tags.bits = 100;
+    if (type === "mod") {
+      Object.assign(newChat.tags, { badges: { moderator: 1 } });
+      newChat.tags.mod = true;
+    }
+    if (type === "user") {
+      Object.assign(newChat.tags, { "display-name": messageArray[0].text, username: messageArray[0].text });
+      messageArray.shift();
+      newChat.message = messageArray;
+    }
+    console.log(exampleTags);
+    messageWrap(newChat);
+  }
 
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
     if (self) return;
@@ -96,38 +195,25 @@
     }
     if (params.points && tags["custom-reward-id"]) return;
     if (params.replies && tags["reply-parent-display-name"]) return;
-    if (firstMessage && !tags.testing) {
-      fetch(`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`)
-        .then((response) => response.json())
-        .then((data) => {
-          Object.keys(data["badge_sets"]).forEach((k) => {
-            badgeData[k] = data["badge_sets"][k];
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      fetch(`https://api.betterttv.net/3/cached/users/twitch/${tags["room-id"]}`)
-        .then((response) => response.json())
-        .then((data) => {
-          for (let i in data.channelEmotes) {
-            bttvEmoteCache.push(data.channelEmotes[i]);
-          }
-          for (let i in data.sharedEmotes) {
-            bttvEmoteCache.push(data.sharedEmotes[i]);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+
+    //Testing Commands
+    let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
+    if (tags.badges.broadcaster) {
+      let splitMessage = message.split(" ");
+      if (testCommands.includes(splitMessage[0])) {
+        testMessage(message.replace(splitMessage[0] + " ", ""), splitMessage[0].slice(9));
+        return;
+      }
+    }
+
+    if (firstMessage) {
+      console.log("Chatter: First message, pulling badges");
+      fetchBadges(tags);
+      console.log(tags);
       firstMessage = false;
     }
 
-    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, tags.bits, params);
-
-    //fetchPronoun(tags.username);
-    //userPronouns = userPronouns;
-
+    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, ffzCache, tags.bits, params);
     let newChat: Message = {
       message: messageArray,
       user: tags.username || "",
@@ -136,34 +222,11 @@
       type: type,
       pronoun: undefined,
     };
-
     let lowerCase = newChat.user.toLowerCase();
     newChat.pronoun = userPronouns.get(lowerCase);
     if (params.pronouns && !newChat.pronoun) fetchPronoun(lowerCase);
-
-    //if (!params.togglecol) newChat.color = params.highcolour;
     console.log(newChat, newChat.tags);
-    if (type === "sub" || type === "announcement" || type === "test") {
-      newChat.tags.id = messageIndex.toString();
-    } else {
-      newChat.tags.id = message[0] + messageIndex.toString();
-    }
-    if (params.direction === "Down") {
-      messageList = messageList.concat(newChat);
-      if (messageList.length > 50) messageList.shift();
-    }
-    if (params.direction === "Up") {
-      messageList.unshift(newChat);
-      if (messageList.length > 50) messageList.pop();
-    }
-    if (params.removeChats) {
-      setTimeout(() => {
-        messageList.shift();
-        messageList = messageList;
-      }, params.removeTime * 1000);
-    }
-    messageIndex++;
-    messageList = messageList;
+    messageWrap(newChat);
   }
 
   function removeUser(userToBlock: string) {
@@ -176,6 +239,10 @@
   onMount(async () => {
     console.log("Chatter has Loaded", params);
 
+    window.onunhandledrejection = (e) => {
+      console.log("Error:", e);
+    };
+
     firstMessage = true;
     // @ts-ignore
     let client = new tmi.Client({
@@ -184,7 +251,8 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      runMessage("", exampleTags, `Connected to ${params.channel} ✅`, false, "announcement");
+      if (params.ffz) ffzChannel(params.channel);
+      testMessage(`Connected to ${params.channel} ✅`, "announcement");
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
@@ -200,11 +268,11 @@
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
     client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
 
-    if (params.version != 2) {
-      runMessage("", exampleTags, `Chatter has had a major update! Please go back to the site and update your URL.`, false, "announcement");
+    if (!params.version || params.version !== 2) {
+      testMessage("Chatter has had a major update! Please go back to the site and update your URL.", "announcement");
     }
-    if (params.channel === "") {
-      runMessage("", exampleTags, `Give me a Twitch channel name to test! 📺`, false, "announcement");
+    if (params.channel === "" || !params.channel) {
+      testMessage("Give me a Twitch channel name to test! 📺", "announcement");
     } else {
       console.log("Attempting Twitch Connection...");
       client.connect();

@@ -14,14 +14,14 @@ interface standardObject {
 }
 
 interface MessageChunk {
-  code: string | null;
+  code?: string;
   text: string;
-  num?: number | undefined;
+  num?: number;
 }
 
 interface Message {
   pronoun: string | undefined;
-	message: string | Array<MessageChunk>;
+	message: Array<MessageChunk>;
 	user: string;
 	color: string;
 	tags: Tags;
@@ -30,15 +30,18 @@ interface Message {
 
 interface Tags {
   bits?: number | undefined;
-  testing: boolean;
-  username: string | undefined;
+  username: string;
   "reply-parent-display-name"?: string | undefined;
   "room-id": string | undefined;
 	"display-name": string;
 	color: string | undefined;
 	id: string;
-	emotes:{[key:number]:Array<string>} | null;
-	badges:{[key:string]:number};
+	turbo: boolean;
+	emotes?:{[key:number]:Array<string>};
+	badges:{
+		[key:string]:number,
+		vip?:number
+	};
 	'first-msg': boolean,
 	mod: boolean,
 	"custom-reward-id"?: string
@@ -57,11 +60,29 @@ interface BadgeSet {
 	}
 }
 
-interface bttvEmoteIndividual {
+interface bttvEmote {
 	id: string,
 	code: string,
 	imageType: string,
 	userId: string
+}
+
+interface ffzEmote {
+	name: string,
+	urls:{
+		[x:string]:string
+	}
+}
+
+interface ffzData {
+	[x:string]:{
+		id: number,
+		_type: number,
+		icon: null,
+		title: string,
+		css: null,
+		emoticons: Array<ffzEmote>
+	}
 }
 
 interface appDetails {

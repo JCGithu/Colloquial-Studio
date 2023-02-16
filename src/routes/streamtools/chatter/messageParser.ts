@@ -23,15 +23,12 @@ function checkEmotes(emotes:{[key:number]:Array<string>}, splitText:Array<Messag
 }
 
 function checkBits(splitText:Array<MessageChunk>){
-  console.log('BITS RECIEVED');
   splitText.forEach(chunk => {
     let cheerTest = cheerRex.test(chunk.text.toLowerCase());
     if (!cheerTest) return;
-    console.log('cheerrex success');
     let title = chunk.text.match(/[a-zA-z]+/g)![0];
     title = title.toLowerCase();
     let num = parseInt(chunk.text.match(/\d+/g)![0]);
-    console.log(title,num);
     cheerTiers.forEach(rank => {
       if (num < rank) return;
       chunk = {
@@ -44,21 +41,37 @@ function checkBits(splitText:Array<MessageChunk>){
   return splitText;
 }
 
-function checkBTTV(bttvEmoteCache:Array<{ code: string; id: string; }>, splitText:Array<object | string>){
+function checkBTTV(bttvEmoteCache:Array<bttvEmote>, splitText:Array<MessageChunk>){
   for (let i in splitText){
     bttvEmoteCache.forEach((BTTVE) => {
-      if (splitText[i] === BTTVE.code){
+      if (splitText[i].text === BTTVE.code){
         splitText[i] = {
           code: `https://cdn.betterttv.net/emote/${BTTVE.id}/3x`,
-          text: splitText[i],
+          text: splitText[i].text,
         };
       }
     });
   }
   return splitText;
 }
+
+function checkFFZ(ffzCache:Array<ffzEmote>, splitText:Array<MessageChunk>){
+  for (let i in splitText){
+    ffzCache.forEach((FFZE) => {
+      if (splitText[i].text === FFZE.name){
+        splitText[i] = {
+          code: FFZE.urls[Object.keys(FFZE.urls).length-1],
+          text: splitText[i].text,
+        };
+        console.log(splitText[i]);
+      }
+    });
+  }
+  return splitText;
+}
+
   
-export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmoteIndividual>, bits:number|undefined, params:ChatterParameters):Array<MessageChunk> {
+export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmote>, ffzCache:Array<ffzEmote>, bits:number|undefined, params:ChatterParameters):Array<MessageChunk> {
   var splitText:Array<any> = text.split(' ');
   for (let i in splitText){
     splitText[i] = {
@@ -70,5 +83,6 @@ export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:
   if (emotes) splitText = checkEmotes(emotes, splitText, text);
   if (bits) splitText = checkBits(splitText);
   if (bttvEmoteCache && params.bttv) splitText = checkBTTV(bttvEmoteCache, splitText);
+  if (ffzCache && params.ffz) splitText = checkFFZ(ffzCache, splitText); 
   return splitText;
 }

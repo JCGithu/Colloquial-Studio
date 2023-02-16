@@ -45,7 +45,7 @@ export function save(params:standardObject, app:string, slot:number) {
 
 export function updateV1URLs(input:standardObject, app:string){
   if (!input.version || input.version === 1){
-    if (input.fontsize) input.fontsize = input.fontsize * 8;
+    if (input.fontsize) input.fontsize = input.fontsize * 5;
   }
   let runningDefault = defaults[app];
   Object.keys(runningDefault).forEach((def)=>{

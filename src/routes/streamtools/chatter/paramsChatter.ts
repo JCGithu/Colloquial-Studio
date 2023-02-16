@@ -16,6 +16,7 @@ export interface ChatterParameters {
   badges: string | boolean;
   border: any;
   bttv: string | boolean;
+  ffz: string | boolean;
   hidebot: any;
   hidecom: any;
   pronouns: string | boolean;
@@ -23,6 +24,7 @@ export interface ChatterParameters {
   customCSS: string;
   animTime: string;
   animEase: string;
+  highlight: string | boolean;
   emoteOnly: string | boolean;
   nameCustom: string | boolean;
   bubbleCustom: string | boolean;
@@ -52,11 +54,13 @@ export const defaultParams:ChatterParameters = {
   fontcolour: "#f7f7ff",
   bgopacity: 3,
   chatopacity: 90,
+  highlight: 'false',
   togglecol: "true",
   animation: "Pop In",
   badges: "true",
   border: 5,
-  bttv: "true",
+  bttv: "false",
+  ffz: 'false',
   hidebot: "",
   hidecom: "",
   pronouns: "false",
@@ -82,7 +86,7 @@ export const defaultParams:ChatterParameters = {
 };
 
 let arrays = ['hidebot', 'hidecom'];
-let booleans = ['togglecol', 'badges', 'bttv', 'pronouns', 'emoteOnly', 'nameCustom', 'bubbleCustom', 'points', 'proOutline', 'proUseCol', 'proBG', 'replies', 'links', 'removeChats'];
+let booleans = ['togglecol', 'badges', 'bttv', 'ffz', 'pronouns', 'emoteOnly', 'nameCustom', 'bubbleCustom', 'points', 'proOutline', 'proUseCol', 'proBG', 'replies', 'links', 'removeChats', 'highlight'];
 
 // INDIVIDUAL FUNCTIONS
 function alignConvert(params:ChatterParameters){
@@ -109,7 +113,7 @@ export async function paramReformat(params:ChatterParameters, id:string | null){
     if (booleans.includes(id) && typeof params[id] === 'string') params[id] = (params[id] === 'true');
     //ALIGN
     if (id === 'align') alignConvert(params);
-    if (id === 'chatcolour') chatColourCalculation(params);
+    if (id === 'chatcolour' || id === 'chatopacity') chatColourCalculation(params);
     if (id === 'bgopacity') backgroundOpacity(params);
     if (id === 'bgcolour') backgroundColour(params);
     console.log (`"${id} reformatted to "${params[id]}"`);

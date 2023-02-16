@@ -139,17 +139,17 @@
       <DashInput {params} type="text" name="CSS Easing" id="animEase" on:valueChange={valueChanger} />
     </DashGroup>
     <DashGroup title="Moderation">
-      <DashInput {params} type="text" name="Hide these bots" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" on:valueChange={valueChanger} />
-      <DashInput {params} type="text" name="Hide these commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" on:valueChange={valueChanger} />
+      <DashInput {params} type="text" name="Hide Users" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" on:valueChange={valueChanger} />
+      <DashInput {params} type="text" name="Hide Commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
     </DashGroup>
-    <DashGroup title="Advanced">
-      <DashInput {params} type="checkbox" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
-      <!--         <DashInput {params} type="text" name="Custom CSS" subtitle="Tutorial coming soon" id="customCSS" on:valueChange={valueChanger} /> -->
+    <DashGroup title="Emotes">
+      <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" name="Show FFZ Emotes" id="ffz" on:valueChange={valueChanger} />
+      <DashInput {params} type="checkbox" subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" on:valueChange={valueChanger} />
     </DashGroup>
     <DashInput {params} type="checkbox" name="Show Badges" id="badges" on:valueChange={valueChanger} />
-    <DashInput {params} type="checkbox" name="Show BTTV Emotes" id="bttv" on:valueChange={valueChanger} />
-    <DashInput {params} type="checkbox" name="Hide chat replies" id="replies" on:valueChange={valueChanger} />
-    <DashInput {params} type="checkbox" name="Hide links" id="links" on:valueChange={valueChanger} />
     <DashInput {params} type="checkbox" name="Hide point redeems" id="points" on:valueChange={valueChanger} />
     <DashInput {params} type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" on:valueChange={valueChanger} />
     {#if updateSettings.removeChats}
