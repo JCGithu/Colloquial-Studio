@@ -5,6 +5,7 @@ specifiers:
   '@sveltejs/kit': ^1.5.0
   '@types/matter-js': ^0.18.2
   '@types/tmi.js': ^1.8.3
+  js-confetti: ^0.11.0
   jsoncrush: ^1.1.8
   matter-js: ^0.18.0
   sass: ^1.57.1
@@ -16,6 +17,7 @@ specifiers:
   vite: ^4.0.4
 
 dependencies:
+  js-confetti: 0.11.0
   jsoncrush: 1.1.8
   matter-js: 0.18.0
   svelte-collapse: 0.1.1
@@ -618,6 +620,10 @@ packages:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
     dev: true
+
+  /js-confetti/0.11.0:
+    resolution: {integrity: sha512-Hc7I3VI4r4H0nq5q/oQK+JJwGoYRYVHK72fGk8E9Ay1dbh+aiZ9yl0yFp1K4oYeq7YFDQAndYChwqLPA3QWQuA==}
+    dev: false
 
   /jsoncrush/1.1.8:
     resolution: {integrity: sha512-lvIMGzMUA0fjuqwNcxlTNRq2bibPZ9auqT/LyGdlR5hvydJtA/BasSgkx4qclqTKVeTidrJvsS/oVjlTCPQ4Nw==}
