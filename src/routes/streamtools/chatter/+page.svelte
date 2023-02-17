@@ -66,6 +66,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Chatter - Dashboard</title>
+</svelte:head>
+
 <Dashboard {urlFill} bind:runningParams={updateSettings} bind:dashboardParams={params} bind:toastUpdate>
   <slot slot="app">
     {#key params.channel}

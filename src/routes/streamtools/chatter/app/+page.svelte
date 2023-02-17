@@ -22,6 +22,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Chatter</title>
+</svelte:head>
+
 {#key params.channel}
   <Chatter {params} {runApp} />
 {/key}

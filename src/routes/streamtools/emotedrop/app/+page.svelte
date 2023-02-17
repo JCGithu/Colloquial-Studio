@@ -21,6 +21,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Emote Drop</title>
+</svelte:head>
+
 {#key params.channel}
   <EmoteDrop {params} {runApp} />
 {/key}

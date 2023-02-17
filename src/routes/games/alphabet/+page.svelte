@@ -111,6 +111,7 @@
 </script>
 
 <svelte:head>
+  <title>Alphabet - Colloquial</title>
   <style>
     body {
       width: 100vw;
