@@ -166,7 +166,7 @@
   $sideB: $black;
 
   main {
-    --userBackground: #eae5db;
+    --userBackground: $white;
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -194,7 +194,7 @@
     text-decoration: underline;
     //font-size: clamp(1rem, -0.1475rem + 2.623vw, 3rem);
     color: $white;
-    text-decoration-color: $pink;
+    text-decoration-color: $colloquial;
     text-underline-offset: 5px;
     text-align: center;
     cursor: pointer;
@@ -206,7 +206,7 @@
   }
 
   #dashTitle {
-    border-color: $pink;
+    border-color: $colloquial;
     border-style: solid;
     border-width: 0px 0px 3px 0px;
     text-align: left;
@@ -441,7 +441,7 @@
     padding: 0.5rem;
     padding-right: 1rem;
     border-radius: 0 0 1rem 0;
-    background-color: #fe5f55;
+    background-color: $colloquial;
     a {
       color: white;
       text-decoration: none;

@@ -15,7 +15,7 @@
   export let ops: Array<Option> = [];
   export let value: any = null;
   export let faded = false;
-  export let params: object;
+  export let params: standardObject;
   const dispatch = createEventDispatcher();
 
   let grouped = getContext("grouped");
@@ -24,7 +24,7 @@
   let titleBlock = true;
   let dashInputValue: any = "";
 
-  let valueUpdate = (e) => {
+  let valueUpdate = (e: any) => {
     value = e.target.value;
     if (type === "checkbox") value = e.target.checked;
     if (type === "color") {

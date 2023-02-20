@@ -5,7 +5,6 @@ import { paramReformat as paramReformetEmote } from "./emotedrop/paramsEmoteDrop
 
 import { defaultParams as defaultChatter } from "./chatter/paramsChatter";
 import { defaultParams as defaultEmote } from "./emotedrop/paramsEmoteDrop";
-import { init } from "svelte/internal";
 
 let reformatting: {[x:string]:Function} = {
   'chatter': paramReformatChatter,
@@ -17,10 +16,10 @@ let defaults: {[x:string]: any} = {
   'emotedrop': defaultEmote
 }
 
-export function urlBuild(params:standardObject, baseURL:string, channelName:string) {
+export function urlBuild(params:standardObject, baseURL:string, channelName?:string) {
   let toCrush = Object.assign({}, params);
   delete toCrush.saves;
-  toCrush.channel = channelName;
+  if (channelName) toCrush.channel = channelName;
   let urlCrush = encodeURIComponent(JSONCrush.crush(JSON.stringify(toCrush)));
   if (baseURL.includes('/app')) return `${baseURL}?data=${urlCrush}`;
   return `${baseURL}/app?data=${urlCrush}`;
@@ -37,7 +36,7 @@ export function save(params:standardObject, app:string, slot:number) {
   console.log(`Saving params to ${app}:${slot}`);
   let toSave = Object.assign({}, params);
   delete toSave.saves;
-  let storage = window.localStorage.getItem(app) || '{0:{},1:{},2:{}}';
+  let storage = window.localStorage.getItem(app) || JSON.stringify({0:{},1:{},2:{}});
   let storageObj = JSON.parse(storage);
   storageObj[slot] = toSave;
   window.localStorage.setItem(app, JSON.stringify(storageObj));
@@ -74,7 +73,7 @@ export async function loadURL(input:string, app:string){
 //LOADING FROM LOCALSTORAGE
 export async function loadSave(slot:number, app:string){
   console.log(`Loading params from ${app}:${slot}`);
-  let storage = window.localStorage.getItem(app) || '{0:{},1:{},2:{}}';
+  let storage = window.localStorage.getItem(app) || JSON.stringify({0:{},1:{},2:{}});
   let storageObj = JSON.parse(storage);
   let parsedData = Object.assign({}, storageObj[slot]);
   return await reformatting[app](parsedData);
@@ -86,7 +85,7 @@ export async function appInit(app:string, toastUpdate:Function){
   let storage = window.localStorage.getItem(app);
   // If there is no save, create one.
   if (storage === null) {
-    window.localStorage.setItem(app, '{0:{},1:{},2:{}}');
+    window.localStorage.setItem(app, '{"0":{},"1":{},"2":{}}');
     return await reformatting[app](initParams);
   }
   // Finding save data
