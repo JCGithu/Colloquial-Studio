@@ -109,7 +109,6 @@
 
   //MOUNTED
   onMount(async () => {
-    console.log(message);
     let size = bubble.getBoundingClientRect();
     if (params.highlight) bubble.style.boxShadow = `1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol)`;
     if (!params.animEase) params.animEase = "ease-in-out";
@@ -151,7 +150,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {params.font}; border-radius: {params.border / 10}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {params.font}; border-radius: {params.border / 100}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {params.fontcolour}">
       {#if params.badges}
