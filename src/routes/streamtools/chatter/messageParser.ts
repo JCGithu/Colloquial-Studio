@@ -63,7 +63,6 @@ function checkFFZ(ffzCache:Array<ffzEmote>, splitText:Array<MessageChunk>){
           code: FFZE.urls[Object.keys(FFZE.urls).length-1],
           text: splitText[i].text,
         };
-        console.log(splitText[i]);
       }
     });
   }
