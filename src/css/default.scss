@@ -6,6 +6,8 @@ html {
   padding: 0;
 }
 
+$phone: 768px;
+
 body {
   width: 100vw;
   height: 100vh;
@@ -24,4 +26,49 @@ body {
 
 .runApp{
   height: 100vh;
+}
+
+.zoomInput{
+  padding: 0.7rem 3rem;
+  border-radius: 0.5rem;
+  border: none;
+  margin-top: 1rem;
+  font-family: "Poppins";
+  height: 1.5rem;
+  opacity: 0.6;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.19, 1.2, 0.46, 0.9);
+  filter: blur(0) !important;
+  z-index: 2;
+  &:hover {
+    opacity: 1;
+  }
+  &:focus {
+    border: none;
+    outline: none;
+    height: 3rem;
+    zoom: 150%;
+    transform: scale(1.5);
+    opacity: 1;
+    z-index: 10;
+  }
+}
+
+:global(.switch) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  height: 1.5rem;
+  width: 2.75rem;
+}
+
+:global(.switch-enabled) {
+  /* Blue */
+  background-color: rgb(37 99 235);
+}
+
+:global(.switch-disabled) {
+  /* Gray */
+  background-color: rgb(229 231 235);
 }
