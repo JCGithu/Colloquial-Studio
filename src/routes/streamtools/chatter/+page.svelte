@@ -78,30 +78,9 @@
   </slot>
   <slot id="dashControls" slot="settings">
     <DashInput {params} type="text" name="Channel Name *" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
-    <DashButton text="Reload!" on:click={paramReload} />
-    <DashInput
-      {params}
-      type="select"
-      name="Align"
-      id="align"
-      ops={[
-        { name: "Left", value: "flex-start" },
-        { name: "Center", value: "center" },
-        { name: "Right", value: "flex-end" },
-      ]}
-      on:valueChange={valueChanger}
-    />
-    <DashInput
-      {params}
-      type="select"
-      name="Chat Direction"
-      id="direction"
-      ops={[
-        { name: "From Bottom", value: "Down" },
-        { name: "From Top", value: "Up" },
-      ]}
-      on:valueChange={valueChanger}
-    />
+    <DashButton text="Reload" on:click={paramReload} />
+    <DashInput {params} type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} on:valueChange={valueChanger} />
+    <DashInput {params} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} on:valueChange={valueChanger} />
     <DashGroup title="Font Settings">
       <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
       <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />
@@ -110,7 +89,7 @@
     </DashGroup>
     <DashGroup title="Chat Bubble">
       <DashInput {params} type="range" name="Opacity" max="100" min="0" id="chatopacity" on:valueChange={valueChanger} />
-      <DashInput {params} type="range" name="Roundness" max="10" min="0" id="border" on:valueChange={valueChanger} />
+      <DashInput {params} type="range" name="Roundness" max="100" min="0" id="border" on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Use User Custom Colours" id="bubbleCustom" on:valueChange={valueChanger} />
       <DashInput {params} type="color" name="Default colour" id="chatcolour" faded={params.bubbleCustom} on:valueChange={valueChanger} />
       <DashInput {params} type="checkbox" name="Drop Shadow" id="highlight" on:valueChange={valueChanger} />
@@ -123,22 +102,10 @@
     {/if}
     <DashGroup title="Background">
       <DashInput {params} type="color" name="Background Colour" id="bgcolour" on:valueChange={valueChanger} />
-      <DashInput {params} type="range" name="Opacity" max="10" min="0" id="bgopacity" on:valueChange={valueChanger} />
+      <DashInput {params} type="range" name="Opacity" max="100" min="0" id="bgopacity" on:valueChange={valueChanger} />
     </DashGroup>
     <DashGroup title="Animation">
-      <DashInput
-        {params}
-        type="select"
-        name="Animation"
-        id="animation"
-        ops={[
-          { name: "Pop In", value: "Pop In" },
-          { name: "Slide In", value: "Slide In" },
-          { name: "Fade In", value: "Fade In" },
-          { name: "Grow", value: "Grow" },
-        ]}
-        on:valueChange={valueChanger}
-      />
+      <DashInput {params} type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide In": "Slide In", "Fade In": "Fade In", Grow: "Grow" }} on:valueChange={valueChanger} />
       <DashInput {params} type="number" name="Speed" subtitle="In seconds. Accepts decimals." id="animTime" on:valueChange={valueChanger} />
       <DashInput {params} type="text" name="CSS Easing" id="animEase" on:valueChange={valueChanger} />
     </DashGroup>
