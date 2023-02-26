@@ -67,6 +67,7 @@
 </div>
 
 <style lang="scss">
+  @import "../css/colours.scss";
   #main {
     flex-direction: column;
     align-items: center;
@@ -80,7 +81,7 @@
     height: 100px;
   }
   ::selection {
-    color: #fe5f55;
+    color: $colloquial;
     background: rgba(255, 255, 255, 0.7);
   }
   .category {
