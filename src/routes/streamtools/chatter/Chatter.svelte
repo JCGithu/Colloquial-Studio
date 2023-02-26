@@ -135,7 +135,6 @@
   function messageWrap(newChat: Message) {
     newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
     messageIndex++;
-    console.log(newChat.tags.id);
     if (params.direction === "Down") {
       messageList = messageList.concat(newChat);
       if (messageList.length > 50) messageList.shift();
@@ -293,7 +292,7 @@
     {#each messageList as message (message.tags.id)}
       <ChatBubble {params} {message} {badgeData} />
     {/each}
-    <div style="--bgOpacity:{params.bgopacity / 10}; --bgColour:{params.bgcolour}" id="chatBackground" />
+    <div style="opacity:{params.bgopacity / 100}; --bgColour:{params.bgcolour}" id="chatBackground" />
   </div>
 </section>
 
@@ -320,11 +319,9 @@
   }
 
   #chatBackground {
-    --bgOpacity: 0;
     --bgColour: #262d36;
 
     background-color: var(--bgColour);
-    opacity: var(--bgOpacity);
     position: absolute;
     border-radius: 1rem;
     left: 0;
