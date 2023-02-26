@@ -9,7 +9,7 @@
     title: "Chatter",
     description: `Chatter is an on-screen chat for OBS/SLOBS. \n
     To start put in a Twitch channel name and click the reload button, the app will load on the left. Changing any settings on the right should be reflected in the app, so you can style it how you like! \n
-    At the top you can find the URL to put into OBS.`,
+    At the top you can find other settings and the URL to put into OBS.`,
   };
 
   import { onMount, setContext } from "svelte";
