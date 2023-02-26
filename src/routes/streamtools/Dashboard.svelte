@@ -260,7 +260,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: calc(35vw - 3rem);
+    width: calc(33vw - 3rem);
     padding: 3rem 1.5rem 2rem 1.5rem;
     overflow-y: auto;
     overflow-x: hidden;
@@ -314,7 +314,7 @@
 
   .dashLeft {
     height: 100vh;
-    width: 65vw;
+    width: 67vw;
     display: flex;
     flex-direction: column;
     @media screen and (max-width: $phone) {
@@ -337,7 +337,7 @@
     left: 0;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: fade-out($colloquial, 0.3);
   }
   .infoBox {
     border-radius: 1rem;
