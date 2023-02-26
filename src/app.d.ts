@@ -9,10 +9,21 @@ declare namespace App {
 	// interface Platform {}
 }
 
+interface svelteInput {
+	target:HTMLInputElement
+}
+
 interface standardObject {
 	[x:string]: any
 }
 
+interface toast {
+	message: string,
+	id: number,
+	code?:string,
+}
+
+//CHATTER
 interface MessageChunk {
   code?: string;
   text: string;
@@ -89,4 +100,47 @@ interface appDetails {
 	title: string,
 	name: string,
 	description: string
+}
+
+
+//TWORDLE
+interface TwordleStyle{
+	[x:string]:{
+		[x:string]: string
+	}
+}
+
+interface TwordleGame{
+	round: number,
+	letter: number,
+	timer: number,
+	message: string,
+	guess: Array<Array<string>>,
+	answer: string,
+	votes: number,
+	settings: boolean,
+	howto: boolean,
+	stats: boolean,
+	state: 'START' | 'OPENING' | 'POLL' | 'RETRY' | 'NEXTROUND' | 'REVEAL' | 'NEXTLINE' | 'SUCCESS' | 'FAIL',
+	connected: boolean
+}
+
+interface TwordlePoll {
+	[x:string]: number
+}
+
+interface TwordleKeys {
+	[x:string]:Array<Array<string>>
+}
+
+interface TwordleStorage {
+	play: number,
+  won: number,
+  votes: number,
+  auto: boolean,
+  dark: boolean,
+  keyboard: boolean,
+  volume: number,
+  timer: number,
+  channel: string,
 }
