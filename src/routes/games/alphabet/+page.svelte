@@ -148,6 +148,7 @@
 </main>
 
 <style lang="scss">
+  @import "../../../css/colours.scss";
   main {
     display: flex;
     width: 100vw;
@@ -239,7 +240,7 @@
   }
   h1 {
     text-decoration: underline;
-    text-decoration-color: coral;
+    text-decoration-color: $colloquial;
   }
   div {
     justify-content: center;
