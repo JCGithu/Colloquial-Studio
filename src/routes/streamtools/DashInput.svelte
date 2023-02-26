@@ -10,8 +10,8 @@
   export let subtitle: string | null = null;
   export let id = "";
   export let type = "";
-  export let min: string | null = null;
-  export let max: string | null = null;
+  export let min: string | null | number = null;
+  export let max: string | null | number = null;
   export let ops: standardObject = {};
   export let value: any = null;
   export let faded = false;
@@ -46,6 +46,10 @@
   if (type === "checkbox") titleBlock = false;
   if (faded) style.opacity = 0.5;
 
+  function scale(number, inMin, inMax, outMin, outMax) {
+    return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
+  }
+
   let rangeWidth = 0;
 
   afterUpdate(() => {
@@ -63,10 +67,9 @@
       optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "";
     }
     if (type === "range") {
-      rangeWidth = dashInputValue;
-      if (max === 10 || max === "10") rangeWidth = dashInputValue * 10;
-      rangeWidth = rangeWidth * 0.94;
-      console.log(rangeWidth);
+      max = parseInt(max) || 0;
+      min = parseInt(min) || 0;
+      rangeWidth = scale(dashInputValue, min, max, 0, 93.5);
     }
   });
 </script>
@@ -198,7 +201,6 @@
     &:hover {
       opacity: 1;
     }
-    box-shadow: inset 0px 0px 0px -60px lighten($pink, 10);
   }
 
   .colourBlock {
@@ -236,12 +238,6 @@
     padding: 0 !important;
     opacity: 1;
     cursor: pointer;
-  }
-  input[type="text"],
-  input[type="number"] {
-    &:focus {
-      box-shadow: inset 0px -207px 0px -200px $black;
-    }
   }
 
   //CHECKBOXES
@@ -470,7 +466,6 @@
     cursor: pointer;
     padding: 0.2rem 1rem;
     transition: 0.4s all ease-in-out;
-    border-color: $black;
     &:nth-child(1) {
       border-width: 0px;
     }
