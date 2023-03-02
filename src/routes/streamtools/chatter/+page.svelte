@@ -17,6 +17,7 @@
 
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
+  import DashGrid from "../DashGrid.svelte";
   import DashGroup from "../DashGroup.svelte";
   import DashButton from "../DashButton.svelte";
   import Chatter from "./Chatter.svelte";
@@ -77,10 +78,12 @@
     {/key}
   </slot>
   <slot id="dashControls" slot="settings">
-    <DashInput {params} type="text" name="Channel Name *" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
+    <DashInput {params} type="text" name="Channel Name" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
     <DashButton text="Reload" on:click={paramReload} />
-    <DashInput {params} type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} on:valueChange={valueChanger} />
-    <DashInput {params} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} on:valueChange={valueChanger} />
+    <DashGrid>
+      <DashInput {params} type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} on:valueChange={valueChanger} />
+      <DashInput {params} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} on:valueChange={valueChanger} />
+    </DashGrid>
     <DashGroup title="Font Settings">
       <DashInput {params} type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" on:valueChange={valueChanger} />
       <DashInput {params} type="number" name="Font Size" id="fontsize" on:valueChange={valueChanger} />

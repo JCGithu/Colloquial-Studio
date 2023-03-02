@@ -8,7 +8,7 @@
   @import "../../css/colours.scss";
   button {
     font-family: "Poppins";
-    font-size: large;
+    font-size: normal;
     border: none;
     height: max-content;
     font-weight: light;
@@ -21,8 +21,7 @@
     margin-bottom: 1rem;
     border-color: $colloquial;
     border-style: solid;
-    border-width: 0px;
-    border-top-width: 0.5px;
+    border-width: 0.5px;
     //background-color: rgba(0, 0, 0, 0);
     background: linear-gradient(290deg, rgba(0, 0, 0, 0) 24%, $pink 25%);
     background-size: 600% 600%;
@@ -32,6 +31,8 @@
     width: max-content;
     align-self: center;
     flex-direction: column;
+    text-transform: uppercase;
+    font-weight: bold;
     transition: 1s cubic-bezier(0.26, 0.77, 0.06, 0.9);
     cursor: pointer;
     &:hover {

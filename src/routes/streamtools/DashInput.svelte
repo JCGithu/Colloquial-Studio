@@ -15,6 +15,7 @@
   export let ops: standardObject = {};
   export let value: any = null;
   export let faded = false;
+  export let required = false;
   export let params: standardObject;
   const dispatch = createEventDispatcher();
 
@@ -41,7 +42,11 @@
   };
 
   let direction = "column";
-  if (type === "select" && !subtitle) direction = "row";
+  let vert = true;
+  if (type === "select" && !subtitle) {
+    direction = "row";
+    vert = false;
+  }
   if (type === "color" && !value) value = "#ffffff";
   if (type === "checkbox") titleBlock = false;
   if (faded) style.opacity = 0.5;
@@ -74,9 +79,9 @@
   });
 </script>
 
-<div class="inputBlock" class:grouped class:faded style:--flex={direction}>
+<div class="inputBlock" class:inputBlockVert={vert} class:grouped class:faded style:--flex={direction}>
   {#if titleBlock}
-    <h2 class="inputName">{name}</h2>
+    <h2 class="inputName {type === 'select' ? 'listName' : ''}" class:required>{name}</h2>
     {#if subtitle}
       <p class="inputSubtitle">{subtitle}</p>
     {/if}
@@ -124,12 +129,21 @@
 </div>
 
 <style lang="scss">
+  @import "../../css//default.scss";
   @import "../../css/colours.scss";
   .invert {
     color: black !important;
   }
   .faded {
     opacity: 0.5;
+  }
+  .required {
+    &::after {
+      content: "*";
+      position: absolute;
+      opacity: 0.7;
+      font-weight: 400;
+    }
   }
   .grouped {
     display: flex;
@@ -154,6 +168,12 @@
     font-weight: bold;
     margin: 0;
     font-size: large;
+    //padding-right: 1rem;
+  }
+
+  .listName {
+    //align-items: baseline;
+    padding-right: 1rem;
   }
 
   .inputSubtitle {
@@ -167,6 +187,15 @@
 
   .inputBlock {
     width: 85%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    @media screen and (max-width: $phone) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .inputBlockVert {
+    grid-template-columns: 1fr;
   }
 
   div {
@@ -174,7 +203,7 @@
     display: flex;
     flex-direction: var(--flex);
     padding: 0.2rem 0rem;
-    align-items: baseline;
+    align-items: center;
     width: calc(100% - 3rem);
   }
 
@@ -380,20 +409,19 @@
     position: absolute;
   }
   :global(.listBox) {
-    padding: 0.2rem 1rem;
+    padding: 0.2rem 0rem;
     border: none;
     outline: none;
     font-family: "Poppins";
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    width: clamp(100%, 250px, 100%);
+    width: 100%;
   }
   :global(.listBoxButton) {
-    padding: 0.2rem 1rem;
     position: relative;
     width: 100%;
-    max-width: 250px;
+    //max-width: 70%;
     border: none;
     outline: none;
     font-family: "Poppins";
@@ -408,7 +436,7 @@
     background-size: 600% 600%;
     background-position: 50% 100%;
     padding: 1rem;
-    margin-left: 1rem;
+    //margin-left: 1rem;
     //box-shadow: 0px 0px 5px darken($pink, 10);
     //margin-left: 16%;
     //margin-bottom: 0rem;
@@ -427,12 +455,11 @@
       content: url("data:image/svg+xml, %3Csvg class='buttonArrow' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m11.125 16.313 7.688-7.688 3.594 3.719-11.094 11.063L0 12.094l3.5-3.531z' /%3E%3C/svg%3E%0A");
       display: block;
       position: absolute;
-      transform: scale(0.5);
-      top: 0;
+      top: calc(50% - 12.5px);
       right: 0;
       opacity: 0.5;
-      width: 50px;
-      height: 50px;
+      width: 25px;
+      height: 25px;
     }
   }
   :global(.boxOpen) {

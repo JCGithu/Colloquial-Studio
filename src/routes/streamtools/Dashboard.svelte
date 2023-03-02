@@ -14,7 +14,7 @@
   let baseURL = "";
   let openMenu = false;
 
-  let userBackground = "#eae5db";
+  let userBackground = "#E9E3D3";
   let toastArray: Array<{ message: string; id: number }> = [];
 
   import { loadURL, loadSave, urlBuild, save } from "./params";
@@ -174,6 +174,11 @@
     </div>
     <slot name="testing" />
   </div>
+  <svg viewBox="0 0 500 500" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" stitchTiles="stitch" />
+    </filter>
+  </svg>
   <div id="dashControls" class="dashRight">
     <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
     <slot name="settings" />
@@ -214,6 +219,8 @@
     color: $titles;
     //font-weight: bold;
     position: relative;
+    font-family: "Marlin";
+
     margin: 0;
     width: max-content;
     font-size: 2.5rem;
@@ -257,6 +264,7 @@
 
   #dashControls {
     cursor: default;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -265,6 +273,24 @@
     overflow-y: auto;
     overflow-x: hidden;
     background-color: $sideB;
+    scrollbar-gutter: stable;
+    // background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0), radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0);
+    // background-size: 1.3rem 1.3rem;
+    // background-position: 0 0, 0.65rem 0.65rem;
+    // &::after {
+    //   content: "";
+    //   position: absolute;
+    //   top: 0;
+    //   left: 0;
+    //   width: 100%;
+    //   height: 100%;
+    //   filter: url(#noiseFilter);
+    //   opacity: 0.5;
+    //   mix-blend-mode: overlay;
+    //   pointer-events: none;
+    //   z-index: 10;
+    // }
+
     @media only screen and (max-width: $phone) {
       padding: 3rem 1rem 5rem 1rem;
       height: max-content;
@@ -415,7 +441,7 @@
       opacity: 1;
       color: $black;
       background-color: rgba(0, 0, 0, 0) !important;
-      height: calc(100% - 0.1rem);
+      //height: calc(100% - 0.1rem);
       &::selection {
         background-color: fade-out($colloquial, 0.5);
       }
@@ -474,7 +500,8 @@
     h4 {
       color: white;
       margin: 0rem;
-      background-color: fade-out(black, 0.5);
+      //background-color: fade-out(black, 0.5);
+      background-color: $colloquial;
       padding: 0.3rem 1rem;
     }
     div {
