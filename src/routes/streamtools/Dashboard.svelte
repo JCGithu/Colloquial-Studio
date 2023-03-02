@@ -212,7 +212,7 @@
 
   h1 {
     color: $titles;
-    font-weight: bold;
+    //font-weight: bold;
     position: relative;
     margin: 0;
     width: max-content;
@@ -307,7 +307,7 @@
     position: relative;
     flex-grow: 1;
     overflow: none;
-    max-height: calc(100% - 5rem);
+    max-height: calc(100% - 4rem);
     width: calc(100% - 2rem);
     padding: 1rem;
   }
@@ -401,8 +401,8 @@
     text-align: left;
     position: relative;
     z-index: 5;
-    height: 3rem;
-    min-height: 3rem;
+    height: 2rem;
+    min-height: 2rem;
     background-color: white;
     input {
       outline: none;
@@ -414,6 +414,8 @@
       transition: all 1s;
       opacity: 1;
       color: $black;
+      background-color: rgba(0, 0, 0, 0) !important;
+      height: calc(100% - 0.1rem);
       &::selection {
         background-color: fade-out($colloquial, 0.5);
       }
@@ -423,7 +425,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
   }
   @keyframes spinOnce {
     from {
@@ -437,8 +439,8 @@
     border: none;
     outline: none;
     width: 35px;
-    height: 35px;
-    border-radius: 0.3rem;
+    height: 32px;
+    //border-radius: 0.3rem;
     padding-top: 0.2rem;
     position: relative;
     background-color: fade-out($black, 0.5);
@@ -531,14 +533,16 @@
     color: white;
     font-style: bold;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     // top: 0;
     // left: 0;
     z-index: 20;
-    height: fit-content;
+    height: 1.8rem;
     width: fit-content;
-    padding: 0.5rem;
-    padding-right: 1rem;
-    border-radius: 0 0 1rem 0;
+    padding: 0.1rem 1rem 0.1rem 0.5rem;
+    //border-radius: 0 0 1rem 0;
     background-color: $colloquial;
     a {
       color: white;
