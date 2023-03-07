@@ -87,14 +87,20 @@ export async function appInit(app:string, toastUpdate:Function){
   if (storage === null) {
     window.localStorage.setItem(app, '{"0":{},"1":{},"2":{}}');
     return await reformatting[app](initParams);
-  }
-  // Finding save data
-  let parsedData = JSON.parse(storage);
-  if (parsedData[0].channel) {
-    toastUpdate('Save Data Found!');
-    for (let i = 0; i < 3; i++){
-      if (parsedData[i].channel) initParams['saves'][i] = true;
+  } else {
+    try {
+      let parsedData = JSON.parse(storage);
+      if (parsedData[0].channel) {
+        toastUpdate('Save Data Found!');
+        for (let i = 0; i < 3; i++){
+          if (parsedData[i].channel) initParams['saves'][i] = true;
+        }
+      }
+    } catch(e) {
+      console.log(e);
+      window.localStorage.setItem(app, '{"0":{},"1":{},"2":{}}');
     }
   }
+  // Finding save data
   return await reformatting[app](initParams);
 }
