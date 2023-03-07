@@ -280,10 +280,12 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    background-color: transparent;
     label {
       position: absolute;
       font-style: normal;
       font-weight: normal;
+      z-index: 2;
       color: white;
       padding: 0;
       padding-top: 0.1rem;
@@ -291,16 +293,32 @@
       pointer-events: none;
       text-transform: uppercase;
     }
+    input {
+      box-shadow: none !important;
+      background-color: transparent;
+      border: none !important;
+      border-color: transparent;
+    }
   }
 
   ::-webkit-color-swatch {
     border: none;
     border-radius: 10px;
     padding: 0;
+    position: absolute;
+    //background-color: transparent !important;
+    left: -5%;
+    top: -5%;
+    width: 110%;
+    height: 110%;
   }
   ::-webkit-color-swatch-wrapper {
-    border: none;
+    border: transparent;
+    outline: none;
+    position: relative;
+    overflow: hidden;
     border-radius: 10px;
+    background-color: transparent !important;
     padding: 0;
   }
   input[type="color"] {
