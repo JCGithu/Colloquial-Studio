@@ -104,7 +104,7 @@
     font-family: "Poppins";
     background-color: $whiteFade !important;
     color: $black;
-    width: calc(90% - 2rem);
+    width: calc(100% - 5rem);
     box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
     transition: all 1s;
     &:focus {
