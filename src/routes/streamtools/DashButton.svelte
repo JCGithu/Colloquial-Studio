@@ -9,38 +9,35 @@
   button {
     font-family: "Poppins";
     font-size: normal;
-    border: none;
-    height: max-content;
-    font-weight: light;
-    opacity: 1;
-    color: white;
-    justify-content: center;
-    margin: 0.2rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    margin-bottom: 1rem;
-    border-color: $colloquial;
-    border-style: solid;
-    border-width: 0.5px;
-    //background-color: rgba(0, 0, 0, 0);
-    background: linear-gradient(290deg, rgba(0, 0, 0, 0) 24%, $pink 25%);
-    background-size: 600% 600%;
-    background-position: 100% 100%;
-    border-radius: 1rem;
     display: flex;
     width: max-content;
     align-self: center;
-    flex-direction: column;
-    text-transform: uppercase;
-    font-weight: bold;
-    transition: 1s cubic-bezier(0.26, 0.77, 0.06, 0.9);
+    justify-content: center;
+    font-weight: normal;
+    height: max-content;
+    color: white;
+
+    margin: 0.2rem 0.2rem 1rem 0.2rem;
+    padding: 0 2rem;
+
+    border: $colloquial solid 0.5px;
+    background: linear-gradient(290deg, rgba(0, 0, 0, 0) 24%, $colloquial 25%);
+    background-size: 600% 600%;
+    background-position: 100% 100%;
+    border-radius: 1rem;
+    transition: all 1s cubic-bezier(0.26, 0.77, 0.06, 0.9), transform 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
     cursor: pointer;
+
+    transform: translateY(-0.1rem);
     &:hover {
-      opacity: 1;
-      transform: scale(1.1);
+      font-weight: bold;
+      transform: scale(1.05) translateY(-0.2rem);
       border-color: $white;
       background-position: 50% 100%;
       box-shadow: 0px 0px 10px fade-out($colloquial, 0.5);
+    }
+    &:active {
+      transform: translateY(0rem);
     }
   }
 </style>

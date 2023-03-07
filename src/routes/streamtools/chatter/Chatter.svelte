@@ -302,7 +302,7 @@
     --flex: column;
     --align: flex-start;
     display: flex;
-    width: calc(100% - 1rem);
+    width: calc(100% - 2rem);
     height: calc(100% - 2rem);
     padding: 1rem;
     flex-direction: var(--flex);
@@ -326,7 +326,7 @@
     border-radius: 1rem;
     left: 0;
     top: 0;
-    min-width: calc(100% - 1rem);
+    min-width: 100%;
     min-height: 100%;
     z-index: 0;
   }

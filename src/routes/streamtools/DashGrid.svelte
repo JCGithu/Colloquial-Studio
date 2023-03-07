@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { setContext } from "svelte";
+  setContext("grid", true);
 </script>
 
 <section class="inputGrid">
-  <slot class="Wide100" />
+  <slot />
 </section>
 
 <style lang="scss">
@@ -10,9 +12,7 @@
     display: grid;
     grid-column: span 2;
     width: 85%;
+    padding: 0rem 0.5rem;
     //grid-template-columns: 1fr 1fr;
-  }
-  .inputGrid :global(> .inputBlock) {
-    width: 100% !important;
   }
 </style>

@@ -3,6 +3,7 @@
   import { onMount, getContext } from "svelte";
   import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
+  import SVGIcon from "../SVGIcon.svelte";
   export let urlFill = "";
   export let showInfo = false;
   export let showButtons = true;
@@ -14,10 +15,12 @@
   let baseURL = "";
   let openMenu = false;
 
-  let userBackground = "#E9E3D3";
+  let userBackground = "#242423";
   let toastArray: Array<{ message: string; id: number }> = [];
 
   import { loadURL, loadSave, urlBuild, save } from "./params";
+  import DashButton from "./DashButton.svelte";
+  import SvgIcon from "../SVGIcon.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
@@ -114,7 +117,7 @@
         <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
         <a href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
       </div>
-      <button on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>Close</button>
+      <DashButton text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
     </div>
   </div>
 {/if}
@@ -134,40 +137,40 @@
     </div>
   {/if}
   <div id="toastBox">
+    <span id="return"><a href="/"><SvgIcon icon="logo" /></a></span>
     {#each toastArray as toasty (toasty.id)}
       <div in:fade out:fly={{ x: -200, duration: 1000 }} id="toast">
         {toasty.message}
       </div>
     {/each}
   </div>
+  <div id="dashControls">
+    <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
+    <slot name="settings" />
+  </div>
   <div class="dashLeft">
     <div id="dashTopBar" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
-      <span id="backlink"><a href="/">Colloquial.Studio</a></span>
-      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={urlFill} />
       <Popover class="PopOver">
         <PopoverButton class="PopOverButton">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
-            <path
-              d="M1024 640q0 106-75 181t-181 75q-106 0-181-75t-75-181q0-106 75-181t181-75q106 0 181 75t75 181zm512 109V527q0-12-8-23t-20-13l-185-28q-19-54-39-91 35-50 107-138 10-12 10-25t-9-23q-27-37-99-108t-94-71q-12 0-26 9l-138 108q-44-23-91-38-16-136-29-186-7-28-36-28H657q-14 0-24.5 8.5T621-98L593 86q-49 16-90 37L362 16q-10-9-25-9-14 0-25 11-126 114-165 168-7 10-7 23 0 12 8 23 15 21 51 66.5t54 70.5q-27 50-41 99L29 495q-13 2-21 12.5T0 531v222q0 12 8 23t19 13l186 28q14 46 39 92-40 57-107 138-10 12-10 24 0 10 9 23 26 36 98.5 107.5T337 1273q13 0 26-10l138-107q44 23 91 38 16 136 29 186 7 28 36 28h222q14 0 24.5-8.5T915 1378l28-184q49-16 90-37l142 107q9 9 24 9 13 0 25-10 129-119 165-170 7-8 7-22 0-12-8-23-15-21-51-66.5t-54-70.5q26-50 41-98l183-28q13-2 21-12.5t8-23.5z"
-              transform="matrix(1 0 0 -1 121.492 1285.424)"
-            /></svg
-          >
+          <SVGIcon fill="hsl(40, 26%, 89%)" />
         </PopoverButton>
         <PopoverPanel class="PopOverPanel">
           <div class="panel-contents" transition:slide>
             <h4>URL Links</h4>
             <div id="go" on:click={openURL}>Open Link</div>
             <div id="copy" on:click={copyURL}><span>Copy Link</span></div>
-            <div id="load" on:click={loadFromURL}>Load from existing URL</div>
+            <div id="load" on:click={loadFromURL}>Load existing URL</div>
             <h4>Settings</h4>
+            <div on:click={toggleInfoScreen}>Info</div>
             <div id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</div>
-            <div>
+            <div class="panelInput">
               <label style="--bg:{userBackground}">Background Colour</label>
               <input type="color" bind:value={userBackground} />
             </div>
           </div>
         </PopoverPanel>
       </Popover>
+      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={urlFill} />
     </div>
     <div id="dashApp">
       <slot name="app" />
@@ -179,19 +182,11 @@
       <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" stitchTiles="stitch" />
     </filter>
   </svg>
-  <div id="dashControls" class="dashRight">
-    <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
-    <slot name="settings" />
-  </div>
 </main>
 
 <style lang="scss">
   @import "../../css/default.scss";
   @import "../../css/colours.scss";
-
-  $breakpoint: 900px;
-  $titles: $deepBlue;
-  $sideB: $black;
 
   main {
     --userBackground: $white;
@@ -201,7 +196,7 @@
     padding: 0;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 2.5fr 1fr;
+    grid-template-columns: 1fr 2.5fr;
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
@@ -210,16 +205,31 @@
       flex-direction: column;
       overflow-x: hidden;
     }
+    * {
+      z-index: 2;
+    }
     background-color: var(--userBackground);
     background-image: radial-gradient(at 18% 25%, rbga(255, 255, 255, 0.5) 0px, transparent 50%), radial-gradient(at 91% 63%, rbga(0, 0, 0, 0.5) 0px, transparent 50%), radial-gradient(at 35% 29%, hsla(0, 0%, 15%, 0.2) 0px, transparent 50%), radial-gradient(at 48% 44%, hsla(0, 0%, 48%, 0.2) 0px, transparent 50%), radial-gradient(at 34% 77%, hsla(0, 0%, 100%, 0.2) 0px, transparent 50%), radial-gradient(at 63% 54%, hsla(0, 0%, 100%, 0.1) 0px, transparent 50%),
       radial-gradient(at 72% 11%, hsla(0, 0%, 0%, 1) 0px, transparent 50%);
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      filter: url(#noiseFilter);
+      opacity: 0.3;
+      mix-blend-mode: overlay;
+      pointer-events: none;
+      z-index: 1;
+    }
   }
 
   h1 {
-    color: $titles;
     //font-weight: bold;
     position: relative;
-    font-family: "Marlin";
+    font-family: Marlin;
 
     margin: 0;
     width: max-content;
@@ -272,24 +282,10 @@
     padding: 3rem 1.5rem 2rem 1.5rem;
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: $sideB;
     scrollbar-gutter: stable;
     // background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0), radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0);
     // background-size: 1.3rem 1.3rem;
     // background-position: 0 0, 0.65rem 0.65rem;
-    // &::after {
-    //   content: "";
-    //   position: absolute;
-    //   top: 0;
-    //   left: 0;
-    //   width: 100%;
-    //   height: 100%;
-    //   filter: url(#noiseFilter);
-    //   opacity: 0.5;
-    //   mix-blend-mode: overlay;
-    //   pointer-events: none;
-    //   z-index: 10;
-    // }
 
     @media only screen and (max-width: $phone) {
       padding: 3rem 1rem 5rem 1rem;
@@ -300,29 +296,29 @@
     &::-webkit-scrollbar-track {
       background-clip: padding-box;
       border-radius: 100px;
-      background-color: lighten($black, 8);
+      background-color: $black;
       padding-right: 0.5rem;
       margin: 1rem;
       width: 10px;
-      border: 8px solid rgba(0, 0, 0, 0);
+      border: 8px solid transparent;
       cursor: pointer !important;
     }
 
     &::-webkit-scrollbar {
       width: 25px;
-      background-color: rgba(0, 0, 0, 0);
+      background-color: transparent;
       margin-right: 1rem;
       cursor: pointer !important;
+      //opacity: 0.5;
     }
 
     &::-webkit-scrollbar-thumb {
       border-radius: 100px;
-      border: 8px solid rgba(0, 0, 0, 0);
+      border: 8px solid transparent;
       //border-top: 8px red;
-      background: linear-gradient(180deg, lighten($colloquial, 5), $colloquial);
+      background: lighten($black, 8);
       background-size: 100%;
       background-position: 0% 0%;
-      //background-color: $pink;
       background-clip: padding-box;
       cursor: pointer !important;
     }
@@ -333,6 +329,7 @@
     position: relative;
     flex-grow: 1;
     overflow: none;
+    z-index: 3;
     max-height: calc(100% - 4rem);
     width: calc(100% - 2rem);
     padding: 1rem;
@@ -395,7 +392,7 @@
   #credits {
     border: 0.2rem solid $white;
     border-radius: 1rem;
-    margin-top: 1rem;
+    margin: 1rem 0;
     display: flex;
     flex-direction: column;
     white-space: normal;
@@ -410,17 +407,16 @@
       }
     }
     a {
-      color: $pink;
+      color: $colloquial;
     }
   }
 
   //TOP BAR
   #dashTopBar {
-    border-color: $colloquial;
-    border-style: solid;
-    border-width: 0px 0px 3px 0px;
+    font-size: 16px;
+    border-color: transparent;
     display: grid;
-    grid-template-columns: 125px 1fr 50px;
+    grid-template-columns: 50px 1fr;
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
@@ -429,21 +425,35 @@
     z-index: 5;
     height: 2rem;
     min-height: 2rem;
-    background-color: white;
+    margin: 1rem 1rem 0rem 1rem;
     input {
+      border-style: solid;
+      border-color: $white;
+      border-width: 1px;
+      border-radius: 1rem;
       outline: none;
-      border: none;
       font-family: "Poppins";
       position: relative;
       //width: calc(100% - 130px - 3rem);
       //padding: 1rem 3rem 1rem 130px;
       transition: all 1s;
+      margin: 0;
+      padding: 0 0.75rem;
+      //padding-left: 0.5rem;
       opacity: 1;
-      color: $black;
-      background-color: rgba(0, 0, 0, 0) !important;
+      color: $white;
+      background-color: transparent !important;
       //height: calc(100% - 0.1rem);
+      &::placeholder {
+        color: $white;
+      }
       &::selection {
-        background-color: fade-out($colloquial, 0.5);
+        background-color: $colloquial;
+      }
+      &:hover,
+      &:focus {
+        background-color: transparent !important;
+        color: $white;
       }
     }
   }
@@ -451,7 +461,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
   }
   @keyframes spinOnce {
     from {
@@ -464,60 +474,66 @@
   :global(.PopOverButton) {
     border: none;
     outline: none;
-    width: 35px;
-    height: 32px;
+    border-radius: 1rem;
+    background-color: transparent;
     //border-radius: 0.3rem;
     padding-top: 0.2rem;
+    padding: 0;
+    height: 100%;
+    max-height: 2rem;
+    width: 100%;
+    fill: $white;
     position: relative;
-    background-color: fade-out($black, 0.5);
     transition: all 0.4s ease-in-out;
     &:hover {
-      background-color: fade-out($black, 0.2);
+      transform: scale(1.1);
+      //background-color: fade-out($colloquial, 0.2);
+    }
+    img {
+      height: 100%;
+      padding: 0;
+      margin: 0;
     }
     cursor: pointer;
     svg {
-      fill: white;
+      fill: $white;
       &:hover {
         animation: spinOnce 0.5s cubic-bezier(0.53, 1.5, 0.15, 0.99);
       }
     }
   }
   :global(.PopOverPanel) {
-    background-color: $black;
-    border: solid $colloquial;
-    border-width: 0px 0px 3px 3px;
-    top: 100%;
+    background-color: transparent;
+    border: solid $black 3px;
+    top: calc(100% + 1.25rem);
     width: max-content;
-    right: 0;
-    //padding-bottom: 0.3rem;
+    left: 0.25rem;
+    padding-bottom: 0.3rem;
     position: absolute;
     z-index: 10;
-    border-radius: 0 0 0 1rem;
-    overflow: hidden;
+    border-radius: 0.7rem;
+
+    //overflow: hidden;
   }
   .panel-contents {
-    color: $white;
+    color: $black;
     h4 {
-      color: white;
+      color: $white;
       margin: 0rem;
       //background-color: fade-out(black, 0.5);
-      background-color: $colloquial;
+      background-color: $black;
       padding: 0.3rem 1rem;
+      text-align: center;
     }
     div {
+      margin: 0 0.3rem;
       padding-right: 1rem;
       position: relative;
       cursor: pointer;
       padding: 0.2rem 1rem;
       display: flex;
       flex-direction: row;
-      &:nth-child(1) {
-        border-width: 0px;
-      }
-      border-color: fade-out($white, 0.9);
-      border-width: 0.5px 0px 0px 0px;
-      border-style: solid;
-      border-radius: 0;
+      border-radius: 1rem;
       img {
         height: 1.2rem;
         padding-left: 0.4rem;
@@ -529,7 +545,6 @@
         color: white;
         padding-left: 1.2rem;
         padding-right: 0.8rem;
-        border-radius: 1rem;
         background-color: lighten($black, 3);
       }
     }
@@ -538,14 +553,26 @@
       top: 0;
       left: 0;
       cursor: pointer;
-      //border-radius: 100%;
-      //height: 1.4rem;
       width: 100%;
       height: 100%;
       padding: 0;
+      overflow: hidden;
       box-shadow: none !important;
-      border: 0.2rem $black solid;
-      background-color: rgba(0, 0, 0, 0);
+      background-color: transparent;
+      border: none !important;
+      border-color: transparent;
+      &:hover {
+        outline: none;
+        border: none !important;
+      }
+      &::-webkit-color-swatch-wrapper {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: transparent;
+      }
     }
     label {
       z-index: 10;
@@ -555,23 +582,27 @@
       filter: invert(1) saturate(0) contrast(10);
     }
   }
+  .panelInput {
+    &:hover {
+      background-color: transparent !important;
+    }
+  }
   #backlink {
-    font-size: 0.7rem;
     color: white;
     font-style: bold;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    // top: 0;
-    // left: 0;
     z-index: 20;
-    height: 1.8rem;
     width: fit-content;
-    padding: 0.1rem 1rem 0.1rem 0.5rem;
-    //border-radius: 0 0 1rem 0;
+    height: 100%;
+    padding: 0rem 0rem 0rem 1rem;
     background-color: $colloquial;
     a {
+      height: 20px;
+      padding-bottom: 2px;
+      width: 20px;
       color: white;
       text-decoration: none;
       &:hover {
@@ -631,14 +662,14 @@
     div {
       padding: 1rem;
       border-radius: 1rem;
-      border: $pink 3px solid;
+      border: $colloquial 3px solid;
       background-color: $black;
     }
     p {
       margin-right: 0.5rem;
     }
     button {
-      background-color: $pink;
+      background-color: $colloquial;
       border-radius: 0.5rem;
       margin: 0.25rem;
     }
@@ -655,17 +686,34 @@
     }
   }
 
+  //Backlink
+  #return {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 10px 0px 0px 10px;
+    opacity: 0.8;
+    cursor: pointer;
+    pointer-events: all;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
   //TOAST
   #toastBox {
     position: absolute;
-    width: 200px;
-    height: 100%;
+    width: calc(33vw - 3rem);
+    height: calc(100% - 1rem);
     left: 0;
     bottom: 0;
     z-index: 30;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    padding-bottom: 1rem;
     flex-direction: column;
     pointer-events: none;
     @media screen and (max-width: $phone) {
@@ -677,12 +725,12 @@
   }
 
   #toast {
-    background-color: fade-out($black, 0.2);
-    color: $white;
+    background-color: $white;
+    color: $black;
     border-radius: 0.5em;
     padding: 0.5em;
     margin: 0.2em;
-    width: 90%;
+    width: 250px;
     text-align: center;
     pointer-events: visible;
     cursor: pointer;

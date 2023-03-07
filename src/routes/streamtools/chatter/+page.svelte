@@ -8,8 +8,8 @@
     name: "chatter",
     title: "Chatter",
     description: `Chatter is an on-screen chat for OBS/SLOBS. \n
-    To start put in a Twitch channel name and click the reload button, the app will load on the left. Changing any settings on the right should be reflected in the app, so you can style it how you like! \n
-    At the top you can find other settings and the URL to put into OBS.`,
+    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style Chatter how you like! \n
+    At the top you can find other settings, copy the URL, and save layouts.`,
   };
 
   import { onMount, setContext } from "svelte";
@@ -19,6 +19,7 @@
   import DashInput from "../DashInput.svelte";
   import DashGrid from "../DashGrid.svelte";
   import DashGroup from "../DashGroup.svelte";
+  import DashChannel from "../DashChannel.svelte";
   import DashButton from "../DashButton.svelte";
   import Chatter from "./Chatter.svelte";
 
@@ -78,8 +79,9 @@
     {/key}
   </slot>
   <slot id="dashControls" slot="settings">
-    <DashInput {params} type="text" name="Channel Name" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
-    <DashButton text="Reload" on:click={paramReload} />
+    <DashChannel {params} bind:value={channelName} on:valueChange={valueChanger} on:reload={paramReload} />
+    <!-- <DashInput {params} type="text" name="Channel Name" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
+    <DashButton text="Reload" on:click={paramReload} /> -->
     <DashGrid>
       <DashInput {params} type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} on:valueChange={valueChanger} />
       <DashInput {params} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} on:valueChange={valueChanger} />

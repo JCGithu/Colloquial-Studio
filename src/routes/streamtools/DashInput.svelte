@@ -18,8 +18,28 @@
   export let required = false;
   export let params: standardObject;
   const dispatch = createEventDispatcher();
-
+  afterUpdate(() => {
+    if (!params) return;
+    dashInputValue = params[id];
+    if (type === "color" && dashInputValue) {
+      value = dashInputValue;
+      let hsl = hexToHSL(dashInputValue);
+      invert = false;
+      if (hsl.l >= 70) invert = true;
+    }
+    style.opacity = 1;
+    if (faded) style.opacity = 0.5;
+    if (type === "select") {
+      optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "";
+    }
+    if (type === "range") {
+      max = parseInt(max) || 0;
+      min = parseInt(min) || 0;
+      rangeWidth = scale(dashInputValue, min, max, 0, 1);
+    }
+  });
   let grouped = getContext("grouped");
+  let grid = getContext("grid");
   let style: { opacity: number } = { opacity: 1 };
   let invert = false;
   let titleBlock = true;
@@ -74,12 +94,12 @@
     if (type === "range") {
       max = parseInt(max) || 0;
       min = parseInt(min) || 0;
-      rangeWidth = scale(dashInputValue, min, max, 0, 93.5);
+      rangeWidth = scale(dashInputValue, min, max, 0, 1);
     }
   });
 </script>
 
-<div class="inputBlock" class:inputBlockVert={vert} class:grouped class:faded style:--flex={direction}>
+<div class="inputBlock" class:inputBlockVert={vert} class:grid class:grouped class:faded style:--flex={direction}>
   {#if titleBlock}
     <h2 class="inputName {type === 'select' ? 'listName' : ''}" class:required>{name}</h2>
     {#if subtitle}
@@ -105,7 +125,7 @@
     </Listbox>
   {:else if type === "color"}
     <div class="colourBlock">
-      <p id="colourfontcolour" class:invert>{value}</p>
+      <label id="colourfontcolour" class:invert>{value}</label>
       <input {type} {id} value={dashInputValue || ""} on:input={valueUpdate} />
     </div>
   {:else if type === "checkbox"}
@@ -121,7 +141,7 @@
       {/if}
     </label>
   {:else if type === "range"}
-    <p class="rangeValue" style="--width:{rangeWidth}%">{dashInputValue}</p>
+    <p class="rangeValue" style="--width:{rangeWidth}">{dashInputValue}</p>
     <input {type} {id} {min} {max} value={dashInputValue || ""} on:input={valueUpdate} />
   {:else}
     <input {type} {id} {min} {max} value={dashInputValue || ""} on:input={valueUpdate} />
@@ -154,17 +174,13 @@
     input[type="text"],
     input[type="number"] {
       padding: 1rem 0rem 1rem 1rem;
+      margin-bottom: 0.3rem;
       width: calc(100% - 1rem);
-    }
-    label input:checked ~ span {
-      background-color: $black;
     }
   }
 
-  $titles: $white;
-
   h2 {
-    color: $titles;
+    color: $white;
     font-weight: bold;
     margin: 0;
     font-size: large;
@@ -186,11 +202,29 @@
   }
 
   .inputBlock {
-    width: 85%;
+    width: calc(85% - 1rem);
+    max-width: calc(85% - 1rem);
+    padding: 0.2rem 0.5rem;
+    margin: 0.15rem 0;
+    &.grouped {
+      width: calc(100% - 2rem);
+      max-width: calc(100% - 2rem);
+    }
+    &.grid {
+      width: calc(100% - 1rem);
+      max-width: calc(100% - 1rem);
+      padding: 0 0.5rem;
+    }
+
     display: grid;
     grid-template-columns: 1fr 1fr;
+    transition: background-color 0.3s ease-in-out;
     @media screen and (max-width: $phone) {
       grid-template-columns: 1fr;
+    }
+    border-radius: 1rem;
+    &:hover {
+      background-color: fade-out($white, 0.9);
     }
   }
 
@@ -213,23 +247,28 @@
     border-radius: 1rem;
     border: none;
     font-family: "Poppins";
-    background-color: $white !important;
-    background: white;
+    background-color: $whiteFade;
+    //background: white;
     color: $black;
     width: 90%;
     //margin-left: 5%;
+    box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
     transition: all 1s;
-    opacity: 0.7;
     &:focus {
       outline: none;
       color: black;
-      background-color: fade-out($deepBlue, 0.5) !important;
       background-color: $white !important;
-      opacity: 1;
+      box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
     }
     &:hover {
-      opacity: 1;
+      background-color: $whiteFade;
+      box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0.5);
     }
+  }
+
+  input[type="text"] {
+    margin-bottom: 0.5rem;
+    height: 1.2rem;
   }
 
   .colourBlock {
@@ -240,14 +279,16 @@
     z-index: 2;
     justify-content: center;
     align-items: center;
-    pointer-events: none;
-    p {
+    cursor: pointer;
+    label {
       position: absolute;
       font-style: normal;
       font-weight: normal;
       color: white;
       padding: 0;
+      padding-top: 0.1rem;
       margin: 0;
+      pointer-events: none;
       text-transform: uppercase;
     }
   }
@@ -263,7 +304,7 @@
     padding: 0;
   }
   input[type="color"] {
-    height: 3rem;
+    height: 4rem;
     padding: 0 !important;
     opacity: 1;
     cursor: pointer;
@@ -271,7 +312,6 @@
 
   //CHECKBOXES
   label {
-    color: $deepBlue;
     font-size: large;
     font-weight: bold;
     display: flex;
@@ -290,7 +330,7 @@
       position: relative;
       padding: 0rem 1rem;
       margin: 0 0.5rem;
-      background-color: fade-out($white, 0.2);
+      background-color: $whiteFade;
       border-radius: 0.3rem;
       transition: 0.2s all;
       &:after {
@@ -309,13 +349,14 @@
       }
     }
     input:checked ~ span {
-      background-color: $pink;
+      background-color: $colloquial;
       justify-content: center;
       display: flex;
       align-content: center;
-      opacity: 0.8;
+      box-shadow: inset 0px 0px 3px fade-out($white, 1);
+      transition: box-shadow 0.2s ease-in-out;
       &:hover {
-        opacity: 1;
+        box-shadow: inset 0px 0px 3px $white;
       }
       &:after {
         display: flex;
@@ -329,21 +370,25 @@
   input[type="range"] {
     appearance: none;
     height: 0.6rem !important;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease-in-out;
     padding: 0.2rem !important;
     margin: 1rem 0rem;
-    margin-top: 3rem;
+    //margin-top: 3rem;
     opacity: 1;
     cursor: pointer;
     width: 100%;
     background-color: darken($black, 5) !important;
+    box-shadow: inset 0px 0px 10px fade-out($whiteFade, 1);
+    &:hover {
+      box-shadow: inset 0px 0px 10px fade-out($whiteFade, 0.9);
+    }
   }
   ::-webkit-slider-runnable-track {
     margin: 0.2rem !important;
   }
   ::-webkit-slider-thumb {
     appearance: none;
-    box-shadow: 0px 0px 0px $white;
+    box-shadow: 0px 0px 0px black;
     width: 25px;
     height: 25px;
     border-radius: 100%;
@@ -352,22 +397,29 @@
     cursor: pointer;
     transition: 0.2s all;
     margin: 0 !important;
+    border: 3px solid $white;
     &:hover {
-      box-shadow: 0px 0.2rem 5px $black;
+      transform: scale(1.1);
+      border-color: $colloquial;
+      box-shadow: 0px 10px 10px black;
       margin-bottom: 0.2rem;
+    }
+    &:focus {
+      background: $colloquial;
     }
   }
   .rangeValue {
     color: $white;
-    position: absolute;
-    left: var(--width);
+    position: relative;
     width: 35px;
     height: 30px;
     padding-top: 5px;
-    background-color: rgba(0, 0, 0, 0);
+    margin: 0;
+    margin-left: calc((100% - 35px) * var(--width));
+    background-color: transparent;
     border: 2px solid $colloquial;
     border-radius: 100%;
-    bottom: 1.7rem;
+    //bottom: 1.7rem;
     text-align: center;
     user-select: none;
     font-weight: bold;
@@ -386,7 +438,7 @@
     div {
       width: 100%;
       flex-direction: row;
-      align-items: initial;
+      align-items: center;
       justify-content: space-between;
     }
     span {
@@ -409,7 +461,7 @@
     position: absolute;
   }
   :global(.listBox) {
-    padding: 0.2rem 0rem;
+    padding: 0.5rem 0rem;
     border: none;
     outline: none;
     font-family: "Poppins";
@@ -432,32 +484,26 @@
     border-width: 0px;
     border-color: fade-out($colloquial, 0.8) fade-out($colloquial, 0.9);
     border-style: solid;
-    background: linear-gradient(0deg, fade-out($white, 0.5), white);
+    background: linear-gradient(0deg, $whiteFade, $white);
     background-size: 600% 600%;
     background-position: 50% 100%;
     padding: 1rem;
-    //margin-left: 1rem;
-    //box-shadow: 0px 0px 5px darken($pink, 10);
-    //margin-left: 16%;
-    //margin-bottom: 0rem;
     border-radius: 1rem;
     z-index: 2;
     transition: all 0.4s ease-in-out !important;
     &:hover {
       border-color: white;
-      //box-shadow: 0px 0px 2px darken($pink, 5);
       background-position: 50% 0%;
-      //background: linear-gradient(0deg, red, pink);
     }
     position: relative;
     overflow: hidden;
     &::after {
-      content: url("data:image/svg+xml, %3Csvg class='buttonArrow' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m11.125 16.313 7.688-7.688 3.594 3.719-11.094 11.063L0 12.094l3.5-3.531z' /%3E%3C/svg%3E%0A");
+      content: url("data:image/svg+xml, %3Csvg fill='#{$black}' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m11.125 16.313 7.688-7.688 3.594 3.719-11.094 11.063L0 12.094l3.5-3.531z' /%3E%3C/svg%3E%0A");
       display: block;
       position: absolute;
       top: calc(50% - 12.5px);
       right: 0;
-      opacity: 0.5;
+      opacity: 1;
       width: 25px;
       height: 25px;
     }
