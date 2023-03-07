@@ -1,24 +1,15 @@
 //Main
-$colloquial: #fe5f55;
-$black: #282828;
-$white: #EAE5DB;
+$colloquial: hsl(4, 99%, 66%);
+$black: hsl(60, 1%, 14%);
+$white: hsl(40, 26%, 89%);
+$whiteFade: hsl(40, 36%, 79%);
+$whiteFadeMore: hsl(40, 36%, 65%);
 
 // Chatter & Apps
-$deepBlue: #525be1;
-$lightbeige: #FFECD2;
-$beige: #FED1B9;
-$darkbeige: #ffd69c;
-$deepPurple: #583098;
-$fadedPurple: #9b82c2;
-$purple: #803cff;
-$palepurple: #d4d1ff;
-$palepurple2: #f1ecff;
-$pink: #fe5f55;
-$orange: #fcb69f;
 
 //Twordle
-$twordleMain: #e2c293;
-$twordleDark: #232323;
-$twordleOrange: rgb(212, 145, 58);
-$twordleGreen: rgb(67, 148, 67);
-$twordlePurple: rgb(128, 77, 223);
+$twordleMain: hsl(36, 58%, 73%);
+$twordleDark: hsl(0, 0%, 14%);
+$twordleOrange: hsl(34, 64%, 53%);
+$twordleGreen: hsl(120, 38%, 42%);
+$twordlePurple: hsl(261, 70%, 59%);

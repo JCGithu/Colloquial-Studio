@@ -3,7 +3,10 @@
   src: url(./marlin.woff2);
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap');
+@font-face {
+  font-family: 'Poppins';
+  src: url(./Poppins-Variable.ttf);
+}
 
 html {
   font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
