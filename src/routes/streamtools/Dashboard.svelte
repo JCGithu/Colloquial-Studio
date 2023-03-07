@@ -288,9 +288,11 @@
     // background-position: 0 0, 0.65rem 0.65rem;
 
     @media only screen and (max-width: $phone) {
-      padding: 3rem 1rem 5rem 1rem;
-      height: max-content;
+      padding: 3rem 1rem 1rem 1rem;
+      height: 40vh;
       width: 100vw;
+      border-bottom: 1px $whiteFade solid;
+      -webkit-mask-image: -webkit-gradient(linear, left 90%, left bottom, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 0)));
     }
 
     &::-webkit-scrollbar-track {
@@ -524,7 +526,13 @@
       background-color: $black;
       padding: 0.3rem 1rem;
       text-align: center;
+      margin-bottom: 0.25rem;
+      margin-top: 0.25rem;
+      &:nth-child(1) {
+        margin-top: 0;
+      }
     }
+
     div {
       margin: 0 0.3rem;
       padding-right: 1rem;
