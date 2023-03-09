@@ -31,7 +31,7 @@
     transform: translateY(-0.1rem);
     &:hover {
       font-weight: bold;
-      transform: scale(1.05) translateY(-0.2rem);
+      transform: scale(1.02) translateY(-0.15rem);
       border-color: $white;
       background-position: 50% 100%;
       box-shadow: 0px 0px 10px fade-out($colloquial, 0.5);
