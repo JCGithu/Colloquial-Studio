@@ -16,7 +16,7 @@
 </script>
 
 <div in:fly={{ x: 200, duration: 500 }} out:slide class="groupBox" class:inner class:groupBoxOpen={opened}>
-  <h2 style="--mouseX:{MouseX}px; --mouseY:{MouseY}px;" class:opened title="click" on:click={runClick}>{title}</h2>
+  <button style="--mouseX:{MouseX}px; --mouseY:{MouseY}px;" class:opened title="Click to show options" on:click={runClick}>{title}</button>
   <div class="group" class:groupOpen={opened} class:groupShut={!opened} use:collapse={{ open: opened, duration: 0.35, easing: "cubic-bezier(.71,.7,.41,1.14)" }}>
     <slot />
   </div>
@@ -24,12 +24,16 @@
 </div>
 
 <style lang="scss">
-  @import "../../css/colours.scss";
-  @import "../../css/default.scss";
+  @import "../../../css/colours.scss";
 
-  h2 {
+  button {
+    appearance: none;
+    background: none;
+    font-family: "Poppins";
+    font-weight: bold;
+
     --shadow-color: 0deg 0% 5%;
-    width: calc(100% - 2rem);
+    width: 100%;
     font-size: 20px;
     cursor: pointer;
     text-align: left;
@@ -97,20 +101,31 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    visibility: hidden;
     border: 0px solid black;
     transition: 0.35s cubic-bezier(0.71, 0.7, 0.41, 1) 0s !important;
   }
 
   .groupOpen {
     //border: 3px $colloquial solid;
+    visibility: visible;
     padding-bottom: 1rem;
   }
 
+  @keyframes visible {
+    from {
+      visibility: visible;
+    }
+    to {
+      visibility: hidden;
+    }
+  }
+
   .groupShut {
-    transition: all 0.5s ease;
     padding-top: 0rem !important;
     padding-bottom: 0rem !important;
-    height: 0 !important;
+    //height: 0 !important;
+    animation: visible 1ms linear 0.4s;
     //width: 60% !important;
     //margin: 0;
   }
@@ -124,15 +139,15 @@
     align-items: center;
     justify-content: center;
     width: calc(85% - 6px);
-
     background-color: var(--userBackground);
 
     border-radius: 1rem;
     margin: 1rem 0;
     flex-direction: column;
     border: 3px fade-out($whiteFade, 0.6) solid;
+    text-decoration-color: transparent;
     box-shadow: 0.2px 0.4px 0.5px hsl(var(--shadow-color) / 0.43), 0.7px 1.2px 1.5px -0.9px hsl(var(--shadow-color) / 0.41), 1.8px 3.1px 3.9px -1.8px hsl(var(--shadow-color) / 0.39), 4.5px 7.8px 9.8px -2.7px hsl(var(--shadow-color) / 0.37);
-    transition: all 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s, background-position 0.5s ease-in-out, background-size 0.5s ease-in-out !important;
+    transition: transform box-shadow text-decoration-color 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s;
     cursor: pointer;
     &:hover {
       transform: scale(1.01);
@@ -143,23 +158,5 @@
 
   .groupBoxOpen {
     margin: 1rem 0rem;
-    &:hover {
-      //background-color: fade-out($white, 0.95);
-    }
-  }
-
-  .inner {
-    width: 100%;
-    padding: 0 !important;
-    margin: 0;
-    .opened {
-      margin-left: -1rem;
-    }
-    .group {
-      padding: 0;
-    }
-    h2 {
-      margin: 0;
-    }
   }
 </style>

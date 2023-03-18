@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, getContext, afterUpdate } from "svelte";
-  import SvgIcon from "../SVGIcon.svelte";
+  import SvgIcon from "../../SVGIcon.svelte";
   const dispatch = createEventDispatcher();
 
   export let value: any = null;
@@ -36,14 +36,22 @@
 <section class:grid class:group>
   <h2>Channel Name</h2>
   <div>
-    <span bind:this={rotate} on:click={refresh}><SvgIcon icon="refresh" fill="black" /></span>
-    <input type="text" id="channel" value={dashInputValue || ""} on:input={valueUpdate} />
+    <span bind:this={rotate} on:click={refresh} on:keypress={refresh}><SvgIcon icon="refresh" fill="black" /></span>
+    <input
+      type="text"
+      on:keypress={(e) => {
+        console.log(e.key);
+        if (e.key === "Enter") refresh();
+      }}
+      id="channel"
+      value={dashInputValue || ""}
+      on:input={valueUpdate}
+    />
   </div>
 </section>
 
 <style lang="scss">
-  @import "../../css/default.scss";
-  @import "../../css/colours.scss";
+  @import "../../../css/colours.scss";
 
   section {
     position: relative;
@@ -51,7 +59,7 @@
     max-width: calc(85% - 1rem);
     padding: 0.2rem 0.5rem;
     margin: 0.15rem 0;
-    &.grouped {
+    &.group {
       width: calc(100% - 2rem);
       max-width: calc(100% - 2rem);
     }
