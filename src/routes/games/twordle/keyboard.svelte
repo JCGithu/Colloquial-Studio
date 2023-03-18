@@ -1,0 +1,90 @@
+<script lang="ts">
+  import { afterUpdate, getContext } from "svelte";
+  import { language, qwerty } from "./twFunctions";
+  export let currentGame: TwordleGame;
+  $: qwertyLang = qwerty[$language];
+
+  let styleString = getContext("colours");
+
+  let keyMap: { [x: string]: Array<string> } = {
+    correct: [],
+    maybe: [],
+    wrong: [],
+  };
+
+  afterUpdate(() => {
+    if (currentGame.round <= 0) return;
+    let revealRound = currentGame.round - 1;
+    currentGame.guess[revealRound].forEach((guessLetter, i) => {
+      if (currentGame.guess[revealRound][i] === currentGame.answer[i]) {
+        if (keyMap.correct.includes(guessLetter)) return;
+        keyMap.correct.push(guessLetter);
+      } else if (currentGame.answer.includes(guessLetter)) {
+        if (keyMap.correct.includes(guessLetter)) return;
+        if (keyMap.maybe.includes(guessLetter)) return;
+        keyMap.maybe.push(guessLetter);
+      } else {
+        keyMap.wrong.push(guessLetter);
+      }
+    });
+    keyMap = keyMap;
+  });
+</script>
+
+<div id="keyboard" style="{styleString} ">
+  {#each qwertyLang as row}
+    <div class="keyRow">
+      {#each row as letter}
+        <span class="keyLetter" class:correct={keyMap.correct.includes(letter)} class:maybe={keyMap.maybe.includes(letter)} class:wrong={keyMap.wrong.includes(letter)}>{letter}</span>
+      {/each}
+    </div>
+  {/each}
+</div>
+
+<style lang="scss">
+  @import "../../../css/colours.scss";
+  #keyboard {
+    font-size: 13px;
+    transition: all 0.5s;
+  }
+
+  .keyRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 2px;
+    height: 40px;
+    &:nth-child(3) {
+      * {
+        //margin: 0 0.4em;
+        width: 2.4em;
+      }
+    }
+  }
+
+  .keyLetter {
+    width: 2.2em;
+    height: 100%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.25em;
+    border-radius: 0.2rem;
+    font-family: "Poppins";
+    font-weight: bold;
+    background-color: var(--mainDarken10);
+    color: var(--text);
+  }
+
+  .wrong {
+    opacity: 0.3;
+    filter: brightness(0.9);
+  }
+  .maybe {
+    background-color: $twordleOrange;
+  }
+  .correct {
+    background-color: $twordleGreen;
+  }
+</style>
