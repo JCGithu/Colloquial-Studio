@@ -61,6 +61,8 @@
     dispatch("valueChange", { value: value, id: id });
   };
 
+  function switchToggle(id: string) {}
+
   let direction = "column";
   let vert = true;
   if (type === "select" && !subtitle) {
@@ -129,8 +131,13 @@
       <input {type} {id} value={dashInputValue || ""} on:input={valueUpdate} />
     </div>
   {:else if type === "checkbox"}
-    <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label style={subtitle ? "flex-direction: column" : ""} class="checkContainer">
+    <label
+      style={subtitle ? "flex-direction: column" : ""}
+      class="checkContainer"
+      on:keypress={(e) => {
+        if (e.key === "Enter") dispatch("valueChange", { value: !dashInputValue, id: id });
+      }}
+    >
       <div>
         <h2>{name}</h2>
         <input {type} {id} checked={dashInputValue || false} on:change={valueUpdate} />
@@ -472,6 +479,13 @@
     }
   }
 
+  input[type="checkbox"] {
+    background-color: red !important;
+    &:focus {
+      border: red 2px solid !important;
+    }
+  }
+
   //SELECT
   .buttonArrow {
     width: 1.4rem;
@@ -508,7 +522,7 @@
     padding: 1rem;
     border-radius: 1rem;
     z-index: 2;
-    transition: all 0.4s ease-in-out !important;
+    transition: all 0.4s ease-in-out, background 0.1s ease;
     &:hover {
       border-color: white;
       background-position: 50% 0%;
@@ -524,6 +538,9 @@
       opacity: 1;
       width: 25px;
       height: 25px;
+    }
+    &:focus {
+      background: white;
     }
   }
   :global(.boxOpen) {
@@ -551,6 +568,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    @media screen and (max-width: $phone) {
+      max-width: 100%;
+    }
   }
   :global(.listBoxOption) {
     list-style-type: none;
