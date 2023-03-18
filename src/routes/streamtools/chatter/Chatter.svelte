@@ -197,7 +197,7 @@
 
     //Testing Commands
     let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
-    if (tags.badges.broadcaster) {
+    if (tags.badges?.broadcaster) {
       let splitMessage = message.split(" ");
       if (testCommands.includes(splitMessage[0])) {
         testMessage(message.replace(splitMessage[0] + " ", ""), splitMessage[0].slice(9));

@@ -133,7 +133,7 @@
       offScreen();
     }
 
-    if (message.tags.badges["vip"]) vip = true;
+    if (message.tags.badges?.vip) vip = true;
     if (message.tags.mod) mod = true;
     if (message.tags["first-msg"]) first = true;
     if (message.tags.bits) bits = true;
@@ -170,7 +170,10 @@
             <i>{" "}{word.num}{" "}</i>
           {/if}
         {:else}
-          {word.text}{" "}
+          {#each word.text as letter}
+            <span class="letter">{letter}</span>
+          {/each}
+          <!-- {word.text}{" "} -->
         {/if}
       {/each}
     </span>
