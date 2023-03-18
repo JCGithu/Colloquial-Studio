@@ -19,7 +19,7 @@
   let toastArray: Array<{ message: string; id: number }> = [];
 
   import { loadURL, loadSave, urlBuild, save } from "./params";
-  import DashButton from "./DashButton.svelte";
+  import DashButton from "./components/DashButton.svelte";
   import SvgIcon from "../SVGIcon.svelte";
 
   //CONTEXT
@@ -110,12 +110,11 @@
 {#if showInfo}
   <div id="introMenu" class="infoScreen" transition:fade>
     <div class="infoBox">
-      <slot name="info" />
       <h1>{appDetails.title}</h1>
-      <p><slot name="description" /><span>{appDetails.description}</span></p>
+      <p><span>{appDetails.description}</span></p>
       <div id="credits">
         <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
-        <a href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
+        <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
       </div>
       <DashButton text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
     </div>
@@ -132,12 +131,12 @@
             <button on:click={() => loadData(i)}>Load</button>
           </span>
         {/each}
-        <button id="closeSave" on:click={() => (saveMenu = !saveMenu)}>Close</button>
+        <DashButton text="Close" on:click={() => (saveMenu = !saveMenu)} on:submit={() => (saveMenu = !saveMenu)} />
       </div>
     </div>
   {/if}
   <div id="toastBox">
-    <span id="return"><a href="/"><SvgIcon icon="logo" /></a></span>
+    <span id="return"><a aria-label="Return to home" href="/"><SvgIcon icon="logo" /></a></span>
     {#each toastArray as toasty (toasty.id)}
       <div in:fade out:fly={{ x: -200, duration: 1000 }} id="toast">
         {toasty.message}
@@ -148,7 +147,7 @@
     <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
     <slot name="settings" />
   </div>
-  <div class="dashLeft">
+  <div class="dashReact">
     <div id="dashTopBar" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
       <Popover class="PopOver">
         <PopoverButton class="PopOverButton">
@@ -289,7 +288,8 @@
 
     @media only screen and (max-width: $phone) {
       padding: 3rem 1rem 1rem 1rem;
-      height: 40vh;
+      height: 35vh;
+      height: 35svh;
       width: 100vw;
       border-bottom: 1px $whiteFade solid;
       -webkit-mask-image: -webkit-gradient(linear, left 90%, left bottom, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 0)));
@@ -337,7 +337,7 @@
     padding: 1rem;
   }
 
-  .dashLeft {
+  .dashReact {
     height: 100vh;
     width: 67vw;
     display: flex;
@@ -346,6 +346,7 @@
       width: 100vw;
       height: 50vh;
       min-height: 50vh;
+      height: 50svh;
     }
   }
 
@@ -399,17 +400,21 @@
     flex-direction: column;
     white-space: normal;
     width: max-content;
+    max-width: 90%;
     padding: 0.5rem 1rem;
     background-color: fade-out($white, 0.9);
     img {
       margin-top: 0.5rem;
       transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+      height: 35px;
+      width: max-content;
       &:hover {
         transform: scale(1.05) rotate(2deg);
       }
     }
     a {
-      color: $colloquial;
+      color: $white;
+      text-decoration-color: $colloquial;
     }
   }
 
@@ -563,7 +568,7 @@
       cursor: pointer;
       width: 100%;
       height: 100%;
-      padding: 0;
+      padding: 0 !important;
       overflow: hidden;
       box-shadow: none !important;
       background-color: transparent;
@@ -593,29 +598,6 @@
   .panelInput {
     &:hover {
       background-color: transparent !important;
-    }
-  }
-  #backlink {
-    color: white;
-    font-style: bold;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 20;
-    width: fit-content;
-    height: 100%;
-    padding: 0rem 0rem 0rem 1rem;
-    background-color: $colloquial;
-    a {
-      height: 20px;
-      padding-bottom: 2px;
-      width: 20px;
-      color: white;
-      text-decoration: none;
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 
@@ -659,20 +641,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    #closeSave {
-      width: 60%;
+    padding: 1rem;
+    border-radius: 1rem;
+    background-color: $black;
+    span {
+      display: flex;
+      align-items: center;
+      color: white;
+      margin: 1rem;
+      padding: 0.2rem 2rem;
+      border-radius: 1rem;
+      border-width: 1px;
+      border-color: $white;
+      border-style: solid;
     }
   }
 
   #saveMenu {
     display: flex;
     flex-direction: column;
-    div {
-      padding: 1rem;
-      border-radius: 1rem;
-      border: $colloquial 3px solid;
-      background-color: $black;
-    }
     p {
       margin-right: 0.5rem;
     }
@@ -680,17 +667,6 @@
       background-color: $colloquial;
       border-radius: 0.5rem;
       margin: 0.25rem;
-    }
-    span {
-      display: flex;
-      align-items: center;
-      color: white;
-      margin: 1rem;
-      padding: 0.2rem 2rem;
-      //border-radius: 1rem;
-      border-width: 0px 0px 3px 0px;
-      border-color: $white;
-      border-style: solid;
     }
   }
 
@@ -744,9 +720,6 @@
     cursor: pointer;
     transition: all 0.3s;
     &:hover {
-      background-color: $black;
-    }
-    @media screen and (max-width: $phone) {
       background-color: $black;
     }
   }
