@@ -15,8 +15,9 @@
 
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
-  import DashGroup from "../DashGroup.svelte";
-  import DashButton from "../DashButton.svelte";
+  import DashGroup from "../components/DashGroup.svelte";
+  import DashChannel from "../components/DashChannel.svelte";
+  import DashButton from "../components/DashButton.svelte";
   import EmoteDrop from "./EmoteDrop.svelte";
 
   import { paramReformat, defaultParams } from "./paramsEmoteDrop";
@@ -74,8 +75,7 @@
     {/key}
   </slot>
   <slot id="dashControls" slot="settings">
-    <DashInput {params} type="text" name="Channel Name *" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
-    <DashButton text="Reload!" on:click={paramReload} />
+    <DashChannel {params} bind:value={channelName} on:valueChange={valueChanger} on:reload={paramReload} />
     <!-- Insert from here -->
     <DashInput {params} type="number" name="Ball Limit *" id="blimit" on:valueChange={valueChanger} />
     <DashInput {params} type="range" name="Emote Size" id="esize" min="1" max="10" on:valueChange={valueChanger} />

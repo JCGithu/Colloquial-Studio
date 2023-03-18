@@ -17,10 +17,10 @@
 
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
-  import DashGrid from "../DashGrid.svelte";
-  import DashGroup from "../DashGroup.svelte";
-  import DashChannel from "../DashChannel.svelte";
-  import DashButton from "../DashButton.svelte";
+  import DashGrid from "../components/DashGrid.svelte";
+  import DashGroup from "../components/DashGroup.svelte";
+  import DashChannel from "../components/DashChannel.svelte";
+  import DashButton from "../components/DashButton.svelte";
   import Chatter from "./Chatter.svelte";
 
   import { paramReformat, defaultParams } from "./paramsChatter";
@@ -80,8 +80,6 @@
   </slot>
   <slot id="dashControls" slot="settings">
     <DashChannel {params} bind:value={channelName} on:valueChange={valueChanger} on:reload={paramReload} />
-    <!-- <DashInput {params} type="text" name="Channel Name" id="channel" bind:value={channelName} on:valueChange={valueChanger} />
-    <DashButton text="Reload" on:click={paramReload} /> -->
     <DashGrid>
       <DashInput {params} type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} on:valueChange={valueChanger} />
       <DashInput {params} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} on:valueChange={valueChanger} />
@@ -140,7 +138,7 @@
         <DashInput {params} type="checkbox" name="Outline" id="proOutline" on:valueChange={valueChanger} />
         <DashInput {params} type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" on:valueChange={valueChanger} />
         <DashInput {params} type="checkbox" name="Background" id="proBG" on:valueChange={valueChanger} />
-        <DashInput {params} type="color" name="Colour" id="proColour" on:valueChange={valueChanger} />
+        <DashInput {params} type="color" name="Default Colour" id="proColour" on:valueChange={valueChanger} />
       </DashGroup>
     {/if}
     <DashButton text="Reset to Default" on:click={paramReload} />
