@@ -511,7 +511,9 @@
   }
   :global(.PopOverPanel) {
     background-color: transparent;
-    border: solid $black 3px;
+    background-color: $whiteFade;
+    border: solid $black;
+    border-width: 3px 3px 5px 3px;
     top: calc(100% + 1.25rem);
     width: max-content;
     left: 0.25rem;
