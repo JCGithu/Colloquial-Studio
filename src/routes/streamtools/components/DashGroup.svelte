@@ -144,7 +144,8 @@
     border-radius: 1rem;
     margin: 1rem 0;
     flex-direction: column;
-    border: 3px fade-out($whiteFade, 0.6) solid;
+    border: fade-out($whiteFade, 0.6) solid;
+    border-width: 3px 3px 5px 3px;
     text-decoration-color: transparent;
     box-shadow: 0.2px 0.4px 0.5px hsl(var(--shadow-color) / 0.43), 0.7px 1.2px 1.5px -0.9px hsl(var(--shadow-color) / 0.41), 1.8px 3.1px 3.9px -1.8px hsl(var(--shadow-color) / 0.39), 4.5px 7.8px 9.8px -2.7px hsl(var(--shadow-color) / 0.37);
     transition: transform box-shadow text-decoration-color 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s;
