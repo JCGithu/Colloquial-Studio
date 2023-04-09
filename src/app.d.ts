@@ -17,6 +17,16 @@ interface standardObject {
 	[x:string]: any
 }
 
+interface streamToolAppStorage {
+	'inProgress': standardObject,
+	'loaded': standardObject,
+	[x:number]: standardObject
+}
+
+interface streamToolStorage {
+	[x:string]: streamToolAppStorage
+}
+
 interface toast {
 	message: string,
 	id: number,

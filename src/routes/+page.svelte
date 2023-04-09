@@ -70,7 +70,7 @@
 </div>
 
 <style lang="scss" global>
-  @import "../css/colours.scss";
+  @use "../css/colours.scss" as *;
 
   #homePage {
     flex-direction: column;
