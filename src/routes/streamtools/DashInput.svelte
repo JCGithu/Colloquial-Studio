@@ -1,50 +1,36 @@
 <script lang="ts">
-  import { createEventDispatcher, afterUpdate, getContext } from "svelte";
-  import { hexToHSL } from "../../js/hexToHSL";
-
+  import { storage, updateValue, urlBuild } from "./params";
+  import { createEventDispatcher, afterUpdate, getContext, onMount } from "svelte";
   import { slide } from "svelte/transition";
 
+  //CONTEXT
+  let appDetails: appDetails = getContext("appDetails");
+
+  import { hexToHSL } from "../../js/hexToHSL";
   import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@rgossiaux/svelte-headlessui";
 
   export let name: string | null = null;
   export let subtitle: string | null = null;
   export let id = "";
   export let type = "";
-  export let min: string | null | number = null;
-  export let max: string | null | number = null;
+  export let min: number = 0;
+  export let max: number = 100;
   export let ops: standardObject = {};
   export let value: any = null;
   export let faded = false;
   export let required = false;
-  export let params: standardObject;
+
+  //export let params: standardObject;
+
   const dispatch = createEventDispatcher();
-  afterUpdate(() => {
-    if (!params) return;
-    dashInputValue = params[id];
-    if (type === "color" && dashInputValue) {
-      value = dashInputValue;
-      let hsl = hexToHSL(dashInputValue);
-      invert = false;
-      if (hsl.l >= 70) invert = true;
-    }
-    style.opacity = 1;
-    if (faded) style.opacity = 0.5;
-    if (type === "select") {
-      optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "";
-    }
-    if (type === "range") {
-      max = parseInt(max) || 0;
-      min = parseInt(min) || 0;
-      rangeWidth = scale(dashInputValue, min, max, 0, 1);
-    }
-  });
+
   let grouped = getContext("grouped");
   let grid = getContext("grid");
   let style: { opacity: number } = { opacity: 1 };
   let invert = false;
   let titleBlock = true;
   let dashInputValue: any;
-  let optionName: string = "";
+  let optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
 
   let valueUpdate = (e: any) => {
     if (!e.target) {
@@ -58,10 +44,9 @@
       invert = false;
       if (hsl.l >= 70) invert = true;
     }
-    dispatch("valueChange", { value: value, id: id });
+    console.log("====== INPUT CHANGE =========");
+    updateValue(appDetails.name, value, id);
   };
-
-  function switchToggle(id: string) {}
 
   let direction = "column";
   let vert = true;
@@ -71,33 +56,33 @@
   }
   if (type === "color" && !value) value = "#ffffff";
   if (type === "checkbox") titleBlock = false;
-  if (faded) style.opacity = 0.5;
 
-  function scale(number, inMin, inMax, outMin, outMax) {
+  function scale(number: number, inMin: number, inMax: number, outMin: number, outMax: number) {
     return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
   }
 
   let rangeWidth = 0;
 
   afterUpdate(() => {
-    if (!params) return;
-    dashInputValue = params[id];
+    style.opacity = 1;
+    if (faded) style.opacity = 0.5;
+
+    dashInputValue = $storage[appDetails.name]["inProgress"][id];
     if (type === "color" && dashInputValue) {
       value = dashInputValue;
       let hsl = hexToHSL(dashInputValue);
       invert = false;
       if (hsl.l >= 70) invert = true;
     }
-    style.opacity = 1;
-    if (faded) style.opacity = 0.5;
-    if (type === "select") {
-      optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "";
-    }
-    if (type === "range") {
-      max = parseInt(max) || 0;
-      min = parseInt(min) || 0;
-      rangeWidth = scale(dashInputValue, min, max, 0, 1);
-    }
+
+    if (type === "select") optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "NA";
+    if (type === "range") rangeWidth = scale(dashInputValue, min, max, 0, 1);
+  });
+  onMount(async () => {
+    setTimeout(() => {
+      if (type != "select") return;
+      optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
+    }, 500);
   });
 </script>
 
@@ -110,7 +95,7 @@
   {/if}
   {#if type === "select"}
     <Listbox value={dashInputValue ? dashInputValue : ops[Object.keys(ops)[0]]} on:change={valueUpdate} class="listBox" let:open>
-      <ListboxButton class="listBoxButton {open ? 'boxOpen' : ''}">{dashInputValue ? optionName : Object.keys(ops)[0]}</ListboxButton>
+      <ListboxButton class="listBoxButton {open ? 'boxOpen' : ''}">{optionName}</ListboxButton>
       {#if open}
         <div class="optionHolder" transition:slide>
           <ListboxOptions class="listBoxOptions">
@@ -156,8 +141,8 @@
 </div>
 
 <style lang="scss">
-  @import "../../css//default.scss";
-  @import "../../css/colours.scss";
+  @use "../../css//default.scss" as d;
+  @use "../../css/colours.scss" as *;
   .invert {
     color: black !important;
   }
@@ -226,7 +211,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     transition: background-color 0.3s ease-in-out;
-    @media screen and (max-width: $phone) {
+    @media screen and (max-width: d.$phone) {
       grid-template-columns: 1fr;
     }
     border-radius: 1rem;
@@ -270,6 +255,7 @@
     &:hover {
       background-color: $whiteFade;
       box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0.5);
+      font-weight: bold;
     }
   }
 
@@ -526,6 +512,7 @@
     &:hover {
       border-color: white;
       background-position: 50% 0%;
+      font-weight: bold;
     }
     position: relative;
     overflow: hidden;
@@ -568,7 +555,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    @media screen and (max-width: $phone) {
+    @media screen and (max-width: d.$phone) {
       max-width: 100%;
     }
   }

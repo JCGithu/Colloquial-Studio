@@ -2,10 +2,10 @@
   import type { ChatterParameters } from "./paramsChatter";
   import "../../../js/tmi";
   import { onMount } from "svelte";
+  import { storage } from "../params";
   import ChatBubble from "./ChatBubble.svelte";
-  import { defaultParams } from "./paramsChatter";
 
-  export let params: ChatterParameters = defaultParams;
+  //export let params: ChatterParameters = defaultParams;
   export let runApp = false;
   let messageIndex = 0;
 
@@ -18,7 +18,7 @@
   import { badge_sets } from "./badges.json";
 
   let exampleTags: Tags = {
-    color: params.highcolour,
+    color: $storage.chatter.inProgress.highcolour,
     "display-name": "Chatter",
     id: "C0",
     badges: {},
@@ -135,30 +135,30 @@
   function messageWrap(newChat: Message) {
     newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
     messageIndex++;
-    if (params.direction === "Down") {
+    if ($storage.chatter.inProgress.direction === "Down") {
       messageList = messageList.concat(newChat);
       if (messageList.length > 50) messageList.shift();
     }
-    if (params.direction === "Up") {
+    if ($storage.chatter.inProgress.direction === "Up") {
       messageList.unshift(newChat);
       if (messageList.length > 50) messageList.pop();
     }
-    if (params.removeChats) {
+    if ($storage.chatter.inProgress.removeChats) {
       setTimeout(() => {
         messageList.shift();
         messageList = messageList;
-      }, params.removeTime * 1000);
+      }, $storage.chatter.inProgress.removeTime * 1000);
     }
     messageList = messageList;
   }
 
   function testMessage(message: string, type: string) {
     console.log("Test Message:", message, type);
-    let messageArray = formatEmotes(message, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits, params);
+    let messageArray = formatEmotes(message, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits);
     let newChat: Message = {
       message: messageArray,
       user: "Test_User",
-      color: params.highcolour,
+      color: $storage.chatter.inProgress.highcolour,
       tags: Object.assign({}, exampleTags),
       type: type,
       pronoun: "Any",
@@ -176,24 +176,23 @@
       messageArray.shift();
       newChat.message = messageArray;
     }
-    console.log(exampleTags);
     messageWrap(newChat);
   }
 
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
     if (self) return;
-    if (typeof params.hidebot === "object") {
-      if (params.hidebot.includes(tags.username)) return;
+    if (typeof $storage.chatter.inProgress.hidebot === "object") {
+      if ($storage.chatter.inProgress.hidebot.includes(tags.username)) return;
     }
-    if (typeof params.hidecom === "object") {
+    if (typeof $storage.chatter.inProgress.hidecom === "object") {
       let comCheck = message.split(" ")[0];
-      if (params.hidecom.includes(comCheck)) return;
+      if ($storage.chatter.inProgress.hidecom.includes(comCheck)) return;
     }
-    if (params.links) {
+    if ($storage.chatter.inProgress.links) {
       if (message.includes("http://") || message.includes("https://")) return;
     }
-    if (params.points && tags["custom-reward-id"]) return;
-    if (params.replies && tags["reply-parent-display-name"]) return;
+    if ($storage.chatter.inProgress.points && tags["custom-reward-id"]) return;
+    if ($storage.chatter.inProgress.replies && tags["reply-parent-display-name"]) return;
 
     //Testing Commands
     let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
@@ -212,18 +211,18 @@
       firstMessage = false;
     }
 
-    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, ffzCache, tags.bits, params);
+    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, ffzCache, tags.bits);
     let newChat: Message = {
       message: messageArray,
       user: tags.username || "",
-      color: tags.color || params.highcolour,
+      color: tags.color || $storage.chatter.inProgress.highcolour,
       tags: tags,
       type: type,
       pronoun: undefined,
     };
     let lowerCase = newChat.user.toLowerCase();
     newChat.pronoun = userPronouns.get(lowerCase);
-    if (params.pronouns && !newChat.pronoun) fetchPronoun(lowerCase);
+    if ($storage.chatter.inProgress.pronouns && !newChat.pronoun) fetchPronoun(lowerCase);
     console.log(newChat, newChat.tags);
     messageWrap(newChat);
   }
@@ -236,22 +235,23 @@
   }
 
   onMount(async () => {
-    console.log("Chatter has Loaded", params);
+    console.log("Chatter has Loaded", $storage.chatter.loaded);
 
     window.onunhandledrejection = (e) => {
       console.log("Error:", e);
+      console.log($storage.chatter.loaded);
     };
 
     firstMessage = true;
     // @ts-ignore
     let client = new tmi.Client({
-      channels: [params.channel],
+      channels: [$storage.chatter.loaded.channel],
     });
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      if (params.ffz) ffzChannel(params.channel);
-      testMessage(`Connected to ${params.channel} ✅`, "announcement");
+      if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
+      testMessage(`Connected to ${$storage.chatter.loaded.channel} ✅`, "announcement");
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
@@ -267,10 +267,10 @@
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
     client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
 
-    if (!params.version || params.version !== 2) {
+    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2) {
       testMessage("Chatter has had a major update! Please go back to the site and update your URL.", "announcement");
     }
-    if (params.channel === "" || !params.channel) {
+    if ($storage.chatter.inProgress.channel === "" || !$storage.chatter.inProgress.channel) {
       testMessage("Give me a Twitch channel name to test! 📺", "announcement");
     } else {
       console.log("Attempting Twitch Connection...");
@@ -288,11 +288,11 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {params.fontsize + 'px'}; {params.customCSS}; align-items: {params.align}; {params.direction === 'Up' ? 'height:auto' : ''}">
+  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
-      <ChatBubble {params} {message} {badgeData} />
+      <ChatBubble {message} {badgeData} />
     {/each}
-    <div style="opacity:{params.bgopacity / 100}; --bgColour:{params.bgcolour}" id="chatBackground" />
+    <div style="opacity:{$storage.chatter.inProgress.bgopacity / 100}; --bgColour:{$storage.chatter.inProgress.bgcolour}" id="chatBackground" />
   </div>
 </section>
 

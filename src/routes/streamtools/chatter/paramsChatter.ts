@@ -28,6 +28,7 @@ export interface ChatterParameters {
   emoteOnly: string | boolean;
   nameCustom: string | boolean;
   bubbleCustom: string | boolean;
+  splitLetters: boolean;
   proFont: string;
   proOutline: boolean | string;
   proUseCol: boolean | string;
@@ -39,7 +40,7 @@ export interface ChatterParameters {
   points: boolean | string;
   removeTime: any;
   version: number;
-  saves:Array<boolean>;
+  intro: boolean;
 }
 
 export const defaultParams:ChatterParameters = {
@@ -54,35 +55,36 @@ export const defaultParams:ChatterParameters = {
   fontcolour: "#f7f7ff",
   bgopacity: 100,
   chatopacity: 90,
-  highlight: 'false',
-  togglecol: "true",
+  highlight: false,
+  togglecol: true,
   animation: "Pop In",
-  badges: "true",
+  badges: true,
   border: 50,
-  bttv: "false",
-  ffz: 'false',
+  bttv: false,
+  ffz: false,
   hidebot: "",
   hidecom: "",
-  pronouns: "false",
+  pronouns: false,
   direction: "Down",
   customCSS: "",
   animTime: "0.5",
   animEase: "ease-in-out",
-  emoteOnly: "false",
-  nameCustom: "false",
-  bubbleCustom: "false",
-  points: 'false',
+  emoteOnly: false,
+  nameCustom: false,
+  bubbleCustom: false,
+  points: false,
   proFont: "Poppins",
-  proOutline: "false",
-  proUseCol: "true",
+  proOutline: false,
+  proUseCol: true,
   proColour: "#f7f7ff",
-  proBG: "false",
-  replies: "false",
-  links: "false",
-  removeChats: 'false',
+  proBG: false,
+  replies: false,
+  links: false,
+  removeChats: false,
   removeTime: 60,
   version: 2,
-  saves: [false,false,false]
+  intro: false,
+  splitLetters: false,
 };
 
 let arrays = ['hidebot', 'hidecom'];
@@ -104,8 +106,11 @@ function backgroundColour(params:ChatterParameters){
 }
 
 // FULL REFORMATTER
-export async function paramReformat(params:ChatterParameters, id:string | null){
+export async function paramReformat(params:ChatterParameters, id?:string){
   // If the function is provided an ID it only changes that value then returns nothing
+  if (!params.version) params.fontsize = params.fontsize * 16;
+  if (!params["chatcolourCalc"]) params["chatcolourCalc"] = params.chatcolour;
+
   if (id) {
     //ARRAYS
     if (arrays.includes(id) && typeof params[id] === 'string') params[id] = params[id].trim().split(',');
@@ -117,7 +122,7 @@ export async function paramReformat(params:ChatterParameters, id:string | null){
     if (id === 'bgopacity') backgroundOpacity(params);
     if (id === 'bgcolour') backgroundColour(params);
     console.log (`"${id} reformatted to "${params[id]}"`);
-    return;
+    return params;
   };
 
   // Otherwise it changes everything it can and returns params

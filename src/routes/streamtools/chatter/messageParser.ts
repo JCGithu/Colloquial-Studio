@@ -1,4 +1,6 @@
 import type { ChatterParameters } from "./paramsChatter";
+import { get } from 'svelte/store';
+import { storage } from "../params";
 
 const cheerTiers = [1, 100, 1000, 5000, 10000, 100000];
 const otherCheers = ['cheer', 'biblethump', 'cheerwhal', 'corgo', 'uni', 'showlove', 'party', 'seemsgood', 'pride', 'kappa', 'frankerz', 'heyguys', 'dansgame', 'elegiggle', 'trihard', 'kreygasm', '4head', 'swiftrage','notlikethis', 'failfish', 'vohiyo', 'pjsalt', 'mrdestructoid', 'bday', 'ripcheer', 'shamrock'];
@@ -70,7 +72,7 @@ function checkFFZ(ffzCache:Array<ffzEmote>, splitText:Array<MessageChunk>){
 }
 
   
-export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmote>, ffzCache:Array<ffzEmote>, bits:number|undefined, params:ChatterParameters):Array<MessageChunk> {
+export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:Array<bttvEmote>, ffzCache:Array<ffzEmote>, bits:number|undefined):Array<MessageChunk> {
   var splitText:Array<any> = text.split(' ');
   for (let i in splitText){
     splitText[i] = {
@@ -81,7 +83,8 @@ export function formatEmotes(text:string, emotes:Tags['emotes'], bttvEmoteCache:
   }
   if (emotes) splitText = checkEmotes(emotes, splitText, text);
   if (bits) splitText = checkBits(splitText);
-  if (bttvEmoteCache && params.bttv) splitText = checkBTTV(bttvEmoteCache, splitText);
-  if (ffzCache && params.ffz) splitText = checkFFZ(ffzCache, splitText); 
+  let params = get(storage);
+  if (bttvEmoteCache && params.chatter.loaded.bttv) splitText = checkBTTV(bttvEmoteCache, splitText);
+  if (ffzCache && params.chatter.loaded.ffz) splitText = checkFFZ(ffzCache, splitText); 
   return splitText;
 }

@@ -9,7 +9,7 @@ export interface EmoteDropParameters {
   random: boolean;
   modWipe: boolean;
   version: number;
-  saves:Array<boolean>;
+  intro: boolean
 }
 
 export const defaultParams:EmoteDropParameters = {
@@ -22,7 +22,7 @@ export const defaultParams:EmoteDropParameters = {
   random: false,
   sleep: true,
   modWipe: true,
-  saves: [false, false, false]
+  intro: false,
 };
 
 // Put IDs of relevant inputs
@@ -35,25 +35,14 @@ let booleans = ['sleep', 'random'];
 export async function paramReformat(params:EmoteDropParameters, id?:string){
   // If the function is provided an ID it only changes that value then returns nothing
   if (id) {
-    // ARRAYS
-    //if (arrays.includes(id) && typeof params[id] === 'string') params[id] = params[id].trim().split(',');
-    // BOOLEANS
     if (booleans.includes(id) && typeof params[id] === 'string') params[id] = (params[id] === 'true');
-    // Other
     console.log (`"${id} reformatted to "${params[id]}"`);
-    return;
+    return params;
   };
 
-  // All individual checks here
-
-  // Standard checks
-   booleans.forEach((b) => {
-     if (typeof params[b] === 'string') params[b] = (params[b] === 'true');
+  booleans.forEach((b) => {
+    if (typeof params[b] === 'string') params[b] = (params[b] === 'true');
   });
-  // arrays.forEach((v, i)=>{
-  //   if (typeof params[v] != 'string') return;
-  //   params[v] = params[v].trim().split(',');
-  // });
 
   console.log('Params Reformatted', params);
   return params;

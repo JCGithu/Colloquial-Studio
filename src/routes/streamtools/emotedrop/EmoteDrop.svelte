@@ -1,12 +1,10 @@
 <script lang="ts">
   import type { EmoteDropParameters } from "./paramsEmoteDrop";
 
+  import { storage } from "../params";
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
   import { onMount } from "svelte";
-  import { defaultParams } from "./paramsEmoteDrop";
-
-  export let params: EmoteDropParameters = defaultParams;
   export let runApp = false;
 
   let appBody: HTMLElement, appSize: DOMRect;
@@ -22,12 +20,12 @@
     9: { img: "3.0", scale: 1, radius: 40 },
     10: { img: "3.0", scale: 1.2, radius: 45 },
   };
-  $: img = ballScaleChart[params.esize].img || "2.0";
-  $: radius = ballScaleChart[params.esize].radius || 20;
-  $: Scale = ballScaleChart[params.esize].scale || 1;
-  $: limit = params.blimit;
-  $: time = params.etime * 1000;
-  $: bounce = params.bounce / 10;
+  $: img = ballScaleChart[$storage.emotedrop.inProgress.esize].img || "2.0";
+  $: radius = ballScaleChart[$storage.emotedrop.inProgress.esize].radius || 20;
+  $: Scale = ballScaleChart[$storage.emotedrop.inProgress.esize].scale || 1;
+  $: limit = $storage.emotedrop.inProgress.blimit;
+  $: time = $storage.emotedrop.inProgress.etime * 1000;
+  $: bounce = $storage.emotedrop.inProgress.bounce / 10;
 
   function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
@@ -36,7 +34,7 @@
   function createWorld() {
     // Create engine
     let engine = Engine.create({
-      enableSleeping: params.sleep,
+      enableSleeping: $storage.emotedrop.loaded.sleep,
     });
     let world = engine.world;
 
@@ -90,14 +88,14 @@
   }
 
   onMount(async () => {
-    console.log("EmoteDrop has Loaded", params);
+    console.log("EmoteDrop has Loaded", $storage.emotedrop.inProgress);
 
     appSize = appBody.getBoundingClientRect();
     let renderedWorld = createWorld();
 
     // @ts-ignore
     const client = new tmi.Client({
-      channels: [params.channel],
+      channels: [$storage.emotedrop.loaded.channel],
     });
 
     client.on("connected", () => {
@@ -108,7 +106,7 @@
       // Deleting emotes
       if (message.startsWith("!emotewipe")) {
         let allowed = tags.badges.broadcaster ? true : false;
-        if (params.modWipe && tags.badges.moderator) allowed = true;
+        if ($storage.emotedrop.inProgress.modWipe && tags.badges.moderator) allowed = true;
         if (!allowed) return;
         if (message === "!emotewipe") {
           wipe(0, renderedWorld);
@@ -120,7 +118,7 @@
       }
 
       if (document.hidden) return;
-      if (params.random) {
+      if ($storage.emotedrop.inProgress.random) {
         let randomNumber = getRandomInt(10);
         img = ballScaleChart[randomNumber].img;
         radius = ballScaleChart[randomNumber].radius;
@@ -165,7 +163,7 @@
       }, time);
     });
 
-    if (params.channel.length) {
+    if ($storage.emotedrop.loaded.channel.length) {
       console.log("Attempting Twitch Connection...");
       client.connect();
     }

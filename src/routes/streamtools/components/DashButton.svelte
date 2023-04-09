@@ -5,7 +5,7 @@
 <button on:click>{text}</button>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
   button {
     font-family: "Poppins";
     font-size: normal;

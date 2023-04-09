@@ -7,17 +7,11 @@
 
   import "../../../../css/default.scss";
   import { onMount } from "svelte";
-  import { runningApp } from "../../params";
-
-  let params = defaultParams;
-  let runApp = true;
+  import { runningApp, storage } from "../../params";
 
   onMount(async () => {
     let urlData = new URLSearchParams(window.location.search);
-    runApp = urlData.has("data");
-    params = await runningApp(urlData, appName);
-
-    // APP SPECIFIC
+    await runningApp(urlData, appName);
   });
 </script>
 
@@ -25,6 +19,6 @@
   <title>Emote Drop</title>
 </svelte:head>
 
-{#key params.channel}
-  <EmoteDrop {params} {runApp} />
+{#key $storage.emotedrop["loaded"].channel}
+  <EmoteDrop runApp={true} />
 {/key}

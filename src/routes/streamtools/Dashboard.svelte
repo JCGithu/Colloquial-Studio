@@ -1,29 +1,28 @@
 <script lang="ts">
   import { fly, fade, slide } from "svelte/transition";
   import { onMount, getContext } from "svelte";
+  import { get } from "svelte/store";
   import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
+  import { loadURL, loadSave, urlBuild, save, storage, urlFill, updateValue, dashReset } from "./params";
+  import DashButton from "./components/DashButton.svelte";
   import SVGIcon from "../SVGIcon.svelte";
-  export let urlFill = "";
+
+  //CONTEXT
+  let appDetails: appDetails = getContext("appDetails");
+
   export let showInfo = false;
   export let showButtons = true;
   export let saves = [false, false, false];
 
-  export let dashboardParams: standardObject;
-  export let runningParams: standardObject;
+  //export let dashboardParams: standardObject;
+  //export let runningParams: standardObject;
 
   let baseURL = "";
   let openMenu = false;
 
   let userBackground = "#242423";
   let toastArray: Array<{ message: string; id: number }> = [];
-
-  import { loadURL, loadSave, urlBuild, save } from "./params";
-  import DashButton from "./components/DashButton.svelte";
-  import SvgIcon from "../SVGIcon.svelte";
-
-  //CONTEXT
-  let appDetails: appDetails = getContext("appDetails");
 
   //TOAST
   let toastID = 0;
@@ -44,57 +43,70 @@
 
   let saveMenu = false;
   function toggleInfoScreen() {
+    updateValue(appDetails.name, true, "intro");
     showInfo = !showInfo;
   }
 
   //URL FUNCTIONS
   function openURL() {
-    if (urlFill) {
-      window.open(urlFill);
-    } else {
+    let currentURL: standardObject = get(urlFill);
+    if (currentURL[appDetails.name].length < 5) {
       ToastQueue("No URL generated yet!");
+      return;
     }
+    window.open(currentURL[appDetails.name]);
   }
+
   function copyURL() {
-    navigator.clipboard.writeText(urlFill);
+    let currentURL: standardObject = get(urlFill);
+    navigator.clipboard.writeText(currentURL[appDetails.name]);
     ToastQueue("URL copied to clipboard");
   }
 
   async function loadFromURL() {
     let urlData = window.prompt("Put in an existing URL", "URL here...");
     if (!urlData) return;
-    dashboardParams = await loadURL(urlData || "", appDetails.name);
-    urlFill = urlBuild(dashboardParams, baseURL);
-    runningParams = dashboardParams;
+    //dashboardParams = await loadURL(urlData || "", appDetails.name);
+    await loadURL(urlData || "", appDetails.name);
+    urlBuild(appDetails.name);
+    //This shouldn't be needed now as it's tackled in the loadURL function
+    //runningParams = dashboardParams;
     ToastQueue("Settings loaded from URL");
   }
 
   //DATA FUNCTIONS
   function saveData(num: number) {
     saveMenu = !saveMenu;
-    save(dashboardParams, appDetails.name, num);
+    save(appDetails.name, num);
     ToastQueue("Saved to File " + (num + 1));
+    setTimeout(saveMenuReload, 1000);
   }
   async function loadData(num: number) {
-    dashboardParams = await loadSave(num, appDetails.name);
+    //dashboardParams = await loadSave(num, appDetails.name);
+    await loadSave(appDetails.name, num);
     saveMenu = !saveMenu;
-    urlFill = urlBuild(dashboardParams, baseURL);
+    urlBuild(appDetails.name);
     ToastQueue("Loaded from Save " + (num + 1));
+  }
+
+  function saveMenuReload() {
+    let appStorage = get(storage);
+    for (let i = 0; i < 3; i++) {
+      saves[i] = appStorage[appDetails.name][i].intro;
+    }
   }
 
   onMount(async () => {
     //Pulling actual base URL
     baseURL = window.location.href.split("?data=")[0];
-
-    //Pulling Localstorage info for saves
+    urlFill.update((urls) => {
+      urls["base"] = baseURL;
+      return urls;
+    });
     setTimeout(() => {
-      let cancelShow = false;
-      console.log(dashboardParams.saves);
-      dashboardParams.saves.forEach((s: boolean) => {
-        if (s && !cancelShow) cancelShow = true;
-      });
-      if (!cancelShow) showInfo = true;
-      saves = dashboardParams.saves;
+      saveMenuReload();
+      urlBuild(appDetails.name);
+      if (!$storage[appDetails.name].loaded.intro) showInfo = true;
     }, 500);
   });
 </script>
@@ -136,7 +148,7 @@
     </div>
   {/if}
   <div id="toastBox">
-    <span id="return"><a aria-label="Return to home" href="/"><SvgIcon icon="logo" /></a></span>
+    <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
     {#each toastArray as toasty (toasty.id)}
       <div in:fade out:fly={{ x: -200, duration: 1000 }} id="toast">
         {toasty.message}
@@ -146,6 +158,12 @@
   <div id="dashControls">
     <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
     <slot name="settings" />
+    <DashButton
+      text="Reset to Default"
+      on:click={() => {
+        dashReset(appDetails.name);
+      }}
+    />
   </div>
   <div class="dashReact">
     <div id="dashTopBar" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
@@ -169,7 +187,7 @@
           </div>
         </PopoverPanel>
       </Popover>
-      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={urlFill} />
+      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={$urlFill[appDetails.name]} />
     </div>
     <div id="dashApp">
       <slot name="app" />
@@ -184,8 +202,8 @@
 </main>
 
 <style lang="scss">
-  @import "../../css/default.scss";
-  @import "../../css/colours.scss";
+  @use "../../css/default.scss" as d;
+  @use "../../css/colours.scss" as *;
 
   main {
     --userBackground: $white;
@@ -199,7 +217,7 @@
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
-    @media screen and (max-width: $phone) {
+    @media screen and (max-width: d.$phone) {
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
@@ -228,7 +246,7 @@
   h1 {
     //font-weight: bold;
     position: relative;
-    font-family: Marlin;
+    font-family: "Poppins";
 
     margin: 0;
     width: max-content;
@@ -286,7 +304,7 @@
     // background-size: 1.3rem 1.3rem;
     // background-position: 0 0, 0.65rem 0.65rem;
 
-    @media only screen and (max-width: $phone) {
+    @media only screen and (max-width: d.$phone) {
       padding: 3rem 1rem 1rem 1rem;
       height: 35vh;
       height: 35svh;
@@ -342,7 +360,7 @@
     width: 67vw;
     display: flex;
     flex-direction: column;
-    @media screen and (max-width: $phone) {
+    @media screen and (max-width: d.$phone) {
       width: 100vw;
       height: 50vh;
       min-height: 50vh;
@@ -702,7 +720,7 @@
     padding-bottom: 1rem;
     flex-direction: column;
     pointer-events: none;
-    @media screen and (max-width: $phone) {
+    @media screen and (max-width: d.$phone) {
       height: 50%;
       bottom: 75%;
       left: 25%;

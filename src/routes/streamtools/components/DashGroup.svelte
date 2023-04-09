@@ -24,7 +24,7 @@
 </div>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
 
   button {
     appearance: none;

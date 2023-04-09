@@ -1,31 +1,26 @@
 <script lang="ts">
   import { createEventDispatcher, getContext, afterUpdate } from "svelte";
+  import { get } from "svelte/store";
+  import { updateValue, storage, reloadDashboard } from "../params";
   import SvgIcon from "../../SVGIcon.svelte";
-  const dispatch = createEventDispatcher();
-
-  export let value: any = null;
-  export let params: standardObject;
-  let dashInputValue = "";
 
   let rotate: HTMLElement;
 
   let grid = getContext("grid");
   let group = getContext("group");
+  let appDetails: appDetails = getContext("appDetails");
 
   function refresh() {
-    dispatch("reload");
+    reloadDashboard(appDetails.name, channelValue, "channel");
     rotate.animate([{ transform: "rotate(0)" }, { transform: "rotate(360deg)" }], { duration: 500, iterations: 1, easing: "ease-out" });
   }
 
-  let valueUpdate = (e: any) => {
-    value = e.target.value;
-    dispatch("valueChange", { value: value, id: "channel" });
-  };
-  afterUpdate(() => {
-    if (!params) return;
-    dashInputValue = params["channel"];
-  });
+  let channelValue = get(storage)[appDetails.name].inProgress.channel;
 
+  let valueUpdate = (e: any) => {
+    channelValue = e.target.value;
+    updateValue(appDetails.name, channelValue, "channel");
+  };
   // IF THE CHANNEL NAME does not equal the connected channel name show a rotation
   // Else show a tick.
 
@@ -40,18 +35,17 @@
     <input
       type="text"
       on:keypress={(e) => {
-        console.log(e.key);
         if (e.key === "Enter") refresh();
       }}
       id="channel"
-      value={dashInputValue || ""}
+      value={$storage[appDetails.name].inProgress.channel}
       on:input={valueUpdate}
     />
   </div>
 </section>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
 
   section {
     position: relative;
