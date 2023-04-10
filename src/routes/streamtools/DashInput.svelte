@@ -196,7 +196,7 @@
   .inputBlock {
     width: calc(85% - 1rem);
     max-width: calc(85% - 1rem);
-    padding: 0.2rem 0.5rem;
+    padding: 0.5rem 0.5rem;
     margin: 0.15rem 0;
     &.grouped {
       width: calc(100% - 2rem);
@@ -229,6 +229,8 @@
     display: flex;
     flex-direction: var(--flex);
     padding: 0.2rem 0rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0.2rem;
     align-items: center;
     width: calc(100% - 3rem);
   }
@@ -243,6 +245,7 @@
     //background: white;
     color: $black;
     width: 90%;
+    width: calc(100% - 3rem);
     //margin-left: 5%;
     box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
     transition: all 1s;
@@ -424,7 +427,7 @@
     position: relative;
     width: 35px;
     height: 30px;
-    padding-top: 5px;
+    padding-top: 7px;
     margin: 0;
     margin-left: calc((100% - 35px) * var(--width));
     background-color: transparent;
