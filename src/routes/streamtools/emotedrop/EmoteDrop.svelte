@@ -4,7 +4,8 @@
   import { storage } from "../params";
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
+  let toastUpdate: (i: string) => void = getContext("toast");
   export let runApp = false;
 
   let appBody: HTMLElement, appSize: DOMRect;
@@ -100,6 +101,7 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
+      toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
     });
 
     client.on("chat", (channel: EmoteDropParameters["channel"], tags: Tags, message: string, self: boolean) => {

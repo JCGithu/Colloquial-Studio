@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fly, fade, slide } from "svelte/transition";
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, setContext } from "svelte";
   import { get } from "svelte/store";
   import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
@@ -40,6 +40,7 @@
   export const toastUpdate = (i: string) => {
     ToastQueue(i);
   };
+  setContext("toast", toastUpdate);
 
   let saveMenu = false;
   function toggleInfoScreen() {

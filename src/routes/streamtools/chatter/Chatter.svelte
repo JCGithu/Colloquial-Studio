@@ -1,9 +1,11 @@
 <script lang="ts">
   import type { ChatterParameters } from "./paramsChatter";
   import "../../../js/tmi";
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
   import { storage } from "../params";
   import ChatBubble from "./ChatBubble.svelte";
+
+  let toastUpdate: (i: string) => void = getContext("toast");
 
   //export let params: ChatterParameters = defaultParams;
   export let runApp = false;
@@ -252,6 +254,7 @@
       console.log("Reading from Twitch! ✅");
       if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
       testMessage(`Connected to ${$storage.chatter.loaded.channel} ✅`, "announcement");
+      toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
