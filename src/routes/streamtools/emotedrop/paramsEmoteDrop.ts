@@ -36,7 +36,7 @@ export async function paramReformat(params:EmoteDropParameters, id?:string){
   // If the function is provided an ID it only changes that value then returns nothing
   if (id) {
     if (booleans.includes(id) && typeof params[id] === 'string') params[id] = (params[id] === 'true');
-    console.log (`"${id} reformatted to "${params[id]}"`);
+    //console.log (`"${id} reformatted to "${params[id]}"`);
     return params;
   };
 
@@ -44,7 +44,7 @@ export async function paramReformat(params:EmoteDropParameters, id?:string){
     if (typeof params[b] === 'string') params[b] = (params[b] === 'true');
   });
 
-  console.log('Params Reformatted', params);
+  //console.log('Params Reformatted', params);
   return params;
 }
 

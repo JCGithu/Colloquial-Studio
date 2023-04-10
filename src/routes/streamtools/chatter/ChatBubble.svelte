@@ -138,8 +138,6 @@
     if (message.tags["first-msg"]) first = true;
     if (message.tags.bits) bits = true;
 
-    console.log($storage.chatter.loaded, message);
-
     if ($storage.chatter.inProgress.emoteOnly) {
       message.message.forEach((el) => {
         if (!el.code) bigEmote = false;

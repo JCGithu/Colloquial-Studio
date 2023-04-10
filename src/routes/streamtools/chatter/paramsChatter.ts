@@ -121,7 +121,7 @@ export async function paramReformat(params:ChatterParameters, id?:string){
     if (id === 'chatcolour' || id === 'chatopacity') chatColourCalculation(params);
     if (id === 'bgopacity') backgroundOpacity(params);
     if (id === 'bgcolour') backgroundColour(params);
-    console.log (`"${id} reformatted to "${params[id]}"`);
+    //console.log (`"${id} reformatted to "${params[id]}"`);
     return params;
   };
 
@@ -139,7 +139,7 @@ export async function paramReformat(params:ChatterParameters, id?:string){
     params[v] = params[v].trim().split(',');
   });
 
-  console.log('Params Reformatted', params);
+  //console.log('Params Reformatted', params);
   return params;
 }
 
