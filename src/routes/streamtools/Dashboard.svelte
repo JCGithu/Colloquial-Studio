@@ -97,6 +97,16 @@
     }
   }
 
+  function checkSave(saveExists: boolean, num: number) {
+    if (!saveExists) {
+      saveData(num);
+      return;
+    }
+    let check = window.confirm("Overwrite Existing Save?");
+    if (!check) return;
+    saveData(num);
+  }
+
   onMount(async () => {
     //Pulling actual base URL
     baseURL = window.location.href.split("?data=")[0];
@@ -133,15 +143,15 @@
     </div>
   </div>
 {/if}
-<main style:--userBackground={userBackground}>
+<main style:--userBackground={userBackground} class:blur={showInfo}>
   {#if saveMenu}
     <div id="saveMenu" class="infoScreen" transition:fade>
       <div class="saveCollection">
         {#each saves as save, i}
           <span class:blank={!saves[i]}>
             <p>Save {i + 1}:</p>
-            <button on:click={() => saveData(i)}>{saves[i] ? "Overwrite" : "Save"}</button>
-            <button on:click={() => loadData(i)}>Load</button>
+            <button type="button" on:click={() => checkSave(saves[i], i)}>Save</button>
+            <button type="button" on:click={() => loadData(i)}>Load</button>
           </span>
         {/each}
         <DashButton text="Close" on:click={() => (saveMenu = !saveMenu)} on:submit={() => (saveMenu = !saveMenu)} />
@@ -157,7 +167,7 @@
     {/each}
   </div>
   <div id="dashControls">
-    <h1 on:click={toggleInfoScreen}>{appDetails.title}</h1>
+    <button class="titleButton" on:click={toggleInfoScreen}><h1>{appDetails.title}</h1></button>
     <slot name="settings" />
     <DashButton
       text="Reset to Default"
@@ -175,15 +185,15 @@
         <PopoverPanel class="PopOverPanel">
           <div class="panel-contents" transition:slide>
             <h4>URL Links</h4>
-            <div id="go" on:click={openURL}>Open Link</div>
-            <div id="copy" on:click={copyURL}><span>Copy Link</span></div>
-            <div id="load" on:click={loadFromURL}>Load existing URL</div>
+            <button type="button" id="go" on:click={openURL}>Open Link</button>
+            <button type="button" id="copy" on:click={copyURL}>Copy Link</button>
+            <button type="button" id="load" on:click={loadFromURL}>Load existing URL</button>
             <h4>Settings</h4>
-            <div on:click={toggleInfoScreen}>Info</div>
-            <div id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</div>
+            <button type="button" on:click={toggleInfoScreen}>Info</button>
+            <button type="button" id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</button>
             <div class="panelInput">
-              <label style="--bg:{userBackground}">Background Colour</label>
-              <input type="color" bind:value={userBackground} />
+              <label for="userBackgroundColour" style="--bg:{userBackground}">Background Colour</label>
+              <input id="userBackgroundColour" type="color" bind:value={userBackground} />
             </div>
           </div>
         </PopoverPanel>
@@ -205,6 +215,10 @@
 <style lang="scss">
   @use "../../css/default.scss" as d;
   @use "../../css/colours.scss" as *;
+
+  * {
+    font-family: "Poppins";
+  }
 
   main {
     --userBackground: $white;
@@ -242,12 +256,17 @@
       pointer-events: none;
       z-index: 1;
     }
+    $mainEase: cubic-bezier(0.13, 1.08, 0.67, 1);
+    transition: 4s transform $mainEase, filter 4s $mainEase;
+  }
+
+  .titleButton {
+    background-color: rgba(0, 0, 0, 0);
   }
 
   h1 {
     //font-weight: bold;
     position: relative;
-    font-family: "Poppins";
 
     margin: 0;
     width: max-content;
@@ -382,10 +401,12 @@
     left: 0;
     align-items: center;
     justify-content: center;
-    background-color: fade-out($colloquial, 0.3);
+    background-color: fade-out(darken($black, 5), 0.3);
   }
   .infoBox {
     border-radius: 1rem;
+    border: fade-out($whiteFade, 0.6) solid;
+    border-width: 3px 3px 5px 3px;
     position: relative;
     padding: 1rem;
     padding-top: 2rem;
@@ -401,13 +422,6 @@
     color: $white;
     p {
       margin: 0;
-    }
-    button {
-      margin-top: 1rem;
-      position: relative;
-      background-color: $black;
-
-      z-index: 2;
     }
   }
 
@@ -437,6 +451,11 @@
     }
   }
 
+  button {
+    border: none;
+    cursor: pointer;
+  }
+
   //TOP BAR
   #dashTopBar {
     font-size: 16px;
@@ -458,7 +477,6 @@
       border-width: 1px;
       border-radius: 1rem;
       outline: none;
-      font-family: "Poppins";
       position: relative;
       //width: calc(100% - 130px - 3rem);
       //padding: 1rem 3rem 1rem 130px;
@@ -515,6 +533,9 @@
       transform: scale(1.1);
       //background-color: fade-out($colloquial, 0.2);
     }
+    &:focus {
+      border: solid 1px $white;
+    }
     img {
       height: 100%;
       padding: 0;
@@ -545,6 +566,7 @@
   }
   .panel-contents {
     color: $black;
+
     h4 {
       color: $white;
       margin: 0rem;
@@ -560,23 +582,27 @@
     }
 
     div {
+      //width: calc(100% - 0.6rem);
+      position: relative;
+      padding: 0.2rem 1rem;
+      display: flex;
       margin: 0 0.3rem;
-      padding-right: 1rem;
+    }
+    button {
+      font-size: 16px;
+      width: calc(100% - 0.6rem);
+      background-color: rgba(0, 0, 0, 0);
+      margin: 0 0.3rem;
       position: relative;
       cursor: pointer;
       padding: 0.2rem 1rem;
       display: flex;
       flex-direction: row;
-      border-radius: 1rem;
-      img {
-        height: 1.2rem;
-        padding-left: 0.4rem;
-        padding-top: 0.2rem;
-        filter: invert(1);
-      }
+      border-radius: 0rem;
       transition: 0.3s all ease-in-out;
       &:hover {
         color: white;
+        border-radius: 1rem;
         padding-left: 1.2rem;
         padding-right: 0.8rem;
         background-color: lighten($black, 3);
@@ -622,29 +648,6 @@
     }
   }
 
-  button {
-    font-family: "Poppins";
-    //font-weight: bold;
-    font-size: large;
-    padding: 0.5rem;
-    margin-right: 0.5rem;
-    border-radius: 0.5rem;
-    color: white;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
-    transition: all 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
-    transform: translateY(-0.1rem);
-    &:hover {
-      transform: translateY(-0.2rem);
-      //box-shadow: 0px 3px 0px 0px rgba(255, 255, 255, 1);
-    }
-    &:active {
-      transform: translateY(0rem);
-      //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
-    }
-  }
-
   ::-webkit-color-swatch,
   ::-webkit-color-swatch-wrapper {
     border: none;
@@ -664,6 +667,8 @@
     align-items: center;
     padding: 1rem;
     border-radius: 1rem;
+    border: fade-out($whiteFade, 0.6) solid;
+    border-width: 3px 3px 5px 3px;
     background-color: $black;
     span {
       display: flex;
@@ -675,6 +680,27 @@
       border-width: 1px;
       border-color: $white;
       border-style: solid;
+    }
+    button {
+      //font-weight: bold;
+      font-size: large;
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      border-radius: 0.5rem;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+      transition: all 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
+      transform: translateY(-0.1rem);
+      &:hover {
+        transform: translateY(-0.2rem);
+        //box-shadow: 0px 3px 0px 0px rgba(255, 255, 255, 1);
+      }
+      &:active {
+        transform: translateY(0rem);
+        //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+      }
     }
   }
 
