@@ -148,7 +148,8 @@
 </main>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
+
   main {
     display: flex;
     width: 100vw;
