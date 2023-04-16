@@ -57,6 +57,7 @@ interface Tags {
 	"display-name": string;
 	color: string | undefined;
 	id: string;
+	"msg-id": string;
 	turbo: boolean;
 	emotes?:{[key:number]:Array<string>};
 	badges:{
@@ -128,9 +129,7 @@ interface TwordleGame{
 	guess: Array<Array<string>>,
 	answer: string,
 	votes: number,
-	settings: boolean,
-	howto: boolean,
-	stats: boolean,
+	menu: number,
 	state: 'START' | 'OPENING' | 'POLL' | 'RETRY' | 'NEXTROUND' | 'REVEAL' | 'NEXTLINE' | 'SUCCESS' | 'FAIL',
 	connected: boolean
 }
