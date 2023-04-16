@@ -78,6 +78,7 @@
     font-weight: bold;
     margin: 0;
     font-size: large;
+    font-family: "Poppins";
     //padding-right: 1rem;
   }
 

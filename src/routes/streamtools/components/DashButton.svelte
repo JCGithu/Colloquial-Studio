@@ -2,7 +2,7 @@
   export let text = "";
 </script>
 
-<button on:click>{text}</button>
+<button type="button" on:click on:submit>{text}</button>
 
 <style lang="scss">
   @use "../../../css/colours.scss" as *;
@@ -18,7 +18,7 @@
     color: white;
 
     margin: 0.2rem 0.2rem 1rem 0.2rem;
-    padding: 0 2rem;
+    padding: 0.1rem 2rem;
 
     border: $colloquial solid 0.5px;
     background: linear-gradient(290deg, rgba(0, 0, 0, 0) 24%, $colloquial 25%);
