@@ -2,23 +2,30 @@
   import { createEventDispatcher } from "svelte";
   export let icon = "settings";
   export let fill = "white";
+  export let title = icon;
+  export let description = "";
   export let hoverFill = fill;
-  const dispatch = createEventDispatcher();
 </script>
 
 {#if icon === "settings"}
-  <svg on:click={() => dispatch("clicked")} class="stroke" style="--fill:{fill};--hoverFill:{hoverFill}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg on:click on:keypress aria-labelledby="{icon + title} {icon + title + 'd'}" role="img" class="stroke" style="--fill:{fill};--hoverFill:{hoverFill}" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <title id={icon + title}>{title}</title>
+    <desc id={icon + title + "d"}>{description}</desc>
     <path d="M0 0h24v24H0z" stroke="none" />
     <path d="M12 6a2 2 0 1 0 4 0 2 2 0 1 0-4 0M4 6h8m4 0h4M6 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0m-2 0h2m4 0h10m-5 6a2 2 0 1 0 4 0 2 2 0 1 0-4 0M4 18h11m4 0h1" />
   </svg>
 {:else if icon === "refresh"}
-  <svg xmlns="http://www.w3.org/2000/svg" class="stroke" style="--fill:{fill};--hoverFill:{hoverFill}" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <svg on:click on:keypress role="img" aria-labelledby="{icon + title} {icon + title + 'd'}" class="stroke" style="--fill:{fill};--hoverFill:{hoverFill}" viewBox="0 0 24 24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <title id={icon + title}>{title}</title>
+    <desc id={icon + title + "d"}>{description}</desc>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M19.933 13.041a8 8 0 1 1 -9.925 -8.788c3.899 -1 7.935 1.007 9.425 4.747" />
     <path d="M20 4v5h-5" />
   </svg>
 {:else if icon === "logo"}
-  <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 664.18 681">
+  <svg on:click on:keypress style="--fill:{fill};--hoverFill:{hoverFill}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 664.18 681" aria-labelledby="{icon + title} {icon + title + 'd'}" role="img">
+    <title id={icon + title}>{title}</title>
+    <desc id={icon + title + "d"}>{description}</desc>
     <defs>
       <style>
         .cls-1 {
@@ -46,6 +53,32 @@
       />
     </g>
   </svg>
+{:else if icon === "cog"}
+  <svg class="spin" on:click on:keypress style="--fill:{fill};--hoverFill:{hoverFill}" xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792" aria-labelledby="{icon + title} {icon + title + 'd'}" role="img">
+    <title id={icon + title}>{title}</title>
+    <desc id={icon + title + "d"}>{description}</desc>
+    <path
+      d="M1024 640q0 106-75 181t-181 75q-106 0-181-75t-75-181q0-106 75-181t181-75q106 0 181 75t75 181zm512 109V527q0-12-8-23t-20-13l-185-28q-19-54-39-91 35-50 107-138 10-12 10-25t-9-23q-27-37-99-108t-94-71q-12 0-26 9l-138 108q-44-23-91-38-16-136-29-186-7-28-36-28H657q-14 0-24.5 8.5T621-98L593 86q-49 16-90 37L362 16q-10-9-25-9-14 0-25 11-126 114-165 168-7 10-7 23 0 12 8 23 15 21 51 66.5t54 70.5q-27 50-41 99L29 495q-13 2-21 12.5T0 531v222q0 12 8 23t19 13l186 28q14 46 39 92-40 57-107 138-10 12-10 24 0 10 9 23 26 36 98.5 107.5T337 1273q13 0 26-10l138-107q44 23 91 38 16 136 29 186 7 28 36 28h222q14 0 24.5-8.5T915 1378l28-184q49-16 90-37l142 107q9 9 24 9 13 0 25-10 129-119 165-170 7-8 7-22 0-12-8-23-15-21-51-66.5t-54-70.5q26-50 41-98l183-28q13-2 21-12.5t8-23.5z"
+      style="fill:var(--fill)"
+      transform="matrix(1 0 0 -1 121.492 1285.424)"
+    />
+  </svg>
+{:else if icon === "stats"}
+  <svg on:click on:keypress style="--fill:{fill};--hoverFill:{hoverFill}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490.4 490.4" aria-labelledby="{icon + title} {icon + title + 'd'}" role="img">
+    <title id={icon + title}>{title}</title>
+    <desc id={icon + title + "d"}>{description}</desc>
+    <path
+      d="M17.2 251.55c-9.5 0-17.2 7.7-17.2 17.1v179.7c0 9.5 7.7 17.2 17.2 17.2h113c9.5 0 17.1-7.7 17.1-17.2v-179.7c0-9.5-7.7-17.1-17.1-17.1h-113zm95.8 179.7H34.3v-145.4H113v145.4zm377.4 17.2v-283.7c0-9.5-7.7-17.2-17.2-17.2h-113c-9.5 0-17.2 7.7-17.2 17.2v283.6c0 9.5 7.7 17.2 17.2 17.2h113c9.5 0 17.2-7.7 17.2-17.1zm-34.3-17.2h-78.7v-249.3h78.7v249.3zm-154.4 34.3c9.5 0 17.1-7.7 17.1-17.2V42.05c0-9.5-7.7-17.2-17.1-17.2h-113c-9.5 0-17.2 7.7-17.2 17.2v406.3c0 9.5 7.7 17.2 17.2 17.2h113zm-95.8-406.3h78.7v372h-78.7v-372z"
+      style="fill:var(--fill)"
+    />
+    <g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g />
+  </svg>
+{:else if icon === "help"}
+  <svg on:click on:keypress class="fill" style="--fill:{fill};--hoverFill:{hoverFill}" xmlns="http://www.w3.org/2000/svg" aria-labelledby="{icon + title} {icon + title + 'd'}" role="img" viewBox="50 0 600 550">
+    <path d="M350 39.199a240.798 240.798 0 0 1 170.27 70.531c45.16 45.156 70.531 106.41 70.531 170.27S565.43 405.11 520.27 450.27c-45.156 45.16-106.41 70.531-170.27 70.531S224.89 495.43 179.73 450.27c-45.16-45.156-70.531-106.41-70.531-170.27s25.371-125.11 70.531-170.27A240.796 240.796 0 0 1 350 39.199M350 0c-74.262 0-145.48 29.5-197.99 82.012a279.995 279.995 0 0 0 0 395.98 279.995 279.995 0 0 0 395.98 0 279.995 279.995 0 0 0 0-395.98A279.992 279.992 0 0 0 350 0z" /><path
+      d="M354.43 140a254.84 254.84 0 0 1 29.621 4.871c29.848 8.457 47.602 32.312 49.84 64.008a58.233 58.233 0 0 1-23.574 53.2c-7.953 6.16-16.297 11.761-24.305 17.808a39.54 39.54 0 0 0-17.809 35.281 22.385 22.385 0 0 1-16.13 22.398 24.745 24.745 0 0 1-15.983.613 24.763 24.763 0 0 1-13.023-9.293 23.438 23.438 0 0 1-3.3-11.59A77.782 77.782 0 0 1 351.683 252a232.523 232.523 0 0 0 25.367-22.398 28.015 28.015 0 0 0 6.555-15.738c1.289-15.848-8.903-26.039-25.312-27.105-19.824-1.289-36.512 3.864-48.16 21.391v.004a23.465 23.465 0 0 1-24.36 11.2c-16.801-2.801-24.023-16.466-17.137-32.2a71.893 71.893 0 0 1 35-34.719A121.548 121.548 0 0 1 354.43 140zm16.74 251.33c.113 17.977-9.969 28.672-27.609 28.672s-29.398-10.305-29.457-25.367c0-20.887 9.352-31.305 28-31.863 15.18-.45 30.969 8.848 29.066 28.559z"
+    />
+  </svg>
 {/if}
 
 <style lang="scss">
@@ -54,6 +87,7 @@
     height: 100%;
     width: 100%;
   }
+  //NOT USED YET
   .fill {
     fill: var(--fill);
     &:hover {
@@ -64,6 +98,20 @@
     stroke: var(--fill);
     &:hover {
       stroke: var(--hoverFill);
+    }
+  }
+  .spin {
+    &:hover {
+      animation: spin 1s ease-out;
+      animation-iteration-count: infinite;
+    }
+  }
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(45deg);
     }
   }
 </style>
