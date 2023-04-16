@@ -148,7 +148,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.username} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {message.type} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {$storage.chatter.inProgress.fontcolour}">
       {#if $storage.chatter.inProgress.badges}
@@ -161,13 +161,13 @@
         <span class="pronoun" class:proOutline={$storage.chatter.inProgress.proOutline} class:proBG={$storage.chatter.inProgress.proBG} style="font-family:{$storage.chatter.inProgress.proFont}; --proColour:{$storage.chatter.inProgress.proUseCol ? message.tags.color : $storage.chatter.inProgress.proColour}; color: {$storage.chatter.inProgress.proBG ? $storage.chatter.inProgress.proColour : 'var(--proColour)'}">{message.pronoun}</span>
       {/if}
       {": "}
-      {#each message.message as word}
+      {#each message.message as word, i}
         {#if word.code}
-          <img src={word.code} alt={word.text} class="emote" class:bigEmote />
+          <img src={word.code} alt={word.text} class="emote" class:bigEmote class:wideEmote={$storage.chatter.inProgress.wideEmotes && i > 0 && message.message[i - 1].text === "w!"} />
           {#if word.num}
             <i>{" "}{word.num}{" "}</i>
           {/if}
-        {:else}
+        {:else if word.text != "w!"}
           <span class="word">
             {#if $storage.chatter.inProgress.splitLetters}
               {#each word.text as letter}
@@ -246,6 +246,14 @@
   height: 2rem;
   margin: 0.2rem 0 ;
   vertical-align: middle;
+}
+
+.wideEmote {
+  width: 4.4em;
+}
+
+.wideEmote + .bigEmote {
+  width: 8rem;
 }
 
 .twitchBadge {

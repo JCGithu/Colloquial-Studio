@@ -37,6 +37,7 @@ export interface ChatterParameters {
   replies: boolean | string;
   links: boolean | string;
   removeChats: boolean | string;
+  wideEmotes: boolean;
   points: boolean | string;
   removeTime: any;
   version: number;
@@ -81,6 +82,7 @@ export const defaultParams:ChatterParameters = {
   replies: false,
   links: false,
   removeChats: false,
+  wideEmotes: false,
   removeTime: 60,
   version: 2,
   intro: false,

@@ -65,7 +65,7 @@
       <DashInput type="checkbox" name="Drop Shadow" id="highlight" />
     </DashGroup>
     {#if $storage[appDetails.name]["inProgress"]["highlight"]}
-      <DashGroup title="Bubble Drop Shadow">
+      <DashGroup title="Drop Shadow">
         <DashInput type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" />
         <DashInput type="color" name="Default colour" id="highcolour" faded={$storage[appDetails.name]["inProgress"].togglecol} />
       </DashGroup>
@@ -88,6 +88,7 @@
     <DashGroup title="Emotes">
       <DashInput type="checkbox" name="Show BTTV Emotes" id="bttv" />
       <DashInput type="checkbox" name="Show FFZ Emotes" id="ffz" />
+      <DashInput type="checkbox" name="Wide Emote Command" subtitle="Chatters can put w! before emotes" id="wideEmotes" />
       <DashInput type="checkbox" subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" />
     </DashGroup>
     <DashInput type="checkbox" name="Show Badges" id="badges" />
