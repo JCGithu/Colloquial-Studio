@@ -39,7 +39,7 @@
   </style>
 </svelte:head>
 
-<div id="homePage">
+<main id="homePage">
   <img src={logo} alt="logo" id="logo" />
   <h1>colloquial</h1>
   {#each structure as folder, i}
@@ -67,10 +67,15 @@
       </ul>
     {/if}
   {/each}
-</div>
+</main>
 
 <style lang="scss" global>
+  @use "../css/default.scss" as *;
   @use "../css/colours.scss" as *;
+
+  main {
+    font-family: "Poppins";
+  }
 
   #homePage {
     flex-direction: column;
