@@ -100,8 +100,8 @@
         <div class="optionHolder" transition:slide>
           <ListboxOptions class="listBoxOptions">
             {#each Object.keys(ops) as option (ops[option])}
-              <ListboxOption class="listBoxOption" value={ops[option]} disabled={option === optionName} let:selected>
-                <span class:listBoxSelected={selected}>
+              <ListboxOption value={ops[option]} disabled={option === optionName} class={({ active }) => (active ? "listBoxActive listBoxOption" : "listBoxOption")} let:selected>
+                <span class:optionSelected={selected}>
                   {option}
                 </span>
               </ListboxOption>
@@ -112,20 +112,20 @@
     </Listbox>
   {:else if type === "color"}
     <div class="colourBlock">
-      <label id="colourfontcolour" class:invert>{value}</label>
-      <input {type} {id} value={dashInputValue || ""} on:input={valueUpdate} />
+      <label for={id} class:invert>{value}</label>
+      <input {type} {id} aria-label={id} value={dashInputValue || ""} on:input={valueUpdate} />
     </div>
   {:else if type === "checkbox"}
     <label
       style={subtitle ? "flex-direction: column" : ""}
       class="checkContainer"
       on:keypress={(e) => {
-        if (e.key === "Enter") dispatch("valueChange", { value: !dashInputValue, id: id });
+        if (e.key === "Enter") updateValue(appDetails.name, !dashInputValue, id);
       }}
     >
       <div>
         <h2>{name}</h2>
-        <input {type} {id} checked={dashInputValue || false} on:change={valueUpdate} />
+        <input {type} {id} aria-label={id} checked={dashInputValue || false} on:change={valueUpdate} />
         <span class="checkmark" />
       </div>
       {#if subtitle}
@@ -134,15 +134,16 @@
     </label>
   {:else if type === "range"}
     <p class="rangeValue" style="--width:{rangeWidth}">{dashInputValue}</p>
-    <input {type} {id} {min} {max} value={dashInputValue || ""} on:input={valueUpdate} />
+    <input {type} {id} {min} {max} aria-label={id} value={dashInputValue || ""} on:input={valueUpdate} />
   {:else}
-    <input {type} {id} {min} {max} value={dashInputValue || ""} on:input={valueUpdate} />
+    <input {type} {id} {min} {max} aria-label={id} value={dashInputValue || ""} on:input={valueUpdate} />
   {/if}
 </div>
 
 <style lang="scss">
   @use "../../css//default.scss" as d;
   @use "../../css/colours.scss" as *;
+
   .invert {
     color: black !important;
   }
@@ -176,6 +177,7 @@
     font-weight: bold;
     margin: 0;
     font-size: large;
+    font-family: "Poppins";
     //padding-right: 1rem;
   }
 
@@ -322,6 +324,12 @@
     padding: 0 !important;
     opacity: 1;
     cursor: pointer;
+    &:focus {
+      box-shadow: 0px 0px 2px rgba($white, 0.8) !important;
+      &::-webkit-color-swatch-wrapper {
+        border: solid $white 2px !important;
+      }
+    }
   }
 
   //CHECKBOXES
@@ -355,6 +363,10 @@
         color: $white;
         border-width: 0 0.2rem 0.2rem 0;
       }
+    }
+    input:focus + span {
+      border: $white solid 2px !important;
+      background-color: fade-out($whiteFade, 0.5);
     }
     &:hover {
       input ~ span {
@@ -468,19 +480,7 @@
     }
   }
 
-  input[type="checkbox"] {
-    background-color: red !important;
-    &:focus {
-      border: red 2px solid !important;
-    }
-  }
-
   //SELECT
-  .buttonArrow {
-    width: 1.4rem;
-    color: $black;
-    position: absolute;
-  }
   :global(.listBox) {
     padding: 0.5rem 0rem;
     border: none;
@@ -547,6 +547,9 @@
     //background-color: darken($white, 5);
     border: $colloquial 2px solid;
     border-top: 0px;
+    &:focus {
+      outline: none;
+    }
   }
   .optionHolder {
     padding: 0;
@@ -575,11 +578,24 @@
     border-width: 0.5px 0px 0px 0px;
     border-style: solid;
     border-radius: 0;
-    &:hover {
+    &:hover,
+    &:focus {
       border-radius: 1rem;
       background-color: lighten($black, 3);
       //color: $black;
       font-weight: bold;
     }
+  }
+  :global(.listBoxActive) {
+    border-radius: 1rem;
+    background-color: lighten($black, 3);
+    //color: $black;
+    font-weight: bold;
+  }
+  .optionSelected {
+    font-weight: bold;
+    //color: $colloquial;
+    text-decoration: underline;
+    text-decoration-color: $colloquial;
   }
 </style>
