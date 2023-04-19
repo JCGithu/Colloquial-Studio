@@ -254,7 +254,7 @@
       console.log("Reading from Twitch! ✅");
       if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
       testMessage(`Connected to ${$storage.chatter.loaded.channel} ✅`, "announcement");
-      toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
+      if (!runApp) toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
     });
 
     client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
