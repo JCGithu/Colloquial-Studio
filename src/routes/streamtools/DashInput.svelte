@@ -32,6 +32,11 @@
   let dashInputValue: any;
   let optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
 
+  function colourCheck(val: string) {
+    let hsl = hexToHSL(val);
+    invert = hsl.l >= 70;
+  }
+
   let valueUpdate = (e: any) => {
     if (!e.target) {
       value = e.detail;
@@ -39,11 +44,7 @@
       value = e.target.value;
     }
     if (type === "checkbox") value = e.target.checked;
-    if (type === "color") {
-      let hsl = hexToHSL(e.target.value);
-      invert = false;
-      if (hsl.l >= 70) invert = true;
-    }
+    if (type === "color") colourCheck(value);
     console.log("====== INPUT CHANGE =========");
     updateValue(appDetails.name, value, id);
   };
@@ -68,15 +69,9 @@
     if (faded) style.opacity = 0.5;
 
     dashInputValue = $storage[appDetails.name]["inProgress"][id];
-    if (type === "color" && dashInputValue) {
-      value = dashInputValue;
-      let hsl = hexToHSL(dashInputValue);
-      invert = false;
-      if (hsl.l >= 70) invert = true;
-    }
-
-    if (type === "select") optionName = Object.keys(ops).find((key) => ops[key] === dashInputValue) || "NA";
-    if (type === "range") rangeWidth = scale(dashInputValue, min, max, 0, 1);
+    if (type === "color") colourCheck($storage[appDetails.name]["inProgress"][id]);
+    if (type === "select") optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
+    if (type === "range") rangeWidth = scale($storage[appDetails.name]["inProgress"][id], min, max, 0, 1);
   });
   onMount(async () => {
     setTimeout(() => {
@@ -120,12 +115,12 @@
       style={subtitle ? "flex-direction: column" : ""}
       class="checkContainer"
       on:keypress={(e) => {
-        if (e.key === "Enter") updateValue(appDetails.name, !dashInputValue, id);
+        if (e.key === "Enter") updateValue(appDetails.name, $storage[appDetails.name]["inProgress"][id], id);
       }}
     >
       <div>
         <h2>{name}</h2>
-        <input {type} {id} aria-label={id} checked={dashInputValue || false} on:change={valueUpdate} />
+        <input {type} {id} aria-label={id} checked={$storage[appDetails.name]["inProgress"][id]} on:change={valueUpdate} />
         <span class="checkmark" />
       </div>
       {#if subtitle}
