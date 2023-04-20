@@ -261,6 +261,7 @@
 
 .wideEmote {
   width: 4.4em;
+  max-width: 75vw;
 }
 
 .wideEmote + .bigEmote {
