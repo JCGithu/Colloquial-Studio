@@ -49,7 +49,8 @@
     <DashChannel />
     <DashGrid>
       <DashInput type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} />
-      <DashInput type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} />
+      <DashInput faded={$storage[appDetails.name]["inProgress"].banner} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} />
+      <DashInput type="checkbox" name="Banner Mode" id="banner" />
     </DashGrid>
     <DashGroup title="Font Settings">
       <DashInput type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" />

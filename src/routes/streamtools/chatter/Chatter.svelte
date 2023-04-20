@@ -27,6 +27,7 @@
     username: "Chatter",
     "room-id": undefined,
     "first-msg": false,
+    "msg-id": "",
     mod: false,
     turbo: false,
   };
@@ -137,13 +138,12 @@
   function messageWrap(newChat: Message) {
     newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
     messageIndex++;
-    if ($storage.chatter.inProgress.direction === "Down") {
-      messageList = messageList.concat(newChat);
-      if (messageList.length > 50) messageList.shift();
-    }
-    if ($storage.chatter.inProgress.direction === "Up") {
+    if (($storage.chatter.inProgress.banner && $storage.chatter.inProgress.align === "flex-start") || $storage.chatter.inProgress.direction === "Up") {
       messageList.unshift(newChat);
       if (messageList.length > 50) messageList.pop();
+    } else {
+      messageList = messageList.concat(newChat);
+      if (messageList.length > 50) messageList.shift();
     }
     if ($storage.chatter.inProgress.removeChats) {
       setTimeout(() => {
@@ -291,7 +291,7 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
+  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {message} {badgeData} />
     {/each}
@@ -312,6 +312,15 @@
     overflow: hidden;
     align-items: var(--align);
     justify-content: end;
+  }
+
+  .banner {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .banner.flex-start {
+    justify-content: flex-start !important;
   }
 
   section {

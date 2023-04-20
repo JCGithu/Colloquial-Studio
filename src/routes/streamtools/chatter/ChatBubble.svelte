@@ -148,7 +148,7 @@
   });
 </script>
 
-<div class="chatBubble {message.type} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;" bind:this={bubble} out:fade>
+<div class="chatBubble {$storage.chatter.inProgress.banner ? 'bubbleBanner' : ''} {message.type} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;" bind:this={bubble} out:fade>
   <p>
     <span style="color: {$storage.chatter.inProgress.fontcolour}">
       {#if $storage.chatter.inProgress.badges}
@@ -186,6 +186,7 @@
 </div>
 
 <style lang="scss">
+  
 .chatBubble{
   --fontCol: #fff;
   --userCol: #2fa578;
@@ -233,6 +234,16 @@
   }
   .twitchBadge:first-of-type{
     margin-left: -0.2rem;
+  }
+}
+
+.bubbleBanner{
+  display: flex;
+  flex-direction: row;
+  min-width: max-content;
+  height: 1.5em;
+  img {
+    height: 1.1em !important;
   }
 }
 

@@ -29,6 +29,7 @@ export interface ChatterParameters {
   nameCustom: string | boolean;
   bubbleCustom: string | boolean;
   splitLetters: boolean;
+  banner: boolean;
   proFont: string;
   proOutline: boolean | string;
   proUseCol: boolean | string;
@@ -83,6 +84,7 @@ export const defaultParams:ChatterParameters = {
   links: false,
   removeChats: false,
   wideEmotes: false,
+  banner: false,
   removeTime: 60,
   version: 2,
   intro: false,
