@@ -277,7 +277,9 @@
       testMessage("Give me a Twitch channel name to test! 📺", "announcement");
     } else {
       console.log("Attempting Twitch Connection...");
-      client.connect();
+      client.connect().catch((error: string) => {
+        console.log(error);
+      });
     }
   });
 </script>
