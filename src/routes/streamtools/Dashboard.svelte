@@ -267,10 +267,11 @@
   h1 {
     //font-weight: bold;
     position: relative;
-
+    font-family: "Outfit";
     margin: 0;
     width: max-content;
-    font-size: 2.5rem;
+    font-size: 3rem;
+    font-weight: 800;
     margin: 0;
     padding: 0;
     margin-top: -1.5rem;
@@ -279,7 +280,7 @@
     //font-size: clamp(1rem, -0.1475rem + 2.623vw, 3rem);
     color: $white;
     text-decoration-color: $colloquial;
-    text-underline-offset: 5px;
+    line-height: 4rem;
     text-align: center;
     cursor: pointer;
     transition: 0.3s all;
