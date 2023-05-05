@@ -76,7 +76,7 @@
       <DashInput type="range" name="Opacity" max={100} min={0} id="bgopacity" />
     </DashGroup>
     <DashGroup title="Animation">
-      <DashInput type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide In": "Slide In", "Fade In": "Fade In", Grow: "Grow" }} />
+      <DashInput type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow" }} />
       <DashInput type="number" name="Speed (seconds)" id="animTime" />
       <DashInput type="text" name="CSS Easing" id="animEase" />
     </DashGroup>
@@ -85,6 +85,7 @@
       <DashInput type="text" name="Hide Commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" />
       <DashInput type="checkbox" name="Hide chat replies" id="replies" />
       <DashInput type="checkbox" name="Hide links" id="links" />
+      <DashInput type="checkbox" name="Hide point redeems" id="points" />
     </DashGroup>
     <DashGroup title="Emotes">
       <DashInput type="checkbox" name="Show BTTV Emotes" id="bttv" />
@@ -93,7 +94,6 @@
       <DashInput type="checkbox" subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" />
     </DashGroup>
     <DashInput type="checkbox" name="Show Badges" id="badges" />
-    <DashInput type="checkbox" name="Hide point redeems" id="points" />
     <DashInput type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" />
     {#if $storage[appDetails.name]["inProgress"].removeChats}
       <DashGroup title="Remove Chats">
