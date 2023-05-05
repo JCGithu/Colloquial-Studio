@@ -115,7 +115,7 @@
       style={subtitle ? "flex-direction: column" : ""}
       class="checkContainer"
       on:keypress={(e) => {
-        if (e.key === "Enter") updateValue(appDetails.name, $storage[appDetails.name]["inProgress"][id], id);
+        if (e.key === "Enter") updateValue(appDetails.name, !$storage[appDetails.name]["inProgress"][id], id);
       }}
     >
       <div>
@@ -347,7 +347,7 @@
       position: relative;
       padding: 0rem 1rem;
       margin: 0 0.5rem;
-      background-color: $whiteFade;
+      border: $white solid 2px;
       border-radius: 0.3rem;
       transition: 0.2s all;
       &:after {
@@ -360,17 +360,16 @@
       }
     }
     input:focus + span {
-      border: $white solid 2px !important;
       background-color: fade-out($whiteFade, 0.5);
     }
     &:hover {
       input ~ span {
-        background-color: $white;
+        background-color: fade-out($whiteFade, 0.5);
         //box-shadow: 0px 0px 3px $white inset;
       }
     }
     input:checked ~ span {
-      background-color: $colloquial;
+      //background-color: $colloquial;
       justify-content: center;
       display: flex;
       align-content: center;
