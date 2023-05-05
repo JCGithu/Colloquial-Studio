@@ -1,155 +1,53 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  //import type { ChatterParameters } from "./paramsChatter";
   import { storage } from "../params";
   export let message: Message, badgeData: BadgeData;
 
-  let bubble: HTMLElement;
   let badges: Array<string> = [];
   let bigEmote = true;
 
-  let vip = false;
-  let mod = false;
-  let first = false;
-  let bits = false;
-
-  //PARSING
-  function runBadge() {
-    if (!message.tags.badges) return;
+  //PARSING BADGES
+  if ($storage.chatter.inProgress.badges && message.tags.badges) {
     Object.keys(message.tags.badges).forEach((k) => {
-      if (badgeData[k]) {
-        let variations = badgeData[k].versions;
-        if (Object.keys(variations).length === 1) {
-          badges.push(variations[Object.keys(variations)[0]]["image_url_2x"]);
-        } else if (variations[message.tags.badges[k]]) {
-          badges.push(variations[message.tags.badges[k]]["image_url_2x"]);
-        }
+      if (!badgeData[k]) return;
+      let variations = badgeData[k].versions;
+      if (Object.keys(variations).length === 1) {
+        badges.push(variations[Object.keys(variations)[0]]["image_url_2x"]);
+      } else if (variations[message.tags.badges[k]]) {
+        badges.push(variations[message.tags.badges[k]]["image_url_2x"]);
       }
     });
   }
-  if ($storage.chatter.inProgress.badges) runBadge();
 
   //ANIMATIONS
-  function PopIn(size: DOMRect) {
-    bubble.style.margin = `0px var(--marginX) 0px var(--marginX)`;
-    bubble.style.padding = `0px var(--paddingX) 0px var(--paddingX)`;
-    bubble.style.visibility = "hidden";
-    bubble.style.maxHeight = "0";
-    requestAnimationFrame(() => {
-      bubble.style.transition = "all var(--animTime) var(--animEase)";
-      bubble.style.visibility = "visible";
-      bubble.style.padding = `var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX)`;
-      bubble.style.margin = `var(--marginY) var(--marginX) var(--marginY) var(--marginX)`;
-      bubble.style.opacity = "1";
-      bubble.style.maxHeight = `${size.height + 30}px`;
-      if ($storage.chatter.inProgress.highlight) {
-        bubble.style.transform = `translateX(-8px) translateY(-8px)`;
-      }
+  let userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${$storage.chatter.inProgress.chatopacity / 100})`;
+  let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
+
+  if ($storage.chatter.inProgress.emoteOnly) {
+    message.message.forEach((el) => {
+      if (!el.code) bigEmote = false;
     });
+  } else {
+    bigEmote = false;
   }
-
-  function slideInBoth() {
-    bubble.style.opacity = "1";
-    requestAnimationFrame(() => {
-      bubble.style.transition = "all var(--animTime) var(--animEase)";
-      bubble.style.transform = `${$storage.chatter.inProgress.highlight ? "translateX(-8px) translateY(-8px)" : ""}`;
-    });
-  }
-
-  function SlideInLeft(size: DOMRect) {
-    if ($storage.chatter.inProgress.align === "center") size.width = size.width * 2.5;
-    let negative = "* -1";
-    if ($storage.chatter.inProgress.align === "flex-end") negative = " * 1.2";
-    bubble.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)) ${negative}))`;
-    if ($storage.chatter.inProgress.highlight) {
-      bubble.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)) ${negative})) translateY(-8px)`;
-    }
-    slideInBoth();
-  }
-
-  function SlideInRight(size: DOMRect) {
-    bubble.style.transform = `translateX(calc( (${size.width}px + var(--paddingX) + var(--marginX)))) ${$storage.chatter.inProgress.highlight ? "translateY(-8px)" : ""}`;
-    slideInBoth();
-  }
-
-  function FadeIn() {
-    bubble.style.opacity = "0";
-    if ($storage.chatter.inProgress.highlight) bubble.style.transform = `translateX(-8px) translateY(-8px)`;
-    requestAnimationFrame(() => {
-      bubble.style.transition = "all var(--animTime) var(--animEase)";
-      bubble.style.opacity = "1";
-    });
-  }
-
-  function Grow(size: DOMRect) {
-    bubble.style.margin = `0px var(--marginX) 0px var(--marginX)`;
-    bubble.style.padding = `0px var(--paddingX) 0px var(--paddingX)`;
-    bubble.style.transform = `scale(0)`;
-    bubble.style.maxHeight = "0";
-    if ($storage.chatter.inProgress.highlight) {
-      bubble.style.transform = `translateX(-8px) translateY(-8px) scale(0)`;
-    }
-    requestAnimationFrame(() => {
-      bubble.style.transition = "all var(--animTime) var(--animEase)";
-      bubble.style.padding = `var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX)`;
-      bubble.style.margin = `var(--marginY) var(--marginX) var(--marginY) var(--marginX)`;
-      bubble.style.maxHeight = `${size.height + 30}px`;
-      bubble.style.transform = `scale(1)`;
-      bubble.style.opacity = "1";
-      if ($storage.chatter.inProgress.highlight) {
-        bubble.style.transform = `translateX(-8px) translateY(-8px) scale(1)`;
-      }
-    });
-  }
-
-  function offScreen() {
-    bubble.style.opacity = "1";
-    bubble.style.transform = `translateX(0px) translateY(0px)`;
-    if ($storage.chatter.inProgress.highlight) bubble.style.transform = `translateX(-8px) translateY(-8px)`;
-  }
-
-  //MOUNTED
-  onMount(async () => {
-    let size = bubble.getBoundingClientRect();
-    if ($storage.chatter.inProgress.highlight) bubble.style.boxShadow = `1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol)`;
-    if (!$storage.chatter.inProgress.animEase) $storage.chatter.inProgress.animEase = "ease-in-out";
-
-    let userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${$storage.chatter.inProgress.chatopacity / 100})`;
-    let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
-
-    bubble.style.setProperty("--animTime", `${$storage.chatter.inProgress.animTime}s`);
-    bubble.style.setProperty("--animEase", $storage.chatter.inProgress.animEase);
-    bubble.style.setProperty("--userCol", $storage.chatter.inProgress.bubbleCustom ? userCol : $storage.chatter.inProgress.chatcolourCalc);
-    bubble.style.setProperty("--shadowCol", $storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour);
-
-    if (!document.hidden) {
-      if ($storage.chatter.inProgress.animation === "Pop In") PopIn(size);
-      if ($storage.chatter.inProgress.animation === "Slide In") SlideInLeft(size);
-      if ($storage.chatter.inProgress.animation === "Slide In" && $storage.chatter.inProgress.align === "flex-end") SlideInRight(size);
-      if ($storage.chatter.inProgress.animation === "Fade In") FadeIn();
-      if ($storage.chatter.inProgress.animation === "Grow") Grow(size);
-    } else {
-      offScreen();
-    }
-
-    if (message.tags.badges?.vip) vip = true;
-    if (message.tags.mod) mod = true;
-    if (message.tags["first-msg"]) first = true;
-    if (message.tags.bits) bits = true;
-
-    if ($storage.chatter.inProgress.emoteOnly) {
-      message.message.forEach((el) => {
-        if (!el.code) bigEmote = false;
-      });
-    } else {
-      bigEmote = false;
-    }
-  });
 </script>
 
-<div class="chatBubble {$storage.chatter.inProgress.banner ? 'bubbleBanner' : ''} {message.type} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}" class:first class:bits class:mod class:vip style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;" bind:this={bubble} out:fade>
-  <p>
+<div
+  class="chatBubble {message.type} {$storage.chatter.inProgress.animation.replace(' ', '_')} {$storage.chatter.inProgress.align} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}"
+  class:dropShadow={$storage.chatter.inProgress.highlight}
+  class:bubbleBanner={$storage.chatter.inProgress.banner}
+  class:first={message.tags["first-msg"]}
+  class:bits={message.tags.bits}
+  class:mod={message.tags.mod}
+  class:vip={message.tags.badges?.vip}
+  style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;"
+  style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
+  style:--animEase={$storage.chatter.inProgress.animEase}
+  style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : $storage.chatter.inProgress.chatcolourCalc}
+  style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
+  out:fade
+>
+  <div class="bubbleContent">
     <span style="color: {$storage.chatter.inProgress.fontcolour}">
       {#if $storage.chatter.inProgress.badges}
         {#each badges as badge}
@@ -181,123 +79,207 @@
         {/if}
       {/each}
     </span>
-  </p>
-  <div class="animAdd" />
+    <div class="animAdd" />
+  </div>
 </div>
 
 <style lang="scss">
-  
-.chatBubble{
-  --fontCol: #fff;
-  --userCol: #2fa578;
-  --bubbleCol: #2fa578;
+  .chatBubble {
+    // DEFAULTS
+    //--fontCol: #fff;
+    //--userCol: #2fa578;
+    //--bubbleCol: #2fa578;
+    --marginY: 2.5px;
+    --paddingY: 5px;
+    --marginX: 10px;
+    --paddingX: 15px;
+    --animEase: ease-in-out;
+    --animTime: 500ms;
 
-  --marginY: 2.5px;
-  --paddingY: 5px;
-
-  --marginX: 10px;
-  --paddingX: 15px;
-
-  position: relative;
-  color: var(--fontCol);
-  display: block;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-self: end;
-  width: max-content;
-  max-width: calc(100% - 25px - 20px - 0.5rem);
-  border-radius: 0.5rem;
-  font-weight: normal;
-  opacity: 0;
-  overflow-wrap: break-word;
-  background-color: var(--userCol);
-  color: var(--userCol);
-  z-index: 1;
-  padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-  margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
-  --animTime: 0.5s 
-  --animEase: ease-in;
-  --animHeight: 35px;
-
-  b{
-    white-space: pre;
-  }
-
-  p {
-    display: block;
     color: var(--fontCol);
-    margin: 0;
+    background-color: var(--userCol);
+    color: var(--userCol);
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr;
+    //transition: all var(--animTime) var(--animEase);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-self: end;
+    width: max-content;
+    max-width: calc(100% - 25px - 20px - 0.5rem);
+    border-radius: 0.5rem;
+    font-weight: normal;
+    overflow-wrap: break-word;
+    z-index: 1;
+    //padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+    padding: 0 var(--paddingX) 0 var(--paddingX);
+    margin: 0 var(--marginX) 0 var(--marginX);
+
+    b {
+      white-space: pre;
+    }
+
+    .bubbleContent {
+      overflow: hidden;
+      display: block;
+      color: var(--fontCol);
+      margin: 0;
+    }
+    span {
+      display: contents;
+      align-items: center;
+    }
+    .twitchBadge:first-of-type {
+      margin-left: -0.2rem;
+    }
   }
-  span {
-    display: contents;
+
+  .dropShadow {
+    //transform: translateX(-8px) translateY(-8px);
+    box-shadow: 1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol);
+  }
+
+  //Animations
+  .Pop_In {
+    animation: PopInAnimation var(--animTime) var(--animEase) forwards;
+    &.bubbleBanner {
+      animation: PopInBanner var(--animTime) var(--animEase) forwards;
+    }
+  }
+  @keyframes PopInAnimation {
+    0% {
+      grid-template-rows: 0fr;
+      padding: 0 var(--paddingX) 0 var(--paddingX);
+      margin: 0 var(--marginX) 0 var(--marginX);
+    }
+    100% {
+      grid-template-rows: 1fr;
+      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    }
+  }
+  @keyframes PopInBanner {
+    0% {
+      grid-template-columns: 0fr;
+      padding: 0 0 0 0;
+      margin: 0 0 0 0;
+    }
+    100% {
+      grid-template-columns: 1fr;
+      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    }
+  }
+  .Fade_In {
+    animation: FadeInAnimation var(--animTime) var(--animEase) forwards;
+  }
+  @keyframes FadeInAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .Grow {
+    --transformAmount: scale(1);
+    animation: GrowAnimation var(--animTime) var(--animEase) forwards;
+  }
+  @keyframes GrowAnimation {
+    0% {
+      transform: scale(0);
+      grid-template-rows: 0fr;
+      font-size: 1px;
+    }
+    100% {
+      transition: var(--transformAmount);
+      grid-template-rows: 1fr;
+      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    }
+  }
+  .Slide_Left,
+  .Slide_Right,
+  .Fade_In {
+    padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+    margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    animation: slideAnimation var(--animTime) var(--animEase) forwards;
+  }
+  .Slide_Left {
+    --transformAmount: translateX(-100%);
+  }
+  .Slide_Right {
+    --transformAmount: translateX(100%);
+  }
+  @keyframes slideAnimation {
+    from {
+      transform: var(--transformAmount);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  //Banner
+  .bubbleBanner {
+    display: flex;
+    flex-direction: row;
+    min-width: max-content;
+    height: 2.25em;
     align-items: center;
+    img {
+      height: 1.1em !important;
+    }
   }
-  .twitchBadge:first-of-type{
-    margin-left: -0.2rem;
+
+  //Images etc
+  .emote {
+    height: 1.1em;
+    padding-bottom: 0.2rem;
+    vertical-align: middle;
   }
-}
 
-.bubbleBanner{
-  display: flex;
-  flex-direction: row;
-  min-width: max-content;
-  height: 1.5em;
-  img {
-    height: 1.1em !important;
+  .bigEmote {
+    height: 2rem;
+    margin: 0.2rem 0;
+    vertical-align: middle;
   }
-}
 
-.emote{
-  height: 1.1em;
-  padding-bottom: 0.2rem;
-  vertical-align: middle;
-}
+  .wideEmote {
+    width: 4.4em;
+    max-width: 75vw;
+  }
 
-.bigEmote{
-  height: 2rem;
-  margin: 0.2rem 0 ;
-  vertical-align: middle;
-}
+  .wideEmote + .bigEmote {
+    width: 8rem;
+  }
 
-.wideEmote {
-  width: 4.4em;
-  max-width: 75vw;
-}
+  .twitchBadge {
+    padding: 0.1rem;
+    height: 1.1em;
+    vertical-align: middle;
+    padding-bottom: 0.2rem;
+  }
 
-.wideEmote + .bigEmote {
-  width: 8rem;
-}
+  .pronoun {
+    --proColour: #ffffff;
+    border-radius: 0.5rem;
+    //font-size: 0.8rem;
+    display: inline !important;
+    width: fit-content;
+    color: var(--proColour);
+  }
 
-.twitchBadge {
-  padding: 0.1rem;
-  height: 1.1em;
-  vertical-align: middle;
-  padding-bottom: 0.2rem;
-}
+  .proOutline {
+    padding: 0 0.3rem;
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--proColour);
+  }
 
-.pronoun {
-  --proColour: #ffffff;
-  border-radius: 0.5rem;
-  //font-size: 0.8rem;
-  display: inline !important;
-  width: fit-content;
-  color: var(--proColour);
-}
-
-.proOutline{
-  padding: 0 0.3rem;
-  border-width: 2px;
-  border-style: solid;
-  border-color: var(--proColour);
-}
-
-.proBG{
-  padding: 0 0.3rem;
-  background-color: var(--proColour);
-}
-
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 100%;}
-}
+  .proBG {
+    padding: 0 0.3rem;
+    background-color: var(--proColour);
+  }
 </style>
