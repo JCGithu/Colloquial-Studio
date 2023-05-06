@@ -32,7 +32,13 @@ const defaultStorage:streamToolStorage = appList.reduce((ac,a) => ({...ac,[a]:Ob
 const defaultURLs:standardObject = {};
 appList.forEach(appKey => {
   defaultURLs[appKey] = '';
-  Object.keys(appStorageTemplate).forEach(keyKey => defaultStorage[appKey][keyKey] = defaults[appKey]);
+  defaultStorage[appKey] = {
+    'inProgress': Object.assign({}, defaults[appKey]),
+    'loaded': Object.assign({}, defaults[appKey]),
+    0: Object.assign({}, defaults[appKey]),
+    1: Object.assign({}, defaults[appKey]),
+    2: Object.assign({}, defaults[appKey]),
+  };
 });
 export const urlFill = writable(defaultURLs);
 export const storage = writable(Object.assign({}, defaultStorage));
