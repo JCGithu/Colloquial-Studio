@@ -1,8 +1,8 @@
 <script lang="ts">
   // FOR NEW APP //
   // Change the details below
-  // Add any app specific param settings in onMount
-  // Add the dashboard options
+  // Replace the imported app
+  // Start adding dashboard options
 
   let appDetails = {
     name: "emotedrop",
@@ -10,26 +10,18 @@
     description: `Make emotes fall from the sky.`,
   };
 
+  import EmoteDrop from "./EmoteDrop.svelte";
+
   import { onMount, setContext } from "svelte";
   import "../../../css/default.scss";
 
   import Dashboard from "../Dashboard.svelte";
   import DashInput from "../DashInput.svelte";
-  import DashGrid from "../components/DashGrid.svelte";
-  import DashGroup from "../components/DashGroup.svelte";
   import DashChannel from "../components/DashChannel.svelte";
-  import DashButton from "../components/DashButton.svelte";
-  import EmoteDrop from "./EmoteDrop.svelte";
 
-  import { appInit, urlBuild, storage, reloadDashboard } from "../params";
+  import { appInit, storage } from "../params";
   setContext("appDetails", appDetails);
   let toastUpdate: (i: string) => void;
-
-  async function paramReload() {
-    reloadDashboard(appDetails.name);
-    urlBuild(appDetails.name);
-    toastUpdate("Channel reset");
-  }
 
   onMount(async () => {
     let baseURL = window.location.href;
