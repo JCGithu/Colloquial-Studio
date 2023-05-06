@@ -1,8 +1,8 @@
 <script lang="ts">
   // FOR NEW APP //
   // Change the details below
-  // Add any app specific param settings in onMount
-  // Add the dashboard options
+  // Replace the imported app
+  // Start adding dashboard options
 
   let appDetails = {
     name: "chatter",
@@ -12,6 +12,8 @@
     At the top you can find other settings, copy the URL, and save layouts.`,
   };
 
+  import Chatter from "./Chatter.svelte";
+
   import { onMount, setContext } from "svelte";
   import "../../../css/default.scss";
 
@@ -20,10 +22,8 @@
   import DashGrid from "../components/DashGrid.svelte";
   import DashGroup from "../components/DashGroup.svelte";
   import DashChannel from "../components/DashChannel.svelte";
-  import DashButton from "../components/DashButton.svelte";
-  import Chatter from "./Chatter.svelte";
 
-  import { appInit, urlBuild, storage, reloadDashboard } from "../params";
+  import { appInit, storage } from "../params";
   setContext("appDetails", appDetails);
   let toastUpdate: (i: string) => void;
 
@@ -76,7 +76,7 @@
       <DashInput type="range" name="Opacity" max={100} min={0} id="bgopacity" />
     </DashGroup>
     <DashGroup title="Animation">
-      <DashInput type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow" }} />
+      <DashInput type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow", None: "None" }} />
       <DashInput type="number" name="Speed (seconds)" id="animTime" />
       <DashInput type="text" name="CSS Easing" id="animEase" />
     </DashGroup>
