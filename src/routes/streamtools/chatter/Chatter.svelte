@@ -279,6 +279,7 @@
       console.log("Attempting Twitch Connection...");
       client.connect().catch((error: string) => {
         console.log(error);
+        if (!runApp) toastUpdate(`Error connecting to ${$storage.chatter.loaded.channel}`);
       });
     }
   });
