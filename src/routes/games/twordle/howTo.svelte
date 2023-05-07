@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { getContext, createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  import { storage } from "./twFunctions";
 </script>
 
-<section>
-  <h2>How to Play!</h2>
+<section class={$storage.dark ? "twordleDark" : "twordleLight"}>
   <p>
     Twordle is a word game to play with Twitch chat. <br /><br />
     The streamer enters a 5 letter secret word, or selects a random word. Each round chat must guess one letter at a time what the word is. <br /><br />
@@ -20,63 +18,20 @@
     It's advised that chat <i>try</i> to write <i>actual</i> words. <br />
     If you want to use this as a handsfree BRB screen, click 'auto mode'!
   </p>
-  <div>
-    <button id="closehow" on:click={() => dispatch("close")}>I get it!</button>
-  </div>
 </section>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
+
   section {
-    z-index: 1;
     text-align: left !important;
-    width: 100%;
-    max-width: 50vw;
-    height: auto;
-    max-height: 50vh;
-    border-radius: 1rem;
-    overflow-y: auto;
-    color: var(--mainDarken40);
-    font-size: 20px;
-    background-color: var(--main);
-    padding: 2rem;
-    padding-right: calc(2rem - 25px);
-  }
-  code {
-    background-color: $black;
-    border-radius: 0.5rem;
-    padding: 0.2rem 1rem;
-    margin: 0rem 0.2rem;
-    color: white;
-  }
-  h2 {
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.5rem;
+    color: var(--text);
+    font-size: 16px;
   }
   div {
     width: 100%;
     display: flex;
     justify-content: center;
-  }
-  button {
-    appearance: none;
-    border: none;
-    color: var(--text);
-    font-family: "Poppins";
-    font-weight: 600;
-    font-size: large;
-    background-color: var(--mainDarken10);
-    border-radius: 1rem;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem;
-    transition: 0.2s all;
-    width: max-content;
-    cursor: pointer;
-    &:hover {
-      transform: scale(1.02);
-      box-shadow: 0px 0px 10px inset rgba(255, 255, 255, 0.2);
-    }
   }
   span {
     width: 4rem !important;
@@ -96,8 +51,7 @@
       text-align: center;
       align-items: center;
       justify-content: center;
-      border-width: 4px;
-      border-color: var(--mainLighten15);
+      border: 4px $twordleMain solid;
     }
     :nth-child(1) {
       background-color: var(--mainDarken10);

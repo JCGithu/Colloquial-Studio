@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { afterUpdate, getContext } from "svelte";
-  import { language, qwerty } from "./twFunctions";
-  export let currentGame: TwordleGame;
+  import { afterUpdate } from "svelte";
+  import { language, qwerty, storage, currentGame } from "./twFunctions";
   $: qwertyLang = qwerty[$language];
-
-  let styleString = getContext("colours");
 
   let keyMap: { [x: string]: Array<string> } = {
     correct: [],
@@ -13,13 +10,13 @@
   };
 
   afterUpdate(() => {
-    if (currentGame.round <= 0) return;
-    let revealRound = currentGame.round - 1;
-    currentGame.guess[revealRound].forEach((guessLetter, i) => {
-      if (currentGame.guess[revealRound][i] === currentGame.answer[i]) {
+    if ($currentGame.round <= 0) return;
+    let revealRound = $currentGame.round - 1;
+    $currentGame.guess[revealRound].forEach((guessLetter, i) => {
+      if ($currentGame.guess[revealRound][i] === $currentGame.answer[i]) {
         if (keyMap.correct.includes(guessLetter)) return;
         keyMap.correct.push(guessLetter);
-      } else if (currentGame.answer.includes(guessLetter)) {
+      } else if ($currentGame.answer.includes(guessLetter)) {
         if (keyMap.correct.includes(guessLetter)) return;
         if (keyMap.maybe.includes(guessLetter)) return;
         keyMap.maybe.push(guessLetter);
@@ -31,7 +28,7 @@
   });
 </script>
 
-<div id="keyboard" style="{styleString} ">
+<div id="keyboard" class={$storage.dark ? "twordleDark" : "twordleLight"}>
   {#each qwertyLang as row}
     <div class="keyRow">
       {#each row as letter}
@@ -42,7 +39,7 @@
 </div>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
   #keyboard {
     font-size: 13px;
     transition: all 0.5s;

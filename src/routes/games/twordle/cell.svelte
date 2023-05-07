@@ -1,9 +1,8 @@
 <script lang="ts">
   import { getContext, afterUpdate, onMount } from "svelte";
-  import { grid } from "./twFunctions";
+  import { grid, storage, currentGame } from "./twFunctions";
   export let x: number;
   export let y: number;
-  export let currentGame: TwordleGame;
 
   let selected = false;
   let correct = false;
@@ -15,29 +14,20 @@
   let delay = (x + y) * 0.1;
   //If current round = y and letter = x make selected true;
   afterUpdate(() => {
-    if (currentGame.round === y && currentGame.letter === x) {
-      selected = true;
-    } else {
-      selected = false;
-    }
-    if (currentGame.round > y) {
-      if (currentGame.guess[y][x] === currentGame.answer[x]) {
-        correct = true;
-      } else if (currentGame.answer.includes(currentGame.guess[y][x])) {
-        maybe = true;
-      } else {
-        wrong = true;
-      }
-    }
+    selected = $currentGame.round === y && $currentGame.letter === x;
+    if ($currentGame.round <= y) return;
+    correct = $currentGame.guess[y][x] === $currentGame.answer[x];
+    maybe = $currentGame.answer.includes($currentGame.guess[y][x]) && !correct;
+    wrong = !correct && !wrong;
   });
 </script>
 
-<div class="cell" class:maybe class:correct class:wrong class:selected style="{styleString} --delay:{delay}s;">{letter}</div>
+<div class="cell {$storage.dark ? 'twordleDark' : 'twordleLight'}" class:maybe class:correct class:wrong class:selected style="{styleString} --delay:{delay}s;">{letter}</div>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
   .cell {
-    border-color: var(--mainDarken15);
+    border-color: var(--cellBorder);
     border-radius: 2px;
     border-style: solid;
     width: 6vh;
@@ -62,7 +52,7 @@
     transform: scale(1.05) translateY(-1px);
   }
   .wrong {
-    background-color: var(--mainDarken5);
+    background-color: var(--cellBackdrop);
     border-width: 0;
     opacity: 0.6;
     width: calc(6vh + 6px);

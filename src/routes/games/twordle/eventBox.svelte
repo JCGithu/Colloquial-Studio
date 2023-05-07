@@ -1,29 +1,16 @@
 <script lang="ts">
-  import { error } from "@sveltejs/kit";
   export let inputValue = "";
-  export let currentGame: TwordleGame;
   import { afterUpdate, createEventDispatcher } from "svelte";
+  import { storage, currentGame } from "./twFunctions";
   const dispatch = createEventDispatcher();
 
-  import { incrementStat, randomWord } from "./twFunctions";
+  import { incrementStat, randomWord, updateGame, incrementGame } from "./twFunctions";
 
   let boxFull = false;
   let errorClass = false;
   let disable = false;
 
-  $: starting = currentGame.state === "START";
-  $: opening = currentGame.state === "OPENING";
-  $: playing = currentGame.state === "POLL";
-
-  // MAY NEED ONE FOR A RETRY;
-  $: retry = currentGame.state === "RETRY";
-  $: nextround = currentGame.state === "NEXTROUND";
-  $: reveal = currentGame.state === "REVEAL";
-  $: nextline = currentGame.state === "NEXTLINE";
-
-  $: success = currentGame.state === "SUCCESS";
-  $: fail = currentGame.state === "FAIL";
-
+  // This is just to prevent doubleclicks;
   function sendButton() {
     if (!disable) dispatch("buttonPress");
     disable = true;
@@ -33,86 +20,83 @@
   }
 
   function wordCheck() {
-    boxFull = false;
-    if (inputValue.length >= 5) boxFull = true;
+    boxFull = inputValue.length >= 5;
   }
-  function startCheck() {
-    if (!currentGame.connected) {
-      errorClass = true;
-      setTimeout(() => {
-        errorClass = false;
-      }, 2500);
+
+  function flashError() {
+    errorClass = true;
+    setTimeout(() => {
+      errorClass = false;
+    }, 2500);
+  }
+  function userStart(randomise: boolean) {
+    // Checking word is valid
+    if (!boxFull && !randomise) {
+      dispatch("toast", { message: "❌ Word must be 5 characters ❌", code: "error" });
+      return;
+    }
+    updateGame("answer", randomise ? randomWord() : inputValue.toUpperCase());
+    // Checking game is connected
+    if (!$currentGame.connected) {
+      flashError();
       dispatch("toast", { message: "❌ You need to connect to a Twitch chat to play ❌", code: "error" });
       return;
     }
     incrementStat("play", 1);
-    currentGame.round = 0;
-    currentGame.letter = 0;
+    incrementGame({ round: -1, letter: -1, votes: 0 });
     dispatch("buttonPress");
-  }
-  function userStart() {
-    if (!boxFull) {
-      dispatch("toast", { message: "❌ Word must be 5 characters ❌", code: "error" });
-      return;
-    }
-    currentGame.answer = inputValue.toUpperCase();
-    startCheck();
-  }
-  function randomStart() {
-    currentGame.answer = randomWord().toUpperCase();
-    startCheck();
   }
 </script>
 
-<div class="eventbox">
-  {#if starting}
+<div class="eventbox {$storage.dark ? 'twordleDark' : 'twordleLight'}">
+  {#if $currentGame.state === "START"}
     <h2>Pick a 5 letter word</h2>
     <input bind:value={inputValue} class:boxFull class:errorClass type="password" placeholder="I'll hide it, I promise!" maxlength="5" on:keyup={wordCheck} />
     <div>
-      <button id="enter" on:click={userStart}>Start!</button>
-      <button id="random" on:click={randomStart}>Random Word</button>
+      <button id="enter" on:click={() => userStart(false)}>Start!</button>
+      <button id="random" on:click={() => userStart(true)}>Random Word</button>
     </div>
   {/if}
-  {#if opening}
+  {#if $currentGame.state === "OPENING"}
     <h2>Round starting in...</h2>
-    <p>{currentGame.timer}</p>
+    <p>{$currentGame.timer}</p>
   {/if}
-  {#if playing}
-    <h2>{currentGame.timer}</h2>
-    <p>{currentGame.votes} votes cast.</p>
+  {#if $currentGame.state === "POLL"}
+    <h2>{$currentGame.timer}</h2>
+    <p>{$currentGame.votes} votes cast.</p>
   {/if}
-  {#if retry}
-    <p>{currentGame.message}</p>
+  {#if $currentGame.state === "RETRY"}
+    <p>{$currentGame.message}</p>
     <div>
       <button on:click={sendButton} class:disable>Try Again?</button>
     </div>
   {/if}
-  {#if nextround}
-    <p>{currentGame.message}</p>
+  {#if $currentGame.state === "NEXTROUND"}
+    <p>{$currentGame.message}</p>
     <button on:click={sendButton} class:disable>Next Round</button>
   {/if}
-  {#if reveal}
-    <h2>{currentGame.guess[currentGame.round].join("")}</h2>
+  {#if $currentGame.state === "REVEAL"}
+    <h2>{$currentGame.currentGuess}</h2>
     <button on:click={sendButton} class:disable>Check Word</button>
   {/if}
-  {#if nextline}
+  {#if $currentGame.state === "NEXTLINE"}
     <h2>Nope!</h2>
     <button on:click={sendButton} class:disable>Guess Again</button>
   {/if}
-  {#if success}
+  {#if $currentGame.state === "SUCCESS"}
     <h2>Congrats!</h2>
-    <p>You guessed in {currentGame.round} tries!</p>
+    <p>You guessed in {$currentGame.round} tries!</p>
     <button on:click={() => location.reload()} class:disable>Play Again?</button>
   {/if}
-  {#if fail}
-    <h2>{currentGame.answer}</h2>
+  {#if $currentGame.state === "FAIL"}
+    <h2>{$currentGame.answer}</h2>
     <p>You failed to guess the word...</p>
     <button on:click={() => location.reload()} class:disable>Play Again?</button>
   {/if}
 </div>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
+  @use "../../../css/colours.scss" as *;
   .eventbox {
     position: relative;
     display: flex;
@@ -186,8 +170,14 @@
     padding: 0.5rem 1rem;
     border-radius: 1rem;
     width: 80%;
-    background-color: var(--mainLighten10);
+    background-color: var(--inputBackdrop);
     color: var(--purple);
+    &::selection {
+      background-color: $twordlePurple !important;
+      padding: 1rem;
+      border-radius: 1rem !important;
+      overflow: hidden !important;
+    }
     transition: 0.5s all;
     font-weight: 600;
     font-size: 1rem;
@@ -203,11 +193,11 @@
   button {
     appearance: none;
     border: none;
-    color: var(--text);
+    color: white;
     font-family: "Poppins";
     font-weight: 600;
     font-size: large;
-    background-color: var(--mainDarken10);
+    background-color: var(--buttons);
     border-radius: 1rem;
     padding: 0.5rem 1rem;
     margin: 0.5rem;

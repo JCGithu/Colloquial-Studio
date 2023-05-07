@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { grid } from "./twFunctions";
+  import { grid, storage, currentGame } from "./twFunctions";
   import Cell from "./cell.svelte";
-  export let currentGame: TwordleGame;
 </script>
 
-<div id="grid">
+<div id="grid" class={$storage.dark ? "twordleDark" : "twordleLight"}>
   {#each $grid as row, y}
-    <div class="row" id={"row" + y} class:rowSelected={y === currentGame.round}>
+    <div class="row" id={"row" + y} class:rowSelected={y === $currentGame.round}>
       {#each row as cell, x}
-        <Cell {x} {y} {currentGame} />
+        <Cell {x} {y} />
       {/each}
     </div>
   {/each}

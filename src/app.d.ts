@@ -121,25 +121,26 @@ interface TwordleStyle{
 	}
 }
 
-interface TwordleGame{
-	round: number,
-	letter: number,
-	timer: number,
-	message: string,
-	guess: Array<Array<string>>,
-	answer: string,
-	votes: number,
-	menu: number,
-	state: 'START' | 'OPENING' | 'POLL' | 'RETRY' | 'NEXTROUND' | 'REVEAL' | 'NEXTLINE' | 'SUCCESS' | 'FAIL',
-	connected: boolean
-}
-
 interface TwordlePoll {
 	[x:string]: number
 }
 
 interface TwordleKeys {
 	[x:string]:Array<Array<string>>
+}
+
+interface TwordleGame{
+	round: number,
+	letter: number,
+	timer: number,
+	message: string,
+	currentGuess: string,
+	guess: Array<Array<string>>,
+	answer: string,
+	votes: number,
+	menu: number,
+	state: 'START' | 'OPENING' | 'POLL' | 'RETRY' | 'NEXTROUND' | 'REVEAL' | 'NEXTLINE' | 'SUCCESS' | 'FAIL',
+	connected: boolean
 }
 
 interface TwordleStorage {
@@ -152,4 +153,5 @@ interface TwordleStorage {
   volume: number,
   timer: number,
   channel: string,
+	words: 'all' | 'movies' | 'games' | 'food',
 }

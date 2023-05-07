@@ -3,23 +3,20 @@
   import { onMount, setContext } from "svelte";
   import { slide } from "svelte/transition";
   import * as twordle from "./twFunctions";
-  import { storage } from "./twFunctions";
+  import { storage, currentGame } from "./twFunctions";
   import "../../../js/tmi";
   //Components
-  import { Switch } from "@rgossiaux/svelte-headlessui";
-  import Darkmode from "./darkmode.svelte";
+  import SVGIcon from "../../SVGIcon.svelte";
   import Keyboard from "./keyboard.svelte";
   import Grid from "./grid.svelte";
   import EventBox from "./eventBox.svelte";
-  import Settings from "./settings.svelte";
-  import HowTo from "./howTo.svelte";
-  import Stats from "./stats.svelte";
   //AUDIO
   let winSound: HTMLAudioElement;
   let roundStart: HTMLAudioElement;
   import roundStartSrc from "./round.mp3";
   import winSoundSrc from "./win.mp3";
   import JSConfetti from "js-confetti";
+  import Overlay from "./overlay.svelte";
   //Variables
   let userEmote: undefined | string = undefined;
   //Overlays
@@ -29,21 +26,6 @@
   //Create Poll
   let poll: TwordlePoll = Object.assign({}, twordle.emptyPoll);
   let usersVoted: Array<string> = [];
-  let currentGame: TwordleGame = {
-    round: -1,
-    letter: -1,
-    timer: 0,
-    votes: 0,
-    message: "",
-    guess: [[], [], [], [], [], []],
-    answer: "",
-    state: "START",
-    connected: false,
-    settings: false,
-    howto: false,
-    stats: false,
-  };
-  setContext("currentGame", currentGame);
 
   //TOAST
   let toastID = 0;
@@ -75,31 +57,6 @@
   // ROUND DONE - Up the letter count, add to grid, make button start round;
   // ROW DONE - Reveal word
 
-  function wrapUpLine() {
-    console.log(currentGame);
-    let roundGuess = currentGame.guess[currentGame.round].join("");
-    console.log(roundGuess);
-    if (roundGuess === currentGame.answer) {
-      // Success
-      currentGame.state = "SUCCESS";
-      twordle.incrementStat("won", 1);
-      currentGame.round++;
-      currentGame.letter++;
-      confetti.addConfetti();
-      winSound.play();
-    } else if (currentGame.round != 5) {
-      // Next Line
-      currentGame.state = "NEXTLINE";
-      currentGame.round++;
-      currentGame.letter = 0;
-      console.log("Changing to Next Line");
-    } else {
-      // Fail
-      currentGame.round++;
-      currentGame.state = "FAIL";
-    }
-  }
-
   function finishPoll() {
     let finalPoll = Object.assign({}, poll);
     let finalResult = twordle.getMax(finalPoll);
@@ -107,38 +64,35 @@
     poll = Object.assign({}, twordle.emptyPoll);
     // REDO
     if (finalPoll[finalResult[0]] === 0) {
-      console.log("No One Entered?");
-      currentGame.state = "RETRY";
-      currentGame.message = `No one entered! Redo?`;
+      twordle.changeState("RETRY");
+      twordle.updateGame("message", `No one entered! Redo?`);
     } else if (finalResult.length > 1) {
-      currentGame.state = "RETRY";
-      currentGame.message = `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`;
+      twordle.changeState("RETRY");
+      twordle.updateGame("message", `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
     }
     //CONTINUE
     if (finalResult.length === 1) {
-      currentGame.state = "NEXTROUND";
-      currentGame.message = `${finalResult[0]} won with ${finalPoll[finalResult[0]]} votes.`;
-      currentGame.guess[currentGame.round].push(finalResult[0]);
-      twordle.gridUpdate(currentGame, finalResult[0]);
+      twordle.changeState("NEXTROUND");
+      twordle.updateGame("message", `${finalResult[0]} won with ${finalPoll[finalResult[0]]} votes.`);
+      twordle.gridLetterUpdate(finalResult[0]);
       // NEXT LINE
-      if (currentGame.letter === 4) {
-        currentGame.state = "REVEAL";
+      if ($currentGame.letter === 4) {
+        twordle.changeState("REVEAL");
       } else {
-        currentGame.letter++;
+        twordle.incrementGame({ letter: 1, round: 0, votes: 0 });
       }
-      console.log("Current game state is ", currentGame.state);
     }
   }
 
   function startPoll() {
-    if (currentGame.state === "POLL") return;
-    currentGame.state = "POLL";
-    currentGame.timer = $storage.timer;
+    if ($currentGame.state === "POLL") return;
+    twordle.changeState("POLL");
+    twordle.updateGame("timer", $storage.timer);
     roundStart.play();
     var roundClock = setInterval(function () {
-      --currentGame.timer;
-      currentGame.message = usersVoted.length + " votes";
-      if (currentGame.timer === 0) {
+      twordle.updateGame("timer", $currentGame.timer - 1);
+      $currentGame.message = usersVoted.length + " votes";
+      if ($currentGame.timer === 0) {
         clearInterval(roundClock);
         finishPoll();
       }
@@ -148,13 +102,12 @@
   function newLetterRound() {
     console.log("Starting new round");
     usersVoted = [];
-    currentGame.timer = 4;
-    currentGame.votes = 0;
+    twordle.updateGame("timer", 4);
+    twordle.incrementGame({ round: 0, letter: 0, votes: -1 });
+    twordle.changeState("OPENING");
     let preroundTimer = setInterval(function () {
-      console.log("countdown timer");
-      --currentGame.timer;
-      currentGame.state = "OPENING";
-      if (currentGame.timer === 1) {
+      twordle.updateGame("timer", $currentGame.timer - 1);
+      if ($currentGame.timer === 0) {
         clearInterval(preroundTimer);
         startPoll();
       }
@@ -162,16 +115,25 @@
   }
 
   function buttonPress() {
-    console.log("Current game state is ", currentGame.state);
-    if (["START", "NEXTROUND", "NEXTLINE", "RETRY"].includes(currentGame.state)) {
-      console.log("Running New round");
+    if ($currentGame.state === "REVEAL") {
+      twordle.updateGuess();
+      if ($currentGame.currentGuess === $currentGame.answer) {
+        // Success
+        twordle.incrementStat("won", 1);
+        twordle.incrementGame({ round: 1, letter: 1, votes: 0 });
+        confetti.addConfetti();
+        winSound.play();
+      } else if ($currentGame.round != 5) {
+        twordle.changeState("NEXTLINE");
+        twordle.incrementGame({ round: 1, letter: -1, votes: 0 });
+      } else {
+        // Fail
+        twordle.incrementGame({ round: 1, letter: 0, votes: 0 });
+        twordle.changeState("FAIL");
+      }
+    } else {
       newLetterRound();
     }
-    if (currentGame.state === "REVEAL") wrapUpLine();
-  }
-
-  function darkToggle({ detail }: { detail: boolean }) {
-    twordle.changeSetting("dark", detail);
   }
 
   onMount(() => {
@@ -179,10 +141,9 @@
     let existingStorage = window.localStorage.twordle;
     if (existingStorage) {
       existingStorage = JSON.parse(existingStorage);
-      console.log(existingStorage);
       twordle.storage.set(existingStorage);
     } else {
-      currentGame.howto = true;
+      twordle.updateGame("menu", 1);
     }
     twordle.storage.subscribe((value) => (window.localStorage.twordle = JSON.stringify(value)));
 
@@ -203,7 +164,7 @@
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      currentGame.connected = true;
+      twordle.updateGame("connected", true);
       toastPopUp(`Connected to ${$storage.channel} chat`);
     });
 
@@ -215,7 +176,7 @@
       let characterCode = upper.charCodeAt(0);
       if (twordle.characterChecker(characterCode)) {
         ++poll[upper];
-        ++currentGame.votes;
+        twordle.incrementGame({ votes: 1, letter: 0, round: 0 });
         usersVoted.push(tags.username);
         console.log(`${tags.username} has voted!`);
       }
@@ -231,16 +192,13 @@
   <title>Twordle</title>
   <style>
     body {
-      width: 100vw;
-      height: 100vh;
-      padding: 0;
-      margin: 0;
       overflow: hidden;
     }
   </style>
 </svelte:head>
 
-<main class="twordleShades {$storage.dark ? 'twordleDark' : 'twordleLight'}">
+<main class={$storage.dark ? "twordleDark" : "twordleLight"}>
+  <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
   <div id="toastBox">
     {#each toastArray as toasty (toasty.id)}
       <div out:slide class="toast {toasty.code}">
@@ -251,40 +209,8 @@
   <audio bind:this={winSound} src={winSoundSrc} volume={$storage.volume / 10} />
   <audio bind:this={roundStart} src={roundStartSrc} volume={$storage.volume / 10} />
   <canvas id="confetti" bind:this={canvas} />
-  {#if currentGame.settings || currentGame.howto || currentGame.stats}
-    <div id="overlay">
-      {#if currentGame.settings}
-        <Settings on:close={() => (currentGame.settings = false)} />
-      {:else if currentGame.howto}
-        <HowTo on:close={() => (currentGame.howto = false)} />
-        <p>HELLO</p>
-      {:else if currentGame.stats}
-        <Stats on:close={() => (currentGame.stats = false)} />
-      {/if}
-    </div>
-  {/if}
-  <div class="menu">
-    <Switch checked={$storage.dark} on:change={darkToggle} class={$storage.dark ? "switch switch-enabled" : "switch switch-disabled"}>
-      <span class="sr-only">Enable notifications</span>
-      <span class="toggle {$storage.dark ? 'toggle-on' : 'toggle-off'}" />
-      <p>{$storage.dark}</p>
-    </Switch>
-    <Darkmode />
-    <svg id="cog" on:click={() => (currentGame.settings = !currentGame.settings)} xmlns="http://www.w3.org/2000/svg" viewBox="0 -256 1792 1792">
-      <path
-        d="M1024 640q0 106-75 181t-181 75q-106 0-181-75t-75-181q0-106 75-181t181-75q106 0 181 75t75 181zm512 109V527q0-12-8-23t-20-13l-185-28q-19-54-39-91 35-50 107-138 10-12 10-25t-9-23q-27-37-99-108t-94-71q-12 0-26 9l-138 108q-44-23-91-38-16-136-29-186-7-28-36-28H657q-14 0-24.5 8.5T621-98L593 86q-49 16-90 37L362 16q-10-9-25-9-14 0-25 11-126 114-165 168-7 10-7 23 0 12 8 23 15 21 51 66.5t54 70.5q-27 50-41 99L29 495q-13 2-21 12.5T0 531v222q0 12 8 23t19 13l186 28q14 46 39 92-40 57-107 138-10 12-10 24 0 10 9 23 26 36 98.5 107.5T337 1273q13 0 26-10l138-107q44 23 91 38 16 136 29 186 7 28 36 28h222q14 0 24.5-8.5T915 1378l28-184q49-16 90-37l142 107q9 9 24 9 13 0 25-10 129-119 165-170 7-8 7-22 0-12-8-23-15-21-51-66.5t-54-70.5q26-50 41-98l183-28q13-2 21-12.5t8-23.5z"
-        style="fill:white"
-        transform="matrix(1 0 0 -1 121.492 1285.424)"
-      /></svg
-    >
-    <svg id="stats" on:click={() => (currentGame.stats = !currentGame.stats)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490.4 490.4" xml:space="preserve"
-      ><path
-        d="M17.2 251.55c-9.5 0-17.2 7.7-17.2 17.1v179.7c0 9.5 7.7 17.2 17.2 17.2h113c9.5 0 17.1-7.7 17.1-17.2v-179.7c0-9.5-7.7-17.1-17.1-17.1h-113zm95.8 179.7H34.3v-145.4H113v145.4zm377.4 17.2v-283.7c0-9.5-7.7-17.2-17.2-17.2h-113c-9.5 0-17.2 7.7-17.2 17.2v283.6c0 9.5 7.7 17.2 17.2 17.2h113c9.5 0 17.2-7.7 17.2-17.1zm-34.3-17.2h-78.7v-249.3h78.7v249.3zm-154.4 34.3c9.5 0 17.1-7.7 17.1-17.2V42.05c0-9.5-7.7-17.2-17.1-17.2h-113c-9.5 0-17.2 7.7-17.2 17.2v406.3c0 9.5 7.7 17.2 17.2 17.2h113zm-95.8-406.3h78.7v372h-78.7v-372z"
-        style="fill:#fff"
-      /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /><g /></svg
-    >
-  </div>
-  <div id="twordleBody" class:blurred={currentGame.howto || currentGame.settings || currentGame.stats}>
+  <Overlay />
+  <div id="twordleBody" class:blurred={$currentGame.menu} on:click={() => twordle.updateGame("menu", 0)} on:keypress={() => twordle.updateGame("menu", 0)}>
     <div id="twordle">
       <div class="Title">
         <span class="personalised">
@@ -297,38 +223,41 @@
           {/if}
         </span>
         <p>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</p>
-        <button on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button>
+        <!-- <button class='HowToPlay' on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button> -->
       </div>
-      <Grid {currentGame} />
+      <Grid />
       <div id="bottom">
-        <Keyboard {currentGame} />
-        <EventBox {currentGame} on:toast={toastDispatch} on:buttonPress={buttonPress} />
+        {#if $storage.keyboard}
+          <Keyboard />
+        {/if}
+        <EventBox on:toast={toastDispatch} on:buttonPress={buttonPress} />
       </div>
     </div>
   </div>
 </main>
 
 <style lang="scss">
-  @import "../../../css/colours.scss";
-  :global(.twordleDark) {
-    --main: #232323;
-    --titleShadow: none;
-    --text: white;
-  }
-  :global(.twordleLight) {
-    --main: #e2c293;
-    --titleShadow: 1px 1px 0px white, 2px 2px 0px white;
-    --text: white;
-  }
-  :global(.twordleShades) {
-    --mainDarken5: #ddb77f;
-    --mainDarken10: #d7ab6b;
-    --mainDarken15: #d2a057;
-    --mainDarken20: #cc9543;
-    --mainDarken40: #855e24;
-    --mainLighten10: #edd9bb;
-    --mainLighten15: #f2e4cf;
-  }
+  @use "../../../css/colours.scss" as *;
+
+  // :global(.twordleDark) {
+  //   --main: #232323;
+  //   --titleShadow: none;
+  //   --text: white;
+  // }
+  // :global(.twordleLight) {
+  //   --main: hsl(36, 58%, 73%);
+  //   --titleShadow: 1px 1px 0px white, 2px 2px 0px white;
+  //   --text: white;
+  // }
+  // :global(.twordleShades) {
+  //   --mainDarken5: #ddb77f;
+  //   --mainDarken10: #d7ab6b;
+  //   --mainDarken15: #d2a057;
+  //   --mainDarken20: #cc9543;
+  //   --mainDarken40: #855e24;
+  //   --mainLighten10: #edd9bb;
+  //   --mainLighten15: #f2e4cf;
+  // }
   main {
     font-family: "Poppins";
     background-color: var(--main);
@@ -392,26 +321,31 @@
     font-size: clamp(0.3rem, 2vh, 1rem);
     a {
       color: $twordlePurple;
-      text-decoration: none !important;
+      transition: all 0.2s ease-in-out;
+      text-decoration-color: $twordlePurple;
+      &:hover {
+        text-decoration-color: $white;
+      }
       text-shadow: none;
-    }
-    button {
-      padding: 0rem 0rem;
-      margin: 0.3rem 0rem;
-      background-color: var(--mainDarken15);
-      cursor: pointer;
     }
     p {
       margin: 0;
     }
     h1 {
+      font-family: "Outfit";
       color: $twordlePurple;
       text-align: center;
       text-shadow: none;
-      font-size: clamp(1rem, 4vh, 3rem);
+      font-size: 3rem;
       font-weight: bold;
       text-shadow: var(--titleShadow);
+      letter-spacing: -1px;
       margin: 0;
+      &::selection {
+        background-color: $twordlePurple;
+        color: $white;
+        text-shadow: none;
+      }
     }
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     a {
@@ -427,6 +361,13 @@
     font-family: "Poppins";
   }
 
+  // .HowToPlay {
+  //   padding: 0rem 0rem;
+  //   margin: 0.3rem 0rem;
+  //   background-color: var(--mainDarken10);
+  //   cursor: pointer;
+  // }
+
   #bottom {
     display: flex;
     flex-direction: column;
@@ -440,7 +381,7 @@
 
   #voted {
     position: absolute;
-    background-color: var(--mainLighten10);
+    background-color: var(--inputBackdrop);
     border-radius: 1rem;
     padding: 0.5rem;
     margin-left: 1.5rem;
@@ -473,7 +414,7 @@
     height: max-content;
     left: 0;
     top: 0;
-    z-index: 30;
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -512,15 +453,6 @@
     justify-content: center;
   }
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(45deg);
-    }
-  }
-
   #overlay {
     position: absolute;
     width: 100vw;
@@ -531,37 +463,27 @@
     justify-content: center;
   }
 
-  .menu {
-    width: max-content;
-    height: 1.6rem;
-    top: 0.5rem;
-    right: 0.7rem;
-    position: absolute;
-    z-index: 1;
-    background-color: var(--mainDarken15);
-    padding: 0.3rem;
-    border-radius: 0.3rem;
-    svg {
-      pointer-events: all;
-      cursor: pointer;
-      width: 1.6rem;
-      path {
-        fill: $white;
-      }
-    }
-    #cog {
-      &:hover {
-        animation: spin 1s ease-out;
-        animation-iteration-count: infinite;
-      }
-    }
-  }
-
   .revealed {
-    background-color: var(--mainDarken40) !important;
+    background-color: var(--mainDarken20) !important;
   }
   .blurred {
     filter: blur(5px) brightness(0.8);
+  }
+
+  #return {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 10px 0px 0px 10px;
+    opacity: 0.8;
+    z-index: 11;
+    cursor: pointer;
+    pointer-events: all;
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .sr-only {
