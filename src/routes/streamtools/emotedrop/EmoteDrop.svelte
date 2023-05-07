@@ -183,6 +183,9 @@
 <section class:runApp class:testApp={!runApp} id="emoteDrop" bind:this={appBody} />
 
 <style lang="scss">
+  .runApp {
+    height: 100vh;
+  }
   #emoteDrop {
     width: 100%;
     height: 100%;

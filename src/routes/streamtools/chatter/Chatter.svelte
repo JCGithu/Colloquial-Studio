@@ -303,6 +303,9 @@
 </section>
 
 <style lang="scss">
+  .runApp {
+    height: 100vh;
+  }
   #chatBoundary {
     position: relative;
     --flex: column;
