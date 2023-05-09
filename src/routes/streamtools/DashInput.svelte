@@ -136,7 +136,7 @@
 </div>
 
 <style lang="scss">
-  @use "../../css//default.scss" as d;
+  @use "../../css/default.scss" as d;
   @use "../../css/colours.scss" as *;
 
   .invert {
