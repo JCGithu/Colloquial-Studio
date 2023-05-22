@@ -63,18 +63,16 @@
     twordle.incrementStat("votes", usersVoted.length);
     poll = Object.assign({}, twordle.emptyPoll);
     // REDO
-    if (finalPoll[finalResult[0]] === 0) {
+    if (finalPoll[finalResult[0]] === 0 || finalResult.length > 1) {
       twordle.changeState("RETRY");
-      twordle.updateGame("message", `No one entered! Redo?`);
-    } else if (finalResult.length > 1) {
-      twordle.changeState("RETRY");
-      twordle.updateGame("message", `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
+      twordle.updateGame("message", finalPoll[finalResult[0]] === 0 ? `No one entered! Redo?` : `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
     }
     //CONTINUE
     if (finalResult.length === 1) {
       twordle.changeState("NEXTROUND");
       twordle.updateGame("message", `${finalResult[0]} won with ${finalPoll[finalResult[0]]} votes.`);
       twordle.gridLetterUpdate(finalResult[0]);
+      twordle.updateGuess();
       // NEXT LINE
       if ($currentGame.letter === 4) {
         twordle.changeState("REVEAL");
@@ -82,6 +80,7 @@
         twordle.incrementGame({ letter: 1, round: 0, votes: 0 });
       }
     }
+    autoPress();
   }
 
   function startPoll() {
@@ -102,7 +101,7 @@
   function newLetterRound() {
     console.log("Starting new round");
     usersVoted = [];
-    twordle.updateGame("timer", 4);
+    twordle.updateGame("timer", 3);
     twordle.incrementGame({ round: 0, letter: 0, votes: -1 });
     twordle.changeState("OPENING");
     let preroundTimer = setInterval(function () {
@@ -114,18 +113,29 @@
     }, 1000);
   }
 
+  let autoOn = false;
+  function autoPress() {
+    if (autoOn || !$storage.auto) return;
+    autoOn = true;
+    setTimeout(() => {
+      autoOn = false;
+      buttonPress();
+    }, 3000);
+  }
+
   function buttonPress() {
     if ($currentGame.state === "REVEAL") {
-      twordle.updateGuess();
       if ($currentGame.currentGuess === $currentGame.answer) {
         // Success
         twordle.incrementStat("won", 1);
         twordle.incrementGame({ round: 1, letter: 1, votes: 0 });
+        twordle.changeState("SUCCESS");
         confetti.addConfetti();
         winSound.play();
       } else if ($currentGame.round != 5) {
-        twordle.changeState("NEXTLINE");
         twordle.incrementGame({ round: 1, letter: -1, votes: 0 });
+        twordle.changeState("NEXTLINE");
+        autoPress();
       } else {
         // Fail
         twordle.incrementGame({ round: 1, letter: 0, votes: 0 });
@@ -145,6 +155,7 @@
     } else {
       twordle.updateGame("menu", 1);
     }
+
     twordle.storage.subscribe((value) => (window.localStorage.twordle = JSON.stringify(value)));
 
     //LANGUAGES
@@ -238,25 +249,6 @@
 <style lang="scss">
   @use "../../../css/colours.scss" as *;
 
-  // :global(.twordleDark) {
-  //   --main: #232323;
-  //   --titleShadow: none;
-  //   --text: white;
-  // }
-  // :global(.twordleLight) {
-  //   --main: hsl(36, 58%, 73%);
-  //   --titleShadow: 1px 1px 0px white, 2px 2px 0px white;
-  //   --text: white;
-  // }
-  // :global(.twordleShades) {
-  //   --mainDarken5: #ddb77f;
-  //   --mainDarken10: #d7ab6b;
-  //   --mainDarken15: #d2a057;
-  //   --mainDarken20: #cc9543;
-  //   --mainDarken40: #855e24;
-  //   --mainLighten10: #edd9bb;
-  //   --mainLighten15: #f2e4cf;
-  // }
   main {
     font-family: "Poppins";
     background-color: var(--main);
@@ -451,7 +443,7 @@
     left: 0;
     margin: 10px 0px 0px 10px;
     opacity: 0.8;
-    z-index: 11;
+    z-index: 9;
     cursor: pointer;
     pointer-events: all;
     &:hover {
