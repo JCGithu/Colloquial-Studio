@@ -18,7 +18,7 @@
     if ($currentGame.round <= y) return;
     correct = $currentGame.guess[y][x] === $currentGame.answer[x];
     maybe = $currentGame.answer.includes($currentGame.guess[y][x]) && !correct;
-    wrong = !correct && !wrong;
+    wrong = !correct && !maybe;
   });
 </script>
 
