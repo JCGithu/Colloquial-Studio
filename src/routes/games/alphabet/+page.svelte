@@ -1,12 +1,12 @@
 <script lang="ts">
   import "../../../js/tmi";
   import { onMount } from "svelte";
-  import { fly } from "svelte/transition";
+  import { fly, fade } from "svelte/transition";
   import JSConfetti from "js-confetti";
   let channel = "";
   let channelInput: string;
   let canvas: HTMLCanvasElement;
-  let confettiTarget = new JSConfetti();
+  let confettiTarget: JSConfetti;
 
   // Starting Variables
   let startNum = 65;
@@ -36,30 +36,28 @@
     window.location.replace(`${baseURL}?channel=${channelInput}&overlay=${overlay}`);
   }
 
-  function fail(username: string) {
-    (red = true), (shake = true);
-    mainText = "...";
-    userList = [];
-    console.log(currNum, highscore);
-    if (currNum > highscore) {
-      highscore = currNum;
-      attempts = -1;
-    }
-    attempts++;
-    let attemptText = "";
-    if (attempts) attemptText = "\n" + attempts + " attempts ago";
-    if (highscore > 64) userText = "Reached " + String.fromCharCode(highscore) + attemptText;
-    if (currNum > 64) extraText = `Broken by: ${username}`;
-    currNum = startNum - 1;
-    setTimeout(() => ((red = false), (shake = false)), 1000);
-  }
-
   function success() {
     mainText = "Z";
     extraText = "ALPHABET COMPLETE!";
     userText = "Thanks to the work of " + userList.join(", ");
     confettiTarget.addConfetti();
     done = true;
+  }
+
+  function fail(username: string) {
+    (red = true), (shake = true);
+    mainText = "...";
+    userList = [];
+    console.log(currNum, highscore);
+    if (currNum >= highscore) {
+      highscore = currNum;
+      attempts = 0;
+    }
+    attempts++;
+    if (highscore > 64) userText = "Reached " + String.fromCharCode(highscore) + (attempts ? `\n ${attempts} attempts ago` : "");
+    if (currNum > 64) extraText = `Broken by: ${username}`;
+    currNum = startNum - 1;
+    setTimeout(() => ((red = false), (shake = false)), 1000);
   }
 
   function runMessage(channel: string, tags: Tags, message: string, misc: { [x: string]: any }) {
@@ -134,8 +132,8 @@
     <canvas bind:this={canvas} />
     <div id="game">
       {#if highscore <= 0}<p>Current letter:</p>{/if}
-      <h2 id="current" class:shake>{mainText}</h2>
-      <p id="users">{userText}</p>
+      <h2 id="current" class:shake style:--increase="{100 + (currNum - 64) / 10}%">{mainText}</h2>
+      {#if currNum < highscore}<p id="users" transition:fade>{userText}</p>{/if}
       {#if extraText}<p id="extra" transition:fly={{ y: 200, duration: 500 }}>{extraText}</p>{/if}
     </div>
   {:else}
@@ -169,6 +167,10 @@
     font-family: "Poppins", sans-serif;
     background-color: #ead2ac;
     transition: all 0.2s ease-in-out;
+  }
+  a {
+    color: $colloquial;
+    text-decoration: none;
   }
   #game {
     position: absolute;
@@ -226,6 +228,7 @@
     font-size: small;
   }
   #current {
+    --increase: 0.1%;
     font-size: 4rem;
     margin: 1rem;
     transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
@@ -316,6 +319,7 @@
     outline: none;
     margin: 0.5rem;
     font-family: "Poppins";
+    border: none;
     background-color: black;
     color: white;
     border-radius: 0.5rem;
