@@ -140,12 +140,12 @@
   }
   button {
     border: none;
-    background-color: transparent;
+    background-color: var(--settingsDetail);
     width: max-content;
     padding: 0.5rem 2rem;
     border-radius: 1rem;
-    border: 1px solid var(--buttons);
-    color: var(--text);
+    //border: 1px solid var(--buttons);
+    color: var(--titles);
     //text-transform: uppercase;
     transition: all 0.4s ease-in-out;
     cursor: pointer;

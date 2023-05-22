@@ -14,8 +14,8 @@ dependencies:
     specifier: ^0.6.0
     version: 0.6.0
   svelte-collapse:
-    specifier: ^0.1.1
-    version: 0.1.1
+    specifier: ^0.1.2
+    version: 0.1.2
 
 devDependencies:
   '@rgossiaux/svelte-headlessui':
@@ -953,8 +953,8 @@ packages:
       - sugarss
     dev: true
 
-  /svelte-collapse@0.1.1:
-    resolution: {integrity: sha512-mQ3A7g8vPnZOVx/m+sDJmxOpfpHVb6KbOUrgE2+WUmirlB6d5/Hzl9alXmmsFkRXb9yLuCPvxGSBykcduUCWuw==}
+  /svelte-collapse@0.1.2:
+    resolution: {integrity: sha512-0ZCbT6V/stHFxe4isKbduvZxnIIdktXeE8KQHtHyocx1bqEMbW1cCrbWiGBvbWp8yVVS58/33hQE5GzgQxby5w==}
     dev: false
 
   /svelte-hmr@0.15.1(svelte@3.58.0):

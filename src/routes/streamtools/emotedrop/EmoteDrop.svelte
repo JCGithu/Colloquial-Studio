@@ -104,7 +104,10 @@
       toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
     });
 
-    client.on("chat", (channel: EmoteDropParameters["channel"], tags: Tags, message: string, self: boolean) => {
+    client.on("chat", (channel: EmoteDropParameters["channel"], tags: Tags, message: string) => {
+      // Just to avoid a TS error
+      console.log(channel);
+
       // Deleting emotes
       if (message.startsWith("!emotewipe")) {
         let allowed = tags.badges.broadcaster ? true : false;

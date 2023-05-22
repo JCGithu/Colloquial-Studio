@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   export let icon = "settings";
   export let fill = "white";
   export let title = icon;

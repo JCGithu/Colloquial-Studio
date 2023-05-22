@@ -88,7 +88,7 @@ export const defaultParams:ChatterParameters = {
   removeTime: 60,
   version: 2,
   intro: false,
-  splitLetters: false,
+  splitLetters: false
 };
 
 let arrays = ['hidebot', 'hidecom'];
@@ -138,7 +138,7 @@ export async function paramReformat(params:ChatterParameters, id?:string){
   booleans.forEach((b) => {
     if (typeof params[b] === 'string') params[b] = (params[b] === 'true');
   });
-  arrays.forEach((v, i)=>{
+  arrays.forEach((v)=>{
     if (typeof params[v] != 'string') return;
     params[v] = params[v].trim().split(',');
   });

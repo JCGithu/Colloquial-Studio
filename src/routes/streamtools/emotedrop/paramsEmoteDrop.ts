@@ -26,7 +26,7 @@ export const defaultParams:EmoteDropParameters = {
 };
 
 // Put IDs of relevant inputs
-let arrays = [''];
+//let arrays = [''];
 let booleans = ['sleep', 'random'];
 
 //Individual Functions

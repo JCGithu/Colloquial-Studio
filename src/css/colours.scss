@@ -15,23 +15,11 @@ $twordlePurple: hsl(261, 70%, 59%);
 $twordleDark: hsl(0, 0%, 10%);
 
 // Variable Setting
-:global(.twordleDark) {
-  --main: #{$twordleDark};
-  --titleShadow: none;
-  --text: #{$white};
-  --inputBackdrop: #{lighten($twordleDark, 10)};
-  --cellBackdrop: #{darken($twordleDark, 5)};
-  --mainDarken10: #{darken($twordleMain, 20)};
-  --mainDarken20: #{darken($twordleMain, 20)};
-  --menuBackdrop: #{lighten($twordleDark, 5)};
-  --buttons: #{darken($twordleMain, 15)};
-  --cellBorder: #{darken($twordleMain, 15)};
-  --settingsDetail: #{lighten($twordleDark, 10)};
-}
 :global(.twordleLight) {
   --main: #{$twordleMain};
   --titleShadow: 1px 1px 0px #{$white}, 2px 2px 0px #{$white};
-  --text: #{$white};
+  --titles: #{$white};
+  --text: #{lighten($twordleDark, 5)};
   --inputBackdrop: #{lighten($twordleMain, 10)};
   --cellBackdrop: #{darken($twordleMain, 5)};
   --mainDarken10: #{darken($twordleMain, 10)};
@@ -40,4 +28,18 @@ $twordleDark: hsl(0, 0%, 10%);
   --buttons: #{darken($twordleMain, 10)};
   --cellBorder: #{darken($twordleMain, 15)};
   --settingsDetail: #{darken($twordleMain, 30)};
+}
+:global(.twordleDark) {
+  --main: #{$twordleDark};
+  --titleShadow: none;
+  --text: #{$white};
+  --titles: #{$white};
+  --inputBackdrop: #{lighten($twordleDark, 10)};
+  --cellBackdrop: #{darken($twordleDark, 5)};
+  --mainDarken10: #{darken($twordleMain, 20)};
+  --mainDarken20: #{darken($twordleMain, 20)};
+  --menuBackdrop: #{lighten($twordleDark, 5)};
+  --buttons: #{lighten($twordleDark, 10)};
+  --cellBorder: #{darken($twordleMain, 15)};
+  --settingsDetail: #{lighten($twordleDark, 10)};
 }

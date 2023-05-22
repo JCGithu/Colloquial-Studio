@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext, afterUpdate } from "svelte";
+  import { getContext } from "svelte";
   import { get } from "svelte/store";
   import { updateValue, storage, reloadDashboard } from "../params";
   import SvgIcon from "../../SVGIcon.svelte";

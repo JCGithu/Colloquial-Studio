@@ -4,27 +4,33 @@
   import { fly } from "svelte/transition";
   import JSConfetti from "js-confetti";
   let channel = "";
+  let channelInput: string;
   let canvas: HTMLCanvasElement;
+  let confettiTarget = new JSConfetti();
 
+  // Starting Variables
   let startNum = 65;
   let currNum = 64;
-  let done = false;
+
+  //Game Data
   let userList: Array<string> = [];
-  let easyMode = false;
   let highscore = 0;
   let attempts = 0;
-  let intro = false;
 
+  //Settings
+  let intro = false;
+  let done = false;
+  let easyMode = false;
   let blurry = false;
   let red = false;
   let shake = false;
   let overlay = false;
 
+  //Text Interface
   let mainText = "...";
   let userText = "";
   let extraText: string | null = null;
 
-  let channelInput: string;
   function reloadGame() {
     let baseURL = window.location.href;
     window.location.replace(`${baseURL}?channel=${channelInput}&overlay=${overlay}`);
@@ -48,16 +54,20 @@
     setTimeout(() => ((red = false), (shake = false)), 1000);
   }
 
-  function success(confetti: JSConfetti) {
+  function success() {
     mainText = "Z";
     extraText = "ALPHABET COMPLETE!";
     userText = "Thanks to the work of " + userList.join(", ");
-    confetti.addConfetti();
+    confettiTarget.addConfetti();
     done = true;
   }
 
-  function runMessage(channel: string, tags: Tags, message: string, confetti: JSConfetti) {
-    if (done) return;
+  function runMessage(channel: string, tags: Tags, message: string, misc: { [x: string]: any }) {
+    if (done) {
+      // Just to remove the TS error
+      console.log(channel, misc);
+      return;
+    }
     if (message.length > 1) return fail(tags.username);
     message = message.toUpperCase();
     if (currNum === 64 && message === "A") {
@@ -73,7 +83,7 @@
     } else if (message.charCodeAt(0) == target) {
       currNum++;
       mainText = String.fromCharCode(currNum);
-      if (currNum === 90) success(confetti);
+      if (currNum === 90) success();
     } else fail(tags.username);
   }
 
@@ -82,25 +92,21 @@
     channel = URldata.get("channel") || "";
     overlay = URldata.get("overlay") === "true" || false;
 
-    const jsConfetti = new JSConfetti({ canvas });
+    confettiTarget = new JSConfetti({ canvas });
 
     //@ts-ignore
     let client = new tmi.Client({
       channels: [channel],
     });
-
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
     });
 
-    function handleEvent(channel: string, tags: Tags, message: string) {
-      runMessage(channel, tags, message, jsConfetti);
-    }
-    client.on("chat", handleEvent);
-    client.on("action", handleEvent);
-    client.on("cheer", handleEvent);
-    client.on("subscription", (channel: string, username: string, method: string, message: string, tags: Tags) => handleEvent(channel, tags, message));
-    client.on("resub", (channel: string, username: string, months: number, message: string, tags: Tags, methods: string) => handleEvent(channel, tags, message));
+    client.on("chat", runMessage);
+    client.on("action", runMessage);
+    client.on("cheer", runMessage);
+    client.on("subscription", (channel: string, username: string, method: string, message: string, tags: Tags) => runMessage(channel, tags, message, { username: username, method: method }));
+    client.on("resub", (channel: string, username: string, months: number, message: string, tags: Tags) => runMessage(channel, tags, message, { username: username, months: months }));
 
     // ADD WAY FOR EASY AND OVERLAY MODE
     if (channel != "") {

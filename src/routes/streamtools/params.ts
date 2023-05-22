@@ -171,7 +171,7 @@ export function dashReset(app:string){
   })
 }
 
-export async function appInit(app:string, toastUpdate:Function){
+export async function appInit(toastUpdate:Function){
 
   let existingStorage = window.localStorage.streamTools;
   if (existingStorage) {

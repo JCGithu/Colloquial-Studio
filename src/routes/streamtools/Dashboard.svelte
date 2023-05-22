@@ -19,8 +19,6 @@
   //export let runningParams: standardObject;
 
   let baseURL = "";
-  let openMenu = false;
-
   let userBackground = "#242423";
   let toastArray: Array<{ message: string; id: number }> = [];
 
@@ -148,7 +146,7 @@
     <div id="saveMenu" class="infoScreen" transition:fade>
       <div class="saveCollection">
         {#each saves as save, i}
-          <span class:blank={!saves[i]}>
+          <span class:blank={!save}>
             <p>Save {i + 1}:</p>
             <button type="button" on:click={() => checkSave(saves[i], i)}>Save</button>
             <button type="button" on:click={() => loadData(i)}>Load</button>

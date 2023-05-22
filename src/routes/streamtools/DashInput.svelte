@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { storage, updateValue, urlBuild } from "./params";
-  import { createEventDispatcher, afterUpdate, getContext, onMount } from "svelte";
+  import { storage, updateValue } from "./params";
+  import { afterUpdate, getContext, onMount } from "svelte";
   import { slide } from "svelte/transition";
 
   //CONTEXT
@@ -19,17 +19,11 @@
   export let value: any = null;
   export let faded = false;
   export let required = false;
-
-  //export let params: standardObject;
-
-  const dispatch = createEventDispatcher();
-
   let grouped = getContext("grouped");
   let grid = getContext("grid");
-  let style: { opacity: number } = { opacity: 1 };
   let invert = false;
   let titleBlock = true;
-  let dashInputValue: any;
+  $: dashInputValue = $storage[appDetails.name]["inProgress"][id];
   let optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
 
   function colourCheck(val: string) {
@@ -65,15 +59,13 @@
   let rangeWidth = 0;
 
   afterUpdate(() => {
-    style.opacity = 1;
-    if (faded) style.opacity = 0.5;
-
-    dashInputValue = $storage[appDetails.name]["inProgress"][id];
     if (type === "color") colourCheck($storage[appDetails.name]["inProgress"][id]);
     if (type === "select") optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
-    if (type === "range") rangeWidth = scale($storage[appDetails.name]["inProgress"][id], min, max, 0, 1);
+    if (type === "range") rangeWidth = scale(dashInputValue, min, max, 0, 1);
   });
   onMount(async () => {
+    if (type === "range") rangeWidth = scale(dashInputValue, min, max, 0, 1);
+    if (type === "select") console.log(ops);
     setTimeout(() => {
       if (type != "select") return;
       optionName = Object.keys(ops).find((key) => ops[key] === $storage[appDetails.name]["inProgress"][id]) || "NA";
@@ -528,7 +520,8 @@
     }
   }
   :global(.boxOpen) {
-    //border-radius: 0;
+    // Just to keep this without a warning
+    position: relative;
   }
   :global(.listBoxOptions) {
     margin: 0;
@@ -537,6 +530,12 @@
     text-align: center;
     padding: 0;
     width: 80%;
+    max-height: 10rem;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      visibility: hidden;
+      width: 0px !important;
+    }
     //margin-left: 1rem;
     //background-color: darken($white, 5);
     border: $colloquial 2px solid;

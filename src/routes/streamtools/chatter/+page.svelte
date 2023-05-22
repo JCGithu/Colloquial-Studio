@@ -28,10 +28,9 @@
   let toastUpdate: (i: string) => void;
 
   onMount(async () => {
-    let baseURL = window.location.href;
     let urlData = new URLSearchParams(window.location.search);
-    if (urlData.has("data")) window.location.replace(`${baseURL.split("?data")[0]}/app` + document.location.search);
-    await appInit(appDetails.name, toastUpdate);
+    if (urlData.has("data")) window.location.replace(`${window.location.href.split("?data")[0]}/app` + document.location.search);
+    await appInit(toastUpdate);
   });
 </script>
 

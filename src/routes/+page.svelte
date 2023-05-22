@@ -42,7 +42,7 @@
 <main id="homePage">
   <img src={logo} alt="logo" id="logo" />
   <h1>colloquial</h1>
-  {#each structure as folder, i}
+  {#each structure as folder}
     <h2
       class="category"
       class:open={folder.on}

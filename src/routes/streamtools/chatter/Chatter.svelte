@@ -11,9 +11,7 @@
   export let runApp = false;
   let messageIndex = 0;
 
-  let viewport,
-    viewportHeight,
-    bttvEmoteCache: Array<bttvEmote>,
+  let bttvEmoteCache: Array<bttvEmote>,
     ffzCache: Array<ffzEmote> = [];
 
   import { formatEmotes } from "./messageParser";
@@ -182,7 +180,7 @@
   }
 
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
-    if (self) return;
+    if (self || !channel) return;
     if (typeof $storage.chatter.inProgress.hidebot === "object") {
       if ($storage.chatter.inProgress.hidebot.includes(tags.username)) return;
     }
@@ -207,9 +205,7 @@
     }
 
     if (firstMessage) {
-      console.log("Chatter: First message, pulling badges");
       fetchBadges(tags);
-      console.log(tags);
       firstMessage = false;
     }
 
@@ -238,13 +234,8 @@
 
   onMount(async () => {
     console.log("Chatter has Loaded", $storage.chatter.loaded);
+    window.onunhandledrejection = (e) => console.log("Error:", e);
 
-    window.onunhandledrejection = (e) => {
-      console.log("Error:", e);
-      console.log($storage.chatter.loaded);
-    };
-
-    firstMessage = true;
     // @ts-ignore
     let client = new tmi.Client({
       channels: [$storage.chatter.loaded.channel],
@@ -264,7 +255,7 @@
       console.log(channel, username, method, message, tags);
       runMessage(channel, tags, message, false, "sub");
     });
-    client.on("resub", (channel: ChatterParameters["channel"], username: string, months: number, message: string, tags: Tags, methods: string) => runMessage(channel, tags, message, false, "sub"));
+    client.on("resub", (channel: ChatterParameters["channel"], username: string, months: number, message: string, tags: Tags) => runMessage(channel, tags, message, false, "sub"));
     client.on("announcement", (channel: ChatterParameters["channel"], tags: Tags, message: string) => runMessage(channel, tags, message, false, "announcement"));
     client.on("clearchat", () => (messageList = []));
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
@@ -294,7 +285,7 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" bind:this={viewport} bind:offsetHeight={viewportHeight} class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
+  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {message} {badgeData} />
     {/each}

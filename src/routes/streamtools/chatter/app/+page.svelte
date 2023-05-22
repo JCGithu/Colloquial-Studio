@@ -2,7 +2,6 @@
   // Add app and name
   import Chatter from "../Chatter.svelte";
   let appName = "chatter";
-  //import { defaultParams } from "../paramsChatter";
   //
 
   import "../../../../css/default.scss";

@@ -1,4 +1,3 @@
-import type { ChatterParameters } from "./paramsChatter";
 import { get } from 'svelte/store';
 import { storage } from "../params";
 

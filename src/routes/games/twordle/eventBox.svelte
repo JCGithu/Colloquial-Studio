@@ -1,6 +1,6 @@
 <script lang="ts">
   export let inputValue = "";
-  import { afterUpdate, createEventDispatcher } from "svelte";
+  import { createEventDispatcher } from "svelte";
   import { storage, currentGame } from "./twFunctions";
   const dispatch = createEventDispatcher();
 
@@ -193,9 +193,9 @@
   button {
     appearance: none;
     border: none;
-    color: white;
+    color: var(--titles);
     font-family: "Poppins";
-    font-weight: 600;
+    //font-weight: 600;
     font-size: large;
     background-color: var(--buttons);
     border-radius: 1rem;

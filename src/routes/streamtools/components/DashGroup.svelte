@@ -7,16 +7,13 @@
   export let title = "";
   export let inner = false;
 
-  let MouseX = 1;
-  let MouseY = 0;
-
   function runClick() {
     opened = !opened;
   }
 </script>
 
 <div in:fly={{ x: 200, duration: 500 }} out:slide class="groupBox" class:inner class:groupBoxOpen={opened}>
-  <button style="--mouseX:{MouseX}px; --mouseY:{MouseY}px;" type="button" class:opened title="Click to show options" on:click={runClick}>{title}</button>
+  <button type="button" class:opened title="Click to show options" on:click={runClick}>{title}</button>
   <div class="group" class:groupOpen={opened} class:groupShut={!opened} use:collapse={{ open: opened, duration: 0.35, easing: "cubic-bezier(.71,.7,.41,1.14)" }}>
     <slot />
   </div>

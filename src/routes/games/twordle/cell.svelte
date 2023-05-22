@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, afterUpdate, onMount } from "svelte";
+  import { getContext, afterUpdate } from "svelte";
   import { grid, storage, currentGame } from "./twFunctions";
   export let x: number;
   export let y: number;

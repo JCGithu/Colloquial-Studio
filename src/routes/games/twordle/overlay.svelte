@@ -151,7 +151,7 @@
     padding: 0.5rem 2rem;
     border-radius: 1rem;
     border: 1px solid transparent;
-    color: var(--text);
+    color: var(--titles);
     transition: all 0.2s ease-in-out;
     cursor: pointer;
     font-family: "Outfit";
@@ -167,7 +167,7 @@
   }
   h1 {
     font-size: "Outfit";
-    color: var(--text);
+    color: var(--titles);
     font-weight: bold;
     font-size: 1.9rem;
     padding: 0;

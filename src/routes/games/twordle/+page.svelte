@@ -1,6 +1,6 @@
 <script lang="ts">
   //Functions
-  import { onMount, setContext } from "svelte";
+  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import * as twordle from "./twFunctions";
   import { storage, currentGame } from "./twFunctions";
@@ -169,8 +169,7 @@
     });
 
     client.on("message", (channel: string, tags: Tags, message: string, self: boolean) => {
-      if (message.length > 1) return;
-      if (usersVoted.includes(tags.username)) return;
+      if (self || !channel || message.length > 1 || usersVoted.includes(tags.username)) return;
       message = message.replace("ß", "ẞ");
       let upper = message.toUpperCase();
       let characterCode = upper.charCodeAt(0);
@@ -392,22 +391,6 @@
     color: $twordlePurple;
   }
 
-  #popup {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    top: 0;
-    left: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    background-color: fade-out(black, 0.5);
-  }
-
   //TOAST
   #toastBox {
     position: absolute;
@@ -448,16 +431,6 @@
   }
 
   .personalised {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  #overlay {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -2,7 +2,6 @@
   // Add app and name
   import EmoteDrop from "../EmoteDrop.svelte";
   let appName = "emotedrop";
-  import { defaultParams } from "../paramsEmoteDrop";
   //
 
   import "../../../../css/default.scss";
