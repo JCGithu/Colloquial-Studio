@@ -68,24 +68,24 @@
   {#if $currentGame.state === "RETRY"}
     <p>{$currentGame.message}</p>
     <div>
-      <button on:click={sendButton} class:disable>Try Again?</button>
+      <button on:click={sendButton} class:disable>Try Again?{$storage.auto ? " (Auto)" : ""}</button>
     </div>
   {/if}
   {#if $currentGame.state === "NEXTROUND"}
     <p>{$currentGame.message}</p>
-    <button on:click={sendButton} class:disable>Next Round</button>
+    <button on:click={sendButton} class:disable>Next Round{$storage.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "REVEAL"}
     <h2>{$currentGame.currentGuess}</h2>
-    <button on:click={sendButton} class:disable>Check Word</button>
+    <button on:click={sendButton} class:disable>Check Word{$storage.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "NEXTLINE"}
     <h2>Nope!</h2>
-    <button on:click={sendButton} class:disable>Guess Again</button>
+    <button on:click={sendButton} class:disable>Guess Again{$storage.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "SUCCESS"}
     <h2>Congrats!</h2>
-    <p>You guessed in {$currentGame.round} tries!</p>
+    <p>You guessed it in {$currentGame.round} tries!</p>
     <button on:click={() => location.reload()} class:disable>Play Again?</button>
   {/if}
   {#if $currentGame.state === "FAIL"}
@@ -171,7 +171,7 @@
     border-radius: 1rem;
     width: 80%;
     background-color: var(--inputBackdrop);
-    color: var(--purple);
+    color: $twordlePurple;
     &::selection {
       background-color: $twordlePurple !important;
       padding: 1rem;
@@ -193,7 +193,7 @@
   button {
     appearance: none;
     border: none;
-    color: var(--titles);
+    color: white;
     font-family: "Poppins";
     //font-weight: 600;
     font-size: large;

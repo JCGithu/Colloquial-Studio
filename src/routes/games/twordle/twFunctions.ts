@@ -211,7 +211,8 @@ export function incrementGame(toAdd:{'round':number, 'letter': number, 'votes': 
     state.votes = state.votes + toAdd.votes;
     if (toAdd.votes < 0) state.votes = 0;
     return state;
-  })
+  });
+  updateGuess();
 }
 export function changeState(newState:TwordleGame["state"]){
   currentGame.update((state)=>{
