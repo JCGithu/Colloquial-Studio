@@ -1,11 +1,14 @@
 <script lang="ts">
-  import type { ChatterParameters } from "./paramsChatter";
   import "../../../js/tmi";
-  import { onMount, getContext } from "svelte";
-  import { storage } from "../params";
+  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
+  import { onMount, getContext, afterUpdate } from "svelte";
+  import { beforeNavigate } from "$app/navigation";
+  import { storage } from "../../toolParams";
   import ChatBubble from "./ChatBubble.svelte";
 
-  let toastUpdate: (i: string) => void = getContext("toast");
+  type Tags = ChatUserstate | SubUserstate;
+
+  const toastUpdate: toastUpdate = getContext("toast");
 
   //export let params: ChatterParameters = defaultParams;
   export let runApp = false;
@@ -70,7 +73,7 @@
         return;
       });
   }
-  async function fetchBadges(tags: Tags) {
+  async function fetchBadges(tags: ChatUserstate | SubUserstate) {
     const urls = [`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`, `https://api.betterttv.net/3/cached/users/twitch/${tags["room-id"]}`];
 
     try {
@@ -232,30 +235,39 @@
     messageList = messageList;
   }
 
+  let backupClient: Client;
+
   onMount(async () => {
-    console.log("Chatter has Loaded", $storage.chatter.loaded);
+    console.log("Chatter has Loaded", $storage.chatter.inProgress);
     window.onunhandledrejection = (e) => console.log("Error:", e);
 
-    // @ts-ignore
-    let client = new tmi.Client({
-      channels: [$storage.chatter.loaded.channel],
-    });
+    //@ts-ignore
+    // It can't seem to find the export from the custom TMI.js
+    let client: Client = new tmi.Client({
+      channels: [$storage.chatter.inProgress.channel],
+    }) as Client;
+    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
       if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
-      testMessage(`Connected to ${$storage.chatter.loaded.channel} ✅`, "announcement");
-      if (!runApp) toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
+      testMessage(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "announcement");
+      if (!runApp) toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
+    });
+    client.on("disconnected", () => {
+      console.log("Disconnected from Twitch");
     });
 
-    client.on("chat", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "chat"));
-    client.on("action", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "action"));
-    client.on("cheer", (channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean) => runMessage(channel, tags, message, self, "cheer"));
-    client.on("subscription", (channel: ChatterParameters["channel"], username: string, method: string, message: string, tags: Tags) => {
+    client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, self, "chat"));
+    client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, self, "action"));
+    client.on("cheer", (channel, tags, message) => runMessage(channel, tags, message, false, "cheer"));
+    client.on("subscription", (channel, username, method, message, tags) => {
       console.log(channel, username, method, message, tags);
       runMessage(channel, tags, message, false, "sub");
     });
     client.on("resub", (channel: ChatterParameters["channel"], username: string, months: number, message: string, tags: Tags) => runMessage(channel, tags, message, false, "sub"));
+    //@ts-ignore
+    // Announcement is not in official TMI.js yet
     client.on("announcement", (channel: ChatterParameters["channel"], tags: Tags, message: string) => runMessage(channel, tags, message, false, "announcement"));
     client.on("clearchat", () => (messageList = []));
     client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
@@ -270,9 +282,30 @@
       console.log("Attempting Twitch Connection...");
       client.connect().catch((error: string) => {
         console.log(error);
-        if (!runApp) toastUpdate(`Error connecting to ${$storage.chatter.loaded.channel}`);
+        if (!runApp) toastUpdate(`Error connecting to ${$storage.chatter.inProgress.channel}`, "error");
       });
     }
+  });
+  beforeNavigate(async () => {
+    console.log("bye!");
+    backupClient.disconnect().catch((error: string) => {
+      console.log(error);
+    });
+  });
+  // This is for the console really. Turning back on deleting chats when it's toggled on the dashboard
+  let deletingChats = $storage.chatter.inProgress.removeChats;
+  afterUpdate(() => {
+    if (deletingChats === $storage.chatter.inProgress.removeChats) return;
+    deletingChats = $storage.chatter.inProgress.removeChats;
+    if ($storage.chatter.inProgress.removeChats === false) return;
+    let intervalID = setInterval(() => {
+      if (messageList.length > 0) {
+        messageList.shift();
+        messageList = messageList;
+      } else {
+        clearInterval(intervalID);
+      }
+    }, $storage.chatter.inProgress.removeTime * 1000);
   });
 </script>
 
@@ -285,11 +318,13 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; {$storage.chatter.inProgress.customCSS}; align-items: {$storage.chatter.inProgress.align}; {$storage.chatter.inProgress.direction === 'Up' ? 'height:auto' : ''}">
-    {#each messageList as message (message.tags.id)}
-      <ChatBubble {message} {badgeData} />
-    {/each}
-    <div style="opacity:{$storage.chatter.inProgress.bgopacity / 100}; --bgColour:{$storage.chatter.inProgress.bgcolour}" id="chatBackground" />
+  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; ' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
+    <div class="chatCrop" class:fade={$storage.chatter.inProgress.fade}>
+      {#each messageList as message (message.tags.id)}
+        <ChatBubble {message} {badgeData} />
+      {/each}
+    </div>
+    <div id="chatBackground" style="opacity:{$storage.chatter.inProgress.bgopacity / 100}; --bgColour:{$storage.chatter.inProgress.bgcolour}; height:{$storage.chatter.inProgress.shrink ? '0px !important' : 'auto'}" />
   </div>
 </section>
 
@@ -301,14 +336,32 @@
     position: relative;
     --flex: column;
     --align: flex-start;
+    --padding: 1rem;
     display: flex;
-    width: calc(100% - 2rem);
-    height: calc(100% - 2rem);
-    padding: 1rem;
+    width: calc(100% - (2 * var(--padding)));
+    height: calc(100% - (2 * var(--padding)));
+    padding: var(--padding);
     flex-direction: var(--flex);
     overflow: hidden;
+    //align-items: var(--align);
+    justify-content: end;
+  }
+
+  .chatCrop {
+    display: flex;
+    flex-direction: var(--flex);
     align-items: var(--align);
     justify-content: end;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .fade {
+    //background-color: red;
+    -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
   }
 
   .banner {
@@ -338,5 +391,6 @@
     min-width: 100%;
     min-height: 100%;
     z-index: 0;
+    transition: 1s all ease-in-out;
   }
 </style>

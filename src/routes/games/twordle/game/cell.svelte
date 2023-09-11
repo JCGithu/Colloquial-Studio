@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getContext, afterUpdate } from "svelte";
-  import { grid, storage, currentGame } from "./twFunctions";
+  import { grid, currentGame } from "../Twordle";
+  import { storage } from "../../../gameParams";
+
   export let x: number;
   export let y: number;
 
@@ -22,10 +24,10 @@
   });
 </script>
 
-<div class="cell {$storage.dark ? 'twordleDark' : 'twordleLight'}" class:maybe class:correct class:wrong class:selected style="{styleString} --delay:{delay}s;">{letter}</div>
+<div class="cell {$storage.twordle.settings.dark ? 'twordleDark' : 'twordleLight'}" class:maybe class:correct class:wrong class:selected style="{styleString} --delay:{delay}s;">{letter}</div>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
+  @use "../../../../css/colours.scss" as *;
   .cell {
     border-color: var(--cellBorder);
     border-radius: 2px;

@@ -1,55 +1,40 @@
 <script lang="ts">
-  // FOR NEW APP //
-  // Change the details below
-  // Replace the imported app
-  // Start adding dashboard options
+  import { storage } from "../../toolParams";
+  import { setContext } from "svelte";
+  import "../../../css/default.scss";
 
-  let appDetails = {
+  let appDetails: appDetails = {
     name: "emotedrop",
     title: "Emote Drop",
     description: `Make emotes fall from the sky.`,
   };
-
-  import EmoteDrop from "./EmoteDrop.svelte";
-
-  import { onMount, setContext } from "svelte";
-  import "../../../css/default.scss";
+  let reload = 0;
 
   import Dashboard from "../Dashboard.svelte";
-  import DashInput from "../DashInput.svelte";
-  import DashChannel from "../components/DashChannel.svelte";
-
-  import { appInit, storage } from "../params";
+  import EmoteDrop from "./EmoteDrop.svelte";
   setContext("appDetails", appDetails);
-  let toastUpdate: (i: string) => void;
-
-  onMount(async () => {
-    let urlData = new URLSearchParams(window.location.search);
-    if (urlData.has("data")) window.location.replace(`${window.location.href.split("?data")[0]}/app` + document.location.search);
-    await appInit(toastUpdate);
-  });
+  setContext("store", storage);
 </script>
 
 <svelte:head>
-  <title>Emote Drop - Dashboard</title>
+  <title>{appDetails.title} - Dashboard</title>
 </svelte:head>
 
-<Dashboard bind:toastUpdate>
+<Dashboard let:Dash>
   <slot slot="app">
-    {#key $storage[appDetails.name]["loaded"].channel}
+    {#key reload}
       <EmoteDrop />
     {/key}
   </slot>
-  <slot id="dashControls" slot="settings">
-    <DashChannel />
-    <!-- Insert from here -->
-    <DashInput type="number" name="Ball Limit *" id="blimit" />
-    <DashInput type="range" name="Emote Size" id="esize" min={1} max={10} />
-    <DashInput type="range" name="Bounce" id="bounce" min={0} max={10} />
-    <DashInput type="number" name="Expiration Time" subtitle="(in seconds)" id="etime" />
-    <DashInput type="checkbox" name="Randomise Size" id="random" />
-    <DashInput type="checkbox" name="Adaptive Mode" subtitle="This stops the 'jelly' effect and makes the app run more effeciently. I'd recommend." id="sleep" />
-    <DashInput type="checkbox" name="Let Mods Reset" subtitle="Allow mods to clear the screen with the command !emotewipe" id="modWipe" />
+  <slot id="dashControls">
+    <Dash.Channel id="channel" />
+    <Dash.Number name="Ball Limit *" id="blimit" />
+    <Dash.Range name="Emote Size" id="esize" min={1} max={10} />
+    <Dash.Range name="Bounce" id="bounce" min={0} max={10} />
+    <Dash.Number name="Expiration Time" subtitle="(in seconds)" id="etime" />
+    <Dash.CheckBox name="Randomise Size" id="random" />
+    <Dash.CheckBox name="Adaptive Mode" subtitle="This stops the 'jelly' effect and makes the app run more effeciently. I'd recommend." id="sleep" />
+    <Dash.CheckBox name="Let Mods Reset" subtitle="Allow mods to clear the screen with the command !emotewipe" id="modWipe" />
   </slot>
 </Dashboard>
 

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { afterUpdate } from "svelte";
-  import { language, qwerty, storage, currentGame } from "./twFunctions";
+  import { qwerty, currentGame } from "../Twordle";
+  import { storage } from "../../../gameParams";
   import { slide } from "svelte/transition";
-  $: qwertyLang = qwerty[$language];
 
   let keyMap: { [x: string]: Array<string> } = {
     correct: [],
@@ -29,8 +29,8 @@
   });
 </script>
 
-<div id="keyboard" class={$storage.dark ? "twordleDark" : "twordleLight"} transition:slide>
-  {#each qwertyLang as row}
+<div id="keyboard" class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"} transition:slide>
+  {#each qwerty[$storage.twordle.settings.language] as row}
     <div class="keyRow">
       {#each row as letter}
         <span class="keyLetter" class:correct={keyMap.correct.includes(letter)} class:maybe={keyMap.maybe.includes(letter)} class:wrong={keyMap.wrong.includes(letter)}>{letter}</span>
@@ -40,7 +40,7 @@
 </div>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
+  @use "../../../../css/colours.scss" as *;
   #keyboard {
     font-size: 13px;
     transition: all 0.5s;

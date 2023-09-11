@@ -1,50 +1,12 @@
 @font-face {
   font-family: "Poppins";
-  src: url(./css/Poppins-Variable.ttf);
+  src: url(/Poppins-Variable.ttf);
 }
-html {
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+@font-face {
+  font-family: "Outfit";
+  src: url(/Outfit-Variable.ttf);
 }
-
-body {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-body:first-child {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.runApp {
-  height: 100vh;
-}
-
-:global(.switch) {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  height: 1.5rem;
-  width: 2.75rem;
-}
-
-:global(.switch-enabled) {
-  /* Blue */
-  background-color: rgb(37, 99, 235);
-}
-
-:global(.switch-disabled) {
-  /* Gray */
-  background-color: rgb(229, 231, 235);
+@font-face {
+  font-family: "Verre";
+  src: url(/Verre-Regular.otf) format("opentype");
 }/*# sourceMappingURL=default.css.map */

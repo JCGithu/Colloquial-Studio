@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { storage } from "./twFunctions";
+  import { storage } from "../../../gameParams";
 </script>
 
-<section class={$storage.dark ? "twordleDark" : "twordleLight"}>
+<section class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
+  <h2>How to play</h2>
   <p>
     Twordle is a word game to play with Twitch chat. <br /><br />
     The streamer enters a 5 letter secret word, or selects a random word. Each round chat must guess one letter at a time what the word is. <br /><br />
@@ -21,12 +22,19 @@
 </section>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
+  @use "../../../../css/colours.scss" as *;
 
   section {
-    text-align: left !important;
-    color: var(--text);
+    text-align: left;
+    color: white;
     font-size: 16px;
+    h2 {
+      text-align: center;
+      text-decoration: underline;
+      text-decoration-color: $twordlePurple;
+      text-decoration-thickness: 3px;
+      margin-top: 0.1rem;
+    }
   }
   div {
     width: 100%;

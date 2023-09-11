@@ -25,3 +25,7 @@ arbok
 gloom
 atari
 bingo
+heart
+bully
+dante
+steam

@@ -4,9 +4,9 @@
   import { get } from "svelte/store";
   import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
-  import { loadURL, loadSave, urlBuild, save, storage, urlFill, updateValue, dashReset } from "./params";
-  import DashButton from "./components/DashButton.svelte";
-  import SVGIcon from "../SVGIcon.svelte";
+  import { appInit, loadURL, loadSave, urlBuild, save, storage, urlFill, dashReset } from "../toolParams";
+  import Dash from "../../components/DashExport";
+  import SVGIcon from "../../components/SVGIcon.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
@@ -15,77 +15,56 @@
   export let showButtons = true;
   export let saves = [false, false, false];
 
-  //export let dashboardParams: standardObject;
-  //export let runningParams: standardObject;
-
   let baseURL = "";
   let userBackground = "#242423";
-  let toastArray: Array<{ message: string; id: number }> = [];
 
-  //TOAST
-  let toastID = 0;
-  function ToastQueue(message: string) {
-    toastID++;
-    toastArray.push({ message: message, id: toastID });
-    toastArray = toastArray;
-    setTimeout(() => {
-      if (toastArray.length > 0) {
-        toastArray.shift();
-        toastArray = toastArray;
-      }
-    }, 5000);
-  }
-  export const toastUpdate = (i: string) => {
-    ToastQueue(i);
-  };
-  setContext("toast", toastUpdate);
+  const toastUpdate: toastUpdate = getContext("toast");
 
   let saveMenu = false;
   function toggleInfoScreen() {
-    updateValue(appDetails.name, true, "intro");
+    storage.update((currentStorage) => {
+      currentStorage[appDetails.name].inProgress.intro = true;
+      return currentStorage;
+    });
     showInfo = !showInfo;
   }
 
   //URL FUNCTIONS
   function openURL() {
-    let currentURL: standardObject = get(urlFill);
-    if (currentURL[appDetails.name].length < 5) {
-      ToastQueue("No URL generated yet!");
+    let currentURL = get(urlFill)[appDetails.name].current;
+    if (currentURL.length < 5) {
+      toastUpdate("No URL generated yet!", "error");
       return;
     }
-    window.open(currentURL[appDetails.name]);
+    window.open(currentURL);
   }
 
   function copyURL() {
-    let currentURL: standardObject = get(urlFill);
-    navigator.clipboard.writeText(currentURL[appDetails.name]);
-    ToastQueue("URL copied to clipboard");
+    let currentURL = get(urlFill)[appDetails.name].current;
+    navigator.clipboard.writeText(currentURL);
+    toastUpdate("URL copied to clipboard", "info");
   }
 
   async function loadFromURL() {
     let urlData = window.prompt("Put in an existing URL", "URL here...");
     if (!urlData) return;
-    //dashboardParams = await loadURL(urlData || "", appDetails.name);
     await loadURL(urlData || "", appDetails.name);
     urlBuild(appDetails.name);
-    //This shouldn't be needed now as it's tackled in the loadURL function
-    //runningParams = dashboardParams;
-    ToastQueue("Settings loaded from URL");
+    toastUpdate("Settings loaded from URL", "pass");
   }
 
   //DATA FUNCTIONS
   function saveData(num: number) {
     saveMenu = !saveMenu;
     save(appDetails.name, num);
-    ToastQueue("Saved to File " + (num + 1));
+    toastUpdate("Saved to File " + (num + 1), "pass");
     setTimeout(saveMenuReload, 1000);
   }
   async function loadData(num: number) {
-    //dashboardParams = await loadSave(num, appDetails.name);
     await loadSave(appDetails.name, num);
     saveMenu = !saveMenu;
     urlBuild(appDetails.name);
-    ToastQueue("Loaded from Save " + (num + 1));
+    toastUpdate("Loaded from Save " + (num + 1), "pass");
   }
 
   function saveMenuReload() {
@@ -108,14 +87,16 @@
   onMount(async () => {
     //Pulling actual base URL
     baseURL = window.location.href.split("?data=")[0];
+    let urlData = new URLSearchParams(window.location.search);
+    if (urlData.has("data")) window.location.replace(`${window.location.href.split("?data")[0]}/app` + document.location.search);
     urlFill.update((urls) => {
-      urls["base"] = baseURL;
+      urls[appDetails.name].base = baseURL;
       return urls;
     });
     setTimeout(() => {
       saveMenuReload();
       urlBuild(appDetails.name);
-      if (!$storage[appDetails.name].loaded.intro) showInfo = true;
+      if (!$storage[appDetails.name].inProgress.intro) showInfo = true;
     }, 500);
   });
 </script>
@@ -137,7 +118,7 @@
         <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
         <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
       </div>
-      <DashButton text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
+      <Dash.Button text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
     </div>
   </div>
 {/if}
@@ -152,22 +133,15 @@
             <button type="button" on:click={() => loadData(i)}>Load</button>
           </span>
         {/each}
-        <DashButton text="Close" on:click={() => (saveMenu = !saveMenu)} on:submit={() => (saveMenu = !saveMenu)} />
+        <Dash.Button text="Close" on:click={() => (saveMenu = !saveMenu)} on:submit={() => (saveMenu = !saveMenu)} />
       </div>
     </div>
   {/if}
-  <div id="toastBox">
-    <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
-    {#each toastArray as toasty (toasty.id)}
-      <div in:fade out:fly={{ x: -200, duration: 1000 }} id="toast">
-        {toasty.message}
-      </div>
-    {/each}
-  </div>
+  <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
   <div id="dashControls">
     <button class="titleButton" on:click={toggleInfoScreen}><h1>{appDetails.title}</h1></button>
-    <slot name="settings" />
-    <DashButton
+    <slot {Dash} />
+    <Dash.Button
       text="Reset to Default"
       on:click={() => {
         dashReset(appDetails.name);
@@ -175,10 +149,10 @@
     />
   </div>
   <div class="dashReact">
-    <div id="dashTopBar" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
+    <div id="dashTopBar" role="banner" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
       <Popover class="PopOver">
         <PopoverButton class="PopOverButton">
-          <SVGIcon fill="hsl(40, 26%, 89%)" />
+          <SVGIcon icon="settings" fill="hsl(40, 26%, 89%)" />
         </PopoverButton>
         <PopoverPanel class="PopOverPanel">
           <div class="panel-contents" transition:slide>
@@ -196,12 +170,15 @@
           </div>
         </PopoverPanel>
       </Popover>
-      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={$urlFill[appDetails.name]} />
+      <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={$urlFill[appDetails.name].current} />
     </div>
     <div id="dashApp">
-      <slot name="app" />
+      {#await appInit(toastUpdate)}
+        <p>Loading</p>
+      {:then run}
+        <slot name="app" />
+      {/await}
     </div>
-    <slot name="testing" />
   </div>
   <svg viewBox="0 0 500 500" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
     <filter id="noiseFilter">
@@ -315,7 +292,7 @@
     flex-direction: column;
     align-items: center;
     width: calc(33vw - 3rem);
-    padding: 3rem 1.5rem 2rem 1.5rem;
+    padding: 3rem 1rem 2rem 1.5rem;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
@@ -727,46 +704,9 @@
     opacity: 0.8;
     cursor: pointer;
     pointer-events: all;
+    z-index: 10;
     &:hover {
       opacity: 1;
-    }
-  }
-
-  //TOAST
-  #toastBox {
-    position: absolute;
-    width: calc(33vw - 3rem);
-    height: calc(100% - 1rem);
-    left: 0;
-    bottom: 0;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-bottom: 1rem;
-    flex-direction: column;
-    pointer-events: none;
-    @media screen and (max-width: d.$phone) {
-      height: 50%;
-      bottom: 75%;
-      left: 25%;
-      width: 50%;
-    }
-  }
-
-  #toast {
-    background-color: $white;
-    color: $black;
-    border-radius: 0.5em;
-    padding: 0.5em;
-    margin: 0.2em;
-    width: 250px;
-    text-align: center;
-    pointer-events: visible;
-    cursor: pointer;
-    transition: all 0.3s;
-    &:hover {
-      background-color: $black;
     }
   }
 </style>

@@ -1,10 +1,11 @@
 <script lang="ts">
   export let inputValue = "";
-  import { createEventDispatcher } from "svelte";
-  import { storage, currentGame } from "./twFunctions";
-  const dispatch = createEventDispatcher();
+  import { createEventDispatcher, getContext } from "svelte";
+  import { currentGame, randomWord, updateGame, incrementGame } from "../Twordle";
+  import { storage } from "../../../gameParams";
 
-  import { incrementStat, randomWord, updateGame, incrementGame } from "./twFunctions";
+  const toastQueue: toastUpdate = getContext("toast");
+  const dispatch = createEventDispatcher();
 
   let boxFull = false;
   let errorClass = false;
@@ -32,23 +33,23 @@
   function userStart(randomise: boolean) {
     // Checking word is valid
     if (!boxFull && !randomise) {
-      dispatch("toast", { message: "❌ Word must be 5 characters ❌", code: "error" });
+      toastQueue("❌ Word must be 5 characters ❌", "error");
       return;
     }
-    updateGame("answer", randomise ? randomWord() : inputValue.toUpperCase());
+    updateGame("answer", randomise ? randomWord($storage.twordle.settings.words) : inputValue.toUpperCase());
     // Checking game is connected
     if (!$currentGame.connected) {
       flashError();
-      dispatch("toast", { message: "❌ You need to connect to a Twitch chat to play ❌", code: "error" });
+      toastQueue("❌ You need to connect to a Twitch chat to play ❌", "error");
       return;
     }
-    incrementStat("play", 1);
+    storage.incrementStat("twordle", "play", 1);
     incrementGame({ round: -1, letter: -1, votes: 0 });
     dispatch("buttonPress");
   }
 </script>
 
-<div class="eventbox {$storage.dark ? 'twordleDark' : 'twordleLight'}">
+<div class="eventbox {$storage.twordle.settings.dark ? 'twordleDark' : 'twordleLight'}">
   {#if $currentGame.state === "START"}
     <h2>Pick a 5 letter word</h2>
     <input bind:value={inputValue} class:boxFull class:errorClass type="password" placeholder="I'll hide it, I promise!" maxlength="5" on:keyup={wordCheck} />
@@ -68,20 +69,20 @@
   {#if $currentGame.state === "RETRY"}
     <p>{$currentGame.message}</p>
     <div>
-      <button on:click={sendButton} class:disable>Try Again?{$storage.auto ? " (Auto)" : ""}</button>
+      <button on:click={sendButton} class:disable>Try Again?{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
     </div>
   {/if}
   {#if $currentGame.state === "NEXTROUND"}
     <p>{$currentGame.message}</p>
-    <button on:click={sendButton} class:disable>Next Round{$storage.auto ? " (Auto)" : ""}</button>
+    <button on:click={sendButton} class:disable>Next Round{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "REVEAL"}
     <h2>{$currentGame.currentGuess}</h2>
-    <button on:click={sendButton} class:disable>Check Word{$storage.auto ? " (Auto)" : ""}</button>
+    <button on:click={sendButton} class:disable>Check Word{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "NEXTLINE"}
     <h2>Nope!</h2>
-    <button on:click={sendButton} class:disable>Guess Again{$storage.auto ? " (Auto)" : ""}</button>
+    <button on:click={sendButton} class:disable>Guess Again{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
   {/if}
   {#if $currentGame.state === "SUCCESS"}
     <h2>Congrats!</h2>
@@ -96,7 +97,7 @@
 </div>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
+  @use "../../../../css/colours.scss" as *;
   .eventbox {
     position: relative;
     display: flex;

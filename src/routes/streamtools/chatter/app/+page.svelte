@@ -1,12 +1,12 @@
 <script lang="ts">
   // Add app and name
   import Chatter from "../Chatter.svelte";
-  let appName = "chatter";
+  let appName: streamToolNames = "chatter";
   //
 
   import "../../../../css/default.scss";
   import { onMount } from "svelte";
-  import { runningApp, storage } from "../../params";
+  import { runningApp, storage } from "../../../toolParams";
 
   onMount(async () => {
     let urlData = new URLSearchParams(window.location.search);
@@ -15,9 +15,9 @@
 </script>
 
 <svelte:head>
-  <title>Chatter</title>
+  <title>Chatter~{$storage.chatter.inProgress.channel}</title>
 </svelte:head>
 
-{#key $storage.chatter["loaded"].channel}
+{#key $storage.chatter.inProgress.channel}
   <Chatter runApp={true} />
 {/key}

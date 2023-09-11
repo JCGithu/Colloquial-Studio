@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { storage } from "../params";
+  import { storage } from "../../toolParams";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];

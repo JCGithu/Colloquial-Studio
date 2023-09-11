@@ -1,22 +1,23 @@
 <script lang="ts">
   //Functions
-  import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
-  import * as twordle from "./twFunctions";
-  import { storage, currentGame } from "./twFunctions";
+  import { onMount, getContext } from "svelte";
+  import { beforeNavigate } from "$app/navigation";
+  import { get } from "svelte/store";
+  import * as twordle from "./Twordle";
+  import { currentGame } from "./Twordle";
+  import { gameInit, storage } from "../../gameParams";
   import "../../../js/tmi";
+  import type { Client } from "tmi.js";
   //Components
-  import SVGIcon from "../../SVGIcon.svelte";
-  import Keyboard from "./keyboard.svelte";
-  import Grid from "./grid.svelte";
-  import EventBox from "./eventBox.svelte";
+  import SVGIcon from "../../../components/SVGIcon.svelte";
+  import Grid from "./game/twordleBody.svelte";
+  import EventBox from "./game/eventBox.svelte";
   //AUDIO
   let winSound: HTMLAudioElement;
   let roundStart: HTMLAudioElement;
   import roundStartSrc from "./round.mp3";
   import winSoundSrc from "./win.mp3";
   import JSConfetti from "js-confetti";
-  import Overlay from "./overlay.svelte";
   //Variables
   let userEmote: undefined | string = undefined;
   //Overlays
@@ -24,28 +25,11 @@
   let canvas: HTMLCanvasElement;
 
   //Create Poll
-  let poll: TwordlePoll = Object.assign({}, twordle.emptyPoll);
+  let poll: Map<string, number> = new Map();
   let usersVoted: Array<string> = [];
 
-  //TOAST
-  let toastID = 0;
-  let toastArray: Array<toast> = [];
-  function ToastQueue(message: string, code?: string) {
-    console.log(message);
-    toastID++;
-    toastArray.push({ message: message, id: toastID, code: code || undefined });
-    toastArray = toastArray;
-    setTimeout(() => {
-      toastArray.shift();
-      toastArray = toastArray;
-    }, 5000);
-  }
-  const toastPopUp = (i: string) => {
-    ToastQueue(i);
-  };
-  function toastDispatch({ detail }: { detail: { message: string; code: string } }) {
-    ToastQueue(detail.message, detail.code);
-  }
+  const toastUpdate: toastUpdate = getContext("toast");
+
   //GAME LOOP
   //START - This is not specified if it's random or not now - need to fix that dispatch up
   // THIS Needs to check if we're connected or not as well.
@@ -58,14 +42,17 @@
   // ROW DONE - Reveal word
 
   function finishPoll() {
-    let finalPoll = Object.assign({}, poll);
+    let finalPoll = Object.fromEntries(poll);
     let finalResult = twordle.getMax(finalPoll);
-    twordle.incrementStat("votes", usersVoted.length);
-    poll = Object.assign({}, twordle.emptyPoll);
+    storage.incrementStat("twordle", "votes", usersVoted.length);
+    poll = new Map();
     // REDO
-    if (finalPoll[finalResult[0]] === 0 || finalResult.length > 1) {
+    if (!finishPoll.length) {
       twordle.changeState("RETRY");
-      twordle.updateGame("message", finalPoll[finalResult[0]] === 0 ? `No one entered! Redo?` : `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
+      twordle.updateGame("message", "No one entered! Redo?");
+    } else if (!finalPoll.length || finalPoll[finalResult[0]] === 0 || finalResult.length > 1) {
+      twordle.changeState("RETRY");
+      twordle.updateGame("message", `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
     }
     //CONTINUE
     if (finalResult.length === 1) {
@@ -86,7 +73,7 @@
   function startPoll() {
     if ($currentGame.state === "POLL") return;
     twordle.changeState("POLL");
-    twordle.updateGame("timer", $storage.timer);
+    twordle.updateGame("timer", $storage.twordle.settings.timer);
     roundStart.play();
     var roundClock = setInterval(function () {
       twordle.updateGame("timer", $currentGame.timer - 1);
@@ -115,7 +102,7 @@
 
   let autoOn = false;
   function autoPress() {
-    if (autoOn || !$storage.auto) return;
+    if (autoOn || !$storage.twordle.settings.auto) return;
     autoOn = true;
     setTimeout(() => {
       autoOn = false;
@@ -127,7 +114,7 @@
     if ($currentGame.state === "REVEAL") {
       if ($currentGame.currentGuess === $currentGame.answer) {
         // Success
-        twordle.incrementStat("won", 1);
+        storage.incrementStat("twordle", "won", 1);
         twordle.incrementGame({ round: 1, letter: 1, votes: 0 });
         twordle.changeState("SUCCESS");
         confetti.addConfetti();
@@ -146,22 +133,12 @@
     }
   }
 
-  onMount(() => {
-    //LocalStorage
-    let existingStorage = window.localStorage.twordle;
-    if (existingStorage) {
-      existingStorage = JSON.parse(existingStorage);
-      twordle.storage.set(existingStorage);
-    } else {
-      twordle.updateGame("menu", 1);
-    }
-
-    twordle.storage.subscribe((value) => (window.localStorage.twordle = JSON.stringify(value)));
-
+  let backupClient: Client;
+  onMount(async () => {
     //LANGUAGES
     let languageCode = navigator.language.substring(0, 2);
     if (Object.keys(twordle.languageList).includes(languageCode)) {
-      twordle.language.set(languageCode);
+      storage.update((settings) => ({ ...settings, ["language"]: languageCode }));
     }
 
     confetti = new JSConfetti({ canvas });
@@ -169,32 +146,39 @@
     //if (onMobile) localKeyboard = false;
 
     //@ts-ignore
-    let client = new tmi.Client({
-      channels: [$storage.channel],
+    let client: Client = new tmi.Client({
+      channels: [$storage.twordle.settings.channel],
     });
+    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
       twordle.updateGame("connected", true);
-      toastPopUp(`Connected to ${$storage.channel} chat`);
+      toastUpdate(`Connected to ${$storage.twordle.settings.channel} chat`, "pass");
     });
 
-    client.on("message", (channel: string, tags: Tags, message: string, self: boolean) => {
-      if (self || !channel || message.length > 1 || usersVoted.includes(tags.username)) return;
-      message = message.replace("ß", "ẞ");
-      let upper = message.toUpperCase();
-      let characterCode = upper.charCodeAt(0);
-      if (twordle.characterChecker(characterCode)) {
-        ++poll[upper];
-        twordle.incrementGame({ votes: 1, letter: 0, round: 0 });
-        usersVoted.push(tags.username);
-        console.log(`${tags.username} has voted!`);
-      }
+    client.on("chat", (channel, tags, message, self) => {
+      if (self || !channel || message.length > 5) return;
+      if (typeof tags.username === "string") if (usersVoted.includes(tags.username)) return;
+      let gameSetting = get(storage).twordle.settings;
+      if ((gameSetting.mode === "letters" && message.length != 1) || (gameSetting.mode === "words" && message.length != 5)) return;
+      message = message.replace("ß", "ẞ").toUpperCase();
+      if (!twordle.characterChecker(message)) return;
+      poll.set(message, (poll.get(message) ?? 0) + 1);
+      twordle.incrementGame({ votes: 1, letter: 0, round: 0 });
+      usersVoted.push(tags.username || "");
+      console.log(`${tags.username} has voted!`);
     });
 
-    if ($storage.channel || $storage.channel != "") {
+    if ($storage.twordle.settings.channel || $storage.twordle.settings.channel != "") {
       client.connect();
     }
+  });
+  beforeNavigate(async () => {
+    console.log("bye!");
+    backupClient.disconnect().catch((error: string) => {
+      console.log(error);
+    });
   });
 </script>
 
@@ -207,44 +191,41 @@
   </style>
 </svelte:head>
 
-<main class={$storage.dark ? "twordleDark" : "twordleLight"}>
-  <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
-  <div id="toastBox">
-    {#each toastArray as toasty (toasty.id)}
-      <div out:slide class="toast {toasty.code}">
-        {toasty.message}
-      </div>
-    {/each}
-  </div>
-  <audio bind:this={winSound} src={winSoundSrc} volume={$storage.volume / 10} />
-  <audio bind:this={roundStart} src={roundStartSrc} volume={$storage.volume / 10} />
-  <canvas id="confetti" bind:this={canvas} />
-  <Overlay />
-  <div id="twordleBody" class:blurred={$currentGame.menu} on:click={() => twordle.updateGame("menu", 0)} on:keypress={() => twordle.updateGame("menu", 0)}>
-    <div id="twordle">
-      <div class="Title">
-        <span class="personalised">
-          {#if !userEmote}
-            <h1>Twordle</h1>
-          {:else}
-            <h1>Tw</h1>
-            <img style="height:2em" alt="emote" src={userEmote} />
-            <h1>rdle</h1>
-          {/if}
-        </span>
-        <p>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</p>
-        <!-- <button class='HowToPlay' on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button> -->
-      </div>
-      <Grid />
-      <div id="bottom">
-        {#if $storage.keyboard}
-          <Keyboard />
-        {/if}
-        <EventBox on:toast={toastDispatch} on:buttonPress={buttonPress} />
+{#await gameInit(toastUpdate)}
+  <p>Loading</p>
+{:then run}
+  <main class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
+    <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
+    <audio bind:this={winSound} src={winSoundSrc} volume={$storage.twordle.settings.volume / 10} />
+    <audio bind:this={roundStart} src={roundStartSrc} volume={$storage.twordle.settings.volume / 10} />
+    <canvas id="confetti" bind:this={canvas} />
+    <div id="twordleBody">
+      <div id="twordle">
+        <div class="Title">
+          <span class="personalised">
+            {#if !userEmote}
+              <h1>Twordle</h1>
+            {:else}
+              <h1>Tw</h1>
+              <img style="height:2em" alt="emote" src={userEmote} />
+              <h1>rdle</h1>
+            {/if}
+          </span>
+          <p>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</p>
+          <!-- <button class='HowToPlay' on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button> -->
+        </div>
+        <Grid>
+          <div id="bottom">
+            <EventBox on:buttonPress={buttonPress} />
+          </div>
+        </Grid>
+        <!-- <div id="bottom">
+          <EventBox on:buttonPress={buttonPress} />
+        </div> -->
       </div>
     </div>
-  </div>
-</main>
+  </main>
+{/await}
 
 <style lang="scss">
   @use "../../../css/colours.scss" as *;
@@ -261,11 +242,12 @@
   #twordleBody {
     display: flex;
     justify-content: center;
-    align-items: center;
+    //align-items: center;
     height: 100vh;
     width: 100vw;
     margin: 0;
     padding: 0;
+    padding-top: 5vh;
     overflow: hidden;
     background-color: var(--main);
     transition: all 500ms ease-in-out;
@@ -282,10 +264,8 @@
     position: relative;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    //justify-content: center;
     color: white;
-    //transform: scale(1.1);
-    //background-color: black;
     transition: all 0.1s ease-in-out;
   }
 
@@ -344,22 +324,10 @@
     }
   }
 
-  button {
-    border: none;
-    padding: 2rem;
-    color: var(--text);
-    font-weight: 500;
-    font-family: "Poppins";
-  }
-
-  // .HowToPlay {
-  //   padding: 0rem 0rem;
-  //   margin: 0.3rem 0rem;
-  //   background-color: var(--mainDarken10);
-  //   cursor: pointer;
-  // }
-
   #bottom {
+    position: absolute;
+    bottom: 0%;
+    transform: translateY(100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -370,69 +338,10 @@
     }
   }
 
-  #voted {
-    position: absolute;
-    background-color: var(--inputBackdrop);
-    border-radius: 1rem;
-    padding: 0.5rem;
-    margin-left: 1.5rem;
-    margin-top: 1.5rem;
-    visibility: hidden;
-    font-size: smaller;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    color: $twordlePurple;
-  }
-
-  //TOAST
-  #toastBox {
-    position: absolute;
-    height: max-content;
-    left: 0;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-direction: column;
-    pointer-events: none;
-  }
-
-  .toast {
-    background-color: $twordleGreen;
-    color: white;
-    padding: 0rem 1rem;
-    margin: 0.5rem;
-    border-radius: 0.5rem;
-    z-index: 10;
-    transition: 0.25s all;
-    animation: slideIn 0.3s cubic-bezier(0.19, 1.38, 0.46, 0.94);
-    &:hover {
-      opacity: 0.6;
-    }
-    &.error {
-      background-color: $colloquial;
-    }
-  }
-  @keyframes slideIn {
-    from {
-      transform: translateX(-200px);
-    }
-    to {
-      transform: translateX(0px);
-    }
-  }
-
   .personalised {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .revealed {
-    background-color: var(--mainDarken20) !important;
-  }
-  .blurred {
-    filter: blur(5px) brightness(0.8);
   }
 
   #return {
@@ -449,34 +358,5 @@
     &:hover {
       opacity: 1;
     }
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-
-  .toggle {
-    display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    background-color: $white;
-    border-radius: 9999px;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .toggle-on {
-    transform: translateX(1.1rem);
-  }
-
-  .toggle-off {
-    transform: translateX(-0.25rem);
   }
 </style>

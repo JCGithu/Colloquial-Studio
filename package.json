@@ -1,6 +1,6 @@
 {
 	"name": "colloquial.studio-svelte",
-	"version": "0.0.1",
+	"version": "2.1.0",
 	"private": true,
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
@@ -12,17 +12,17 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@rgossiaux/svelte-headlessui": "^1.0.2",
-		"@sveltejs/adapter-static": "^2.0.2",
-		"@sveltejs/kit": "^1.20.5",
+		"@rgossiaux/svelte-headlessui": "^2.0.0",
+		"@sveltejs/adapter-static": "^2.0.3",
+		"@sveltejs/kit": "^1.22.6",
 		"@types/matter-js": "^0.18.5",
 		"@types/tmi.js": "^1.8.3",
-		"sass": "^1.63.6",
-		"svelte": "^3.59.2",
+		"sass": "^1.66.1",
+		"svelte": "4.0.5",
 		"svelte-check": "^2.10.3",
-		"tslib": "^2.6.0",
+		"tslib": "^2.6.2",
 		"typescript": "^4.9.5",
-		"vite": "^4.3.9"
+		"vite": "^4.4.9"
 	},
 	"type": "module",
 	"dependencies": {

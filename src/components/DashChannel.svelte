@@ -1,51 +1,55 @@
 <script lang="ts">
-  import { getContext } from "svelte";
-  import { get } from "svelte/store";
-  import { updateValue, storage, reloadDashboard } from "../params";
-  import SvgIcon from "../../SVGIcon.svelte";
+  import { getContext, createEventDispatcher, afterUpdate } from "svelte";
+
+  //PROPS
+  export let name = "Channel Name";
+  export let id = "channel";
+  export let subtitle = "";
+  export let faded = false;
+  export let value = "";
+  export let center = false;
+  export let placeholder = "";
+  export let customClass = "";
+  //CONTEXT
+  let group = getContext("grouped");
+  let grid = getContext("grid");
+
+  const dispatch = createEventDispatcher();
+
+  import SvgIcon from "./SVGIcon.svelte";
 
   let rotate: HTMLElement;
 
-  let grid = getContext("grid");
-  let group = getContext("group");
-  let appDetails: appDetails = getContext("appDetails");
-
   function refresh() {
-    reloadDashboard(appDetails.name, channelValue, "channel");
+    dispatch("refresh");
     rotate.animate([{ transform: "rotate(0)" }, { transform: "rotate(360deg)" }], { duration: 500, iterations: 1, easing: "ease-out" });
   }
-
-  let channelValue = get(storage)[appDetails.name].inProgress.channel;
-
-  let valueUpdate = (e: any) => {
-    channelValue = e.target.value;
-    updateValue(appDetails.name, channelValue, "channel");
-  };
-  // IF THE CHANNEL NAME does not equal the connected channel name show a rotation
-  // Else show a tick.
-
-  // Connect the input
-  // Make the refresh button work
+  afterUpdate(() => {
+    console.log(value);
+  });
 </script>
 
-<section class:grid class:group>
-  <h2>Channel Name</h2>
+<section class={customClass} class:grid class:group class:faded class:center>
+  <h2>{name}</h2>
+  {#if subtitle}
+    <p class="inputSubtitle">{subtitle}</p>
+  {/if}
   <div>
-    <span bind:this={rotate} on:click={refresh} on:keypress={refresh}><SvgIcon icon="refresh" fill="black" /></span>
     <input
       type="text"
+      {placeholder}
       on:keypress={(e) => {
         if (e.key === "Enter") refresh();
       }}
-      id="channel"
-      value={$storage[appDetails.name].inProgress.channel}
-      on:input={valueUpdate}
+      {id}
+      bind:value
     />
+    <span bind:this={rotate} on:click={refresh} on:keypress={refresh} role="button" tabindex="0"><SvgIcon icon="refresh" fill="black" /></span>
   </div>
 </section>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
+  @use "../css/colours.scss" as *;
 
   section {
     position: relative;
@@ -73,13 +77,25 @@
     }
   }
 
+  .center {
+    text-align: center;
+  }
+
   h2 {
     color: $white;
     font-weight: bold;
     margin: 0;
     font-size: large;
     font-family: "Poppins";
-    //padding-right: 1rem;
+  }
+
+  .inputSubtitle {
+    color: $white;
+    font-size: 1rem;
+    font-style: italic;
+    line-height: initial;
+    vertical-align: text-bottom;
+    margin: 0.35em 0;
   }
 
   div {

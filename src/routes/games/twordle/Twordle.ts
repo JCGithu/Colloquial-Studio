@@ -1,24 +1,28 @@
 import { writable, get } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import AllWords from "./words/all.txt?raw";
 import Movies from "./words/movies.txt?raw";
 import Food from "./words/food.txt?raw";
-import Games from "./words/games.txt?raw";
+import Gaming from "./words/gaming.txt";
 
-//Stores
-const blankGrid:Array<Array<string>> = [['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','',''],['','','','','']]
-const blankStorage:TwordleStorage = {
-  play: 0,
-  won: 0,
-  votes: 0,
+//Grid
+const blankGrid: Array<Array<string>> = [['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', '']]
+export const grid = writable(blankGrid);
+
+//Boot
+export const defaultParams: TwordleParameters = {
   auto: false,
   dark: false,
+  language: 'en',
   keyboard: true,
   volume: 3,
   timer: 25,
   channel: "",
+  mode: 'letters',
   words: 'all',
+  version: 2
 }
-const blankGame:TwordleGame = {
+const blankGame: TwordleGame = {
   round: -1,
   letter: -1,
   timer: 0,
@@ -31,19 +35,21 @@ const blankGame:TwordleGame = {
   state: "START",
   connected: false,
 };
+const blankStats: TwordleStats = {
+  play: 0,
+  votes: 0,
+  won: 0
+}
 
-export const language = writable('en');
-export const grid = writable(blankGrid);
-export const storage = writable(Object.assign({}, blankStorage));
-export const currentGame = writable(Object.assign({}, blankGame));
+export const currentGame = writable(structuredClone(blankGame));
 
-export const languageList:standardObject = {
+export const languageList: Record<string, string> = {
   "es": "¡Los caracteres españoles son compatibles!",
   "fr": "Les caractères français sont pris en charge!",
   "de": "Deutsche Schriftzeichen werden unterstützt!",
 }
 
-export let personalisedUsers:standardObject = {
+export let personalisedUsers: Record<string, string> = {
   //coollike: "https://static-cdn.jtvnw.net/emoticons/v2/305274770/default/light/3.0",
   lbx0: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_44ede65082fb45ef9473c9966c3cd9ea/default/light/3.0",
   colloquialowl: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_607ddb2a873f4606b5397997c33b6bbf/default/light/3.0",
@@ -59,38 +65,7 @@ export let personalisedUsers:standardObject = {
   //gamesarehaunted: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_b64a784799524986894c9b6110dee173/default/light/3.0",
 };
 
-
-// YOU NEED TO CHANGE THIS SO THAT IT REGENERATES WITH DIFFERENT LANGUAGES
-export let emptyPoll:TwordlePoll = {
-  A: 0,
-  B: 0,
-  C: 0,
-  D: 0,
-  E: 0,
-  F: 0,
-  G: 0,
-  H: 0,
-  I: 0,
-  J: 0,
-  K: 0,
-  L: 0,
-  M: 0,
-  N: 0,
-  O: 0,
-  P: 0,
-  Q: 0,
-  R: 0,
-  S: 0,
-  T: 0,
-  U: 0,
-  V: 0,
-  W: 0,
-  X: 0,
-  Y: 0,
-  Z: 0
-}
-
-export let qwerty:TwordleKeys = {
+export let qwerty: Record<string, Array<Array<string>>> = {
   en: [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
     ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
@@ -113,14 +88,18 @@ export let qwerty:TwordleKeys = {
   ]
 };
 
-export function characterChecker(input:number){
-  if (input >= 65 && input <= 91) return true;
-  if (input >= 192 && input <= 221) return true;
-  if (input === 338 || input === 7838) return true;
-  return false;
+export function characterChecker(inputString: string) {
+  for (var i = 0; i < inputString.length; i++) {
+    let value = inputString.charCodeAt(i)
+    if (value >= 65 && value <= 91) break;
+    if (value >= 192 && value <= 221) break;
+    if (value === 338 || value === 7838) break;
+    return false;
+  }
+  return true;
 }
 
-export function getMax(object:TwordlePoll) {
+export function getMax(object: Record<string, number>) {
   return Object.keys(object).filter(x => {
     return object[x] == Math.max.apply(null, Object.values(object));
   }).map(x => x.toUpperCase());
@@ -130,43 +109,23 @@ export function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
-let wordSelect = {
+let wordSelect: Record<TwordleParameters['words'], string> = {
   'all': AllWords,
   'movies': Movies,
   'food': Food,
-  'games': Games
+  'gaming': Gaming
 }
-export function randomWord(){
-  let currentStorage = get(storage);
-  let wordCollection = wordSelect[currentStorage.words];
+export function randomWord(currentWords: TwordleParameters['words']) {
+  // I HAVE NO IDEA WHY I NEED TO PUT THIS ''AS'' HERE.
+  let wordCollection: string = wordSelect[currentWords];
   let TwordleWords = wordCollection.split("\r\n");
   return TwordleWords[getRandomInt(TwordleWords.length)].toUpperCase();;
 }
 
-export function incrementStat(targetStat:'play'|'won'|'votes'|'timer', value:number){
-  storage.update((prev) => {
-    let statUpdate = prev;
-    statUpdate[targetStat] += value;
-    return statUpdate;
-  });
-}
-export function decrementStat(targetStat:'play'|'won'|'votes'|'timer', value:number){
-  storage.update((prev) => {
-    let statUpdate = prev;
-    statUpdate[targetStat] -= value;
-    return statUpdate;
-  });
-}
-
-export function changeSetting(targetSetting:string, value:any){
-  storage.update(state => ({...state, [targetSetting]: value}))
-}
-
 // Gameplay
-
-export function gridLetterUpdate(value:string){
+export function gridLetterUpdate(value: string) {
   // Updating the Guess
-  currentGame.update(state => { 
+  currentGame.update(state => {
     state.guess[state.round][state.letter] = value;
     return state;
   });
@@ -178,14 +137,14 @@ export function gridLetterUpdate(value:string){
   });
 }
 
-export function undoMove(){
+export function undoMove() {
   let currentGameData = get(currentGame);
   if (currentGameData.round < 0) return;
   if (currentGameData.guess[currentGameData.round].length === 0) return;
   currentGame.update(state => {
     state.guess[state.round] = state.guess[state.round].slice(0, -1);
     --state.letter;
-    return state 
+    return state
   })
   grid.update((currGrid) => {
     currGrid[currentGameData.round][currentGameData.letter] = '';
@@ -193,16 +152,13 @@ export function undoMove(){
   })
 }
 
-export function updateGame(targetSetting:string, value:any){
-  currentGame.update(state => ({...state, [targetSetting]: value}))
+export function updateGame(targetSetting: string, value: any) {
+  currentGame.update(state => ({ ...state, [targetSetting]: value }))
 }
-export function updateGuess(){
-  currentGame.update((state) => {
-    state.currentGuess = state.guess[state.round].join("");
-    return state;
-  })
+export function updateGuess() {
+  currentGame.update((state) => ({ ...state, currentGuess: state.guess[state.round].join("") }))
 }
-export function incrementGame(toAdd:{'round':number, 'letter': number, 'votes': number}){
+export function incrementGame(toAdd: { 'round': number, 'letter': number, 'votes': number }) {
   currentGame.update((state) => {
     state.round = state.round + toAdd.round;
     if (toAdd.round < 0) state.round = 0;
@@ -214,8 +170,8 @@ export function incrementGame(toAdd:{'round':number, 'letter': number, 'votes': 
   });
   updateGuess();
 }
-export function changeState(newState:TwordleGame["state"]){
-  currentGame.update((state)=>{
+export function changeState(newState: TwordleGame["state"]) {
+  currentGame.update((state) => {
     state.state = newState;
     return state;
   })

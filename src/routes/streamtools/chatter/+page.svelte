@@ -1,113 +1,99 @@
 <script lang="ts">
-  // FOR NEW APP //
-  // Change the details below
-  // Replace the imported app
-  // Start adding dashboard options
-
-  let appDetails = {
+  let appDetails: appDetails = {
     name: "chatter",
     title: "Chatter",
     description: `Chatter is an on-screen chat for OBS/SLOBS. \n
     1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style Chatter how you like! \n
     At the top you can find other settings, copy the URL, and save layouts.`,
   };
+  let reload = 0;
 
   import Chatter from "./Chatter.svelte";
-
-  import { onMount, setContext } from "svelte";
+  import { setContext } from "svelte";
+  import { storage } from "../../toolParams";
   import "../../../css/default.scss";
-
   import Dashboard from "../Dashboard.svelte";
-  import DashInput from "../DashInput.svelte";
-  import DashGrid from "../components/DashGrid.svelte";
-  import DashGroup from "../components/DashGroup.svelte";
-  import DashChannel from "../components/DashChannel.svelte";
-
-  import { appInit, storage } from "../params";
   setContext("appDetails", appDetails);
-  let toastUpdate: (i: string) => void;
-
-  onMount(async () => {
-    let urlData = new URLSearchParams(window.location.search);
-    if (urlData.has("data")) window.location.replace(`${window.location.href.split("?data")[0]}/app` + document.location.search);
-    await appInit(toastUpdate);
-  });
+  setContext("store", storage);
 </script>
 
 <svelte:head>
-  <title>Chatter - Dashboard</title>
+  <title>{appDetails.title} - Dashboard</title>
 </svelte:head>
 
-<Dashboard bind:toastUpdate>
+<Dashboard let:Dash>
   <slot slot="app">
-    {#key $storage[appDetails.name]["loaded"].channel}
+    {#key reload}
       <Chatter />
     {/key}
   </slot>
-  <slot id="dashControls" slot="settings">
-    <DashChannel />
-    <DashGrid>
-      <DashInput type="select" name="Align" id="align" ops={{ Left: "flex-start", Center: "center", Right: "flex-end" }} />
-      <DashInput faded={$storage[appDetails.name]["inProgress"].banner} type="select" name="Chat Direction" id="direction" ops={{ "From Bottom": "Down", "From Top": "Up" }} />
-      <DashInput type="checkbox" name="Banner Mode" id="banner" />
-    </DashGrid>
-    <DashGroup title="Font Settings">
-      <DashInput type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" />
-      <DashInput type="number" name="Font Size" id="fontsize" />
-      <DashInput type="checkbox" name="Use Twitch Username Colours" id="nameCustom" />
-      <DashInput faded={$storage[appDetails.name]["inProgress"].nameCustom} type="color" name="Font Colour" id="fontcolour" />
-    </DashGroup>
-    <DashGroup title="Chat Bubble">
-      <DashInput type="range" name="Opacity" max={100} min={0} id="chatopacity" />
-      <DashInput type="range" name="Roundness" max={100} min={0} id="border" />
-      <DashInput type="checkbox" name="Use User Custom Colours" id="bubbleCustom" />
-      <DashInput type="color" name="Default colour" id="chatcolour" faded={$storage[appDetails.name]["inProgress"].bubbleCustom} />
-      <DashInput type="checkbox" name="Drop Shadow" id="highlight" />
-    </DashGroup>
-    {#if $storage[appDetails.name]["inProgress"]["highlight"]}
-      <DashGroup title="Drop Shadow">
-        <DashInput type="checkbox" name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" />
-        <DashInput type="color" name="Default colour" id="highcolour" faded={$storage[appDetails.name]["inProgress"].togglecol} />
-      </DashGroup>
+  <slot id="dashControls">
+    <Dash.Channel placeholder="In here!" on:refresh={() => reload++} bind:value={$storage.chatter.inProgress.channel} />
+    <Dash.Grid>
+      <Dash.Tab id="align" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.align} name="Align" options={{ Left: { value: "flex-start", icon: "align-left" }, Center: { value: "center", icon: "align-center" }, Right: { value: "flex-end", icon: "align-right" } }} />
+      <Dash.Tab id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
+      <Dash.CheckBox name="Banner Mode" id="banner" faded={$storage.chatter.inProgress.shrink} bind:value={$storage.chatter.inProgress.banner} />
+      <Dash.CheckBox name="Fit to Chat" id="shrink" faded={$storage.chatter.inProgress.banner} bind:value={$storage.chatter.inProgress.shrink} />
+    </Dash.Grid>
+    <Dash.Group title="Font Settings">
+      <Dash.Text name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" bind:value={$storage.chatter.inProgress.font} />
+      <Dash.Number name="Font Size" id="fontsize" bind:value={$storage.chatter.inProgress.fontsize} />
+      <Dash.CheckBox name="Use Twitch Username Colours" id="nameCustom" bind:value={$storage.chatter.inProgress.nameCustom} />
+      <Dash.Colour id="fontcolour" name="Font Colour" faded={$storage.chatter.inProgress.nameCustom} bind:value={$storage.chatter.inProgress.fontcolour} />
+    </Dash.Group>
+    <Dash.Group title="Chat Bubble">
+      <Dash.Range name="Opacity" max={100} min={0} id="chatopacity" bind:value={$storage.chatter.inProgress.chatopacity} />
+      <Dash.Range name="Roundness" max={100} min={0} id="border" bind:value={$storage.chatter.inProgress.border} />
+      <Dash.CheckBox name="Use User Custom Colours" id="bubbleCustom" bind:value={$storage.chatter.inProgress.bubbleCustom} />
+      <Dash.Colour name="Default colour" id="chatcolour" faded={$storage.chatter.inProgress.bubbleCustom} bind:value={$storage.chatter.inProgress.chatcolour} />
+      <Dash.CheckBox name="Drop Shadow" id="highlight" bind:value={$storage.chatter.inProgress.highlight} />
+    </Dash.Group>
+    {#if $storage.chatter.inProgress["highlight"]}
+      <Dash.Group title="Drop Shadow">
+        <Dash.CheckBox name="Use User Custom Colours" subtitle="Chat shadow will use Twitch users custom colours, if they have one." id="togglecol" bind:value={$storage.chatter.inProgress.togglecol} />
+        <Dash.Colour name="Default colour" id="highcolour" faded={$storage.chatter.inProgress.togglecol} bind:value={$storage.chatter.inProgress.highcolour} />
+      </Dash.Group>
     {/if}
-    <DashGroup title="Background">
-      <DashInput type="color" name="Background Colour" id="bgcolour" />
-      <DashInput type="range" name="Opacity" max={100} min={0} id="bgopacity" />
-    </DashGroup>
-    <DashGroup title="Animation">
-      <DashInput type="select" name="Animation" id="animation" ops={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow", None: "None" }} />
-      <DashInput type="number" name="Speed (seconds)" id="animTime" />
-      <DashInput type="text" name="CSS Easing" id="animEase" />
-    </DashGroup>
-    <DashGroup title="Moderation">
-      <DashInput type="text" name="Hide Users" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" />
-      <DashInput type="text" name="Hide Commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" />
-      <DashInput type="checkbox" name="Hide chat replies" id="replies" />
-      <DashInput type="checkbox" name="Hide links" id="links" />
-      <DashInput type="checkbox" name="Hide point redeems" id="points" />
-    </DashGroup>
-    <DashGroup title="Emotes">
-      <DashInput type="checkbox" name="Show BTTV Emotes" id="bttv" />
-      <DashInput type="checkbox" name="Show FFZ Emotes" id="ffz" />
-      <DashInput type="checkbox" name="Wide Emote Command" subtitle="Chatters can put w! before emotes" id="wideEmotes" />
-      <DashInput type="checkbox" subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" />
-    </DashGroup>
-    <DashInput type="checkbox" name="Show Badges" id="badges" />
-    <DashInput type="checkbox" name="Set Chat On-Screen Duration" id="removeChats" />
-    {#if $storage[appDetails.name]["inProgress"].removeChats}
-      <DashGroup title="Remove Chats">
-        <DashInput type="number" name="Chat Duration" subtitle="In seconds." id="removeTime" />
-      </DashGroup>
+    <Dash.Group title="Container">
+      <Dash.Colour name="Background Colour" id="bgcolour" bind:value={$storage.chatter.inProgress.bgcolour} />
+      <Dash.Range name="Opacity" max={100} min={0} id="bgopacity" bind:value={$storage.chatter.inProgress.bgopacity} />
+      <Dash.Range name="Padding" min={0} max={3} step={0.1} id="padding" bind:value={$storage.chatter.inProgress.padding} />
+      <Dash.CheckBox name="Fade Chat" id="fade" bind:value={$storage.chatter.inProgress.fade} />
+    </Dash.Group>
+    <Dash.Group title="Animation">
+      <Dash.Select name="Animation" id="animation" options={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow", None: "None" }} bind:value={$storage.chatter.inProgress.animation} />
+      <Dash.Number name="Speed (seconds)" id="animTime" bind:value={$storage.chatter.inProgress.animTime} />
+      <Dash.Text name="CSS Easing" id="animEase" bind:value={$storage.chatter.inProgress.animEase} />
+    </Dash.Group>
+    <Dash.Group title="Moderation">
+      <Dash.Text name="Hide Users" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" bind:value={$storage.chatter.inProgress.hidebot} />
+      <Dash.Text name="Hide Commands" subtitle="Split with commas and write full command e.g. !play" id="hidecom" bind:value={$storage.chatter.inProgress.hidecom} />
+      <Dash.CheckBox name="Hide chat replies" id="replies" bind:value={$storage.chatter.inProgress.replies} />
+      <Dash.CheckBox name="Hide links" id="links" bind:value={$storage.chatter.inProgress.links} />
+      <Dash.CheckBox name="Hide point redeems" id="points" bind:value={$storage.chatter.inProgress.points} />
+    </Dash.Group>
+    <Dash.Group title="Emotes">
+      <Dash.CheckBox name="Show BTTV Emotes" id="bttv" bind:value={$storage.chatter.inProgress.bttv} />
+      <Dash.CheckBox name="Show FFZ Emotes" id="ffz" bind:value={$storage.chatter.inProgress.ffz} />
+      <Dash.CheckBox name="Wide Emote Command" subtitle="Chatters can put w! before emotes" id="wideEmotes" bind:value={$storage.chatter.inProgress.wideEmotes} />
+      <Dash.CheckBox subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" bind:value={$storage.chatter.inProgress.emoteOnly} />
+    </Dash.Group>
+    <Dash.CheckBox name="Show Badges" id="badges" bind:value={$storage.chatter.inProgress.badges} />
+    <Dash.CheckBox name="Set Chat On-Screen Duration" id="removeChats" bind:value={$storage.chatter.inProgress.removeChats} />
+    {#if $storage.chatter.inProgress.removeChats}
+      <Dash.Group title="Remove Chats">
+        <Dash.Number name="Chat Duration" subtitle="In seconds." id="removeTime" bind:value={$storage.chatter.inProgress.removeTime} />
+      </Dash.Group>
     {/if}
-    <DashInput type="checkbox" name="Show Pronouns" id="pronouns" />
-    {#if $storage[appDetails.name]["inProgress"].pronouns}
-      <DashGroup title="Pronouns">
-        <DashInput type="text" name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" />
-        <DashInput type="checkbox" name="Outline" id="proOutline" />
-        <DashInput type="checkbox" name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" />
-        <DashInput type="checkbox" name="Background" id="proBG" />
-        <DashInput type="color" name="Default Colour" id="proColour" />
-      </DashGroup>
+    <Dash.CheckBox name="Show Pronouns" id="pronouns" bind:value={$storage.chatter.inProgress.pronouns} />
+    {#if $storage.chatter.inProgress.pronouns}
+      <Dash.Group title="Pronouns">
+        <Dash.Text name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" bind:value={$storage.chatter.inProgress.proFont} />
+        <Dash.CheckBox name="Outline" id="proOutline" bind:value={$storage.chatter.inProgress.proOutline} />
+        <Dash.CheckBox name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" bind:value={$storage.chatter.inProgress.proUseCol} />
+        <Dash.CheckBox name="Background" id="proBG" bind:value={$storage.chatter.inProgress.proBG} />
+        <Dash.Colour name="Default Colour" id="proColour" bind:value={$storage.chatter.inProgress.proColour} />
+      </Dash.Group>
     {/if}
   </slot>
 </Dashboard>

@@ -1,1 +1,29 @@
-/*# sourceMappingURL=colours.css.map */
+:global(.twordleLight) {
+  --main: hsl(36, 58%, 73%);
+  --titleShadow: 1px 1px 0px hsl(40, 26%, 89%), 2px 2px 0px hsl(40, 26%, 89%);
+  --titles: hsl(40, 26%, 89%);
+  --text: #262626;
+  --inputBackdrop: #edd9bb;
+  --cellBackdrop: #ddb77e;
+  --mainDarken10: #d7ac6a;
+  --mainDarken20: #cd9542;
+  --menuBackdrop: #cd9542;
+  --buttons: #d7ac6a;
+  --cellBorder: #d2a056;
+  --settingsDetail: #ad7a2e;
+}
+
+:global(.twordleDark) {
+  --main: hsl(0, 0%, 10%);
+  --titleShadow: none;
+  --text: hsl(40, 26%, 89%);
+  --titles: hsl(40, 26%, 89%);
+  --inputBackdrop: #333333;
+  --cellBackdrop: #0d0d0d;
+  --mainDarken10: #cd9542;
+  --mainDarken20: #cd9542;
+  --menuBackdrop: #262626;
+  --buttons: #333333;
+  --cellBorder: #d2a056;
+  --settingsDetail: #333333;
+}/*# sourceMappingURL=colours.css.map */

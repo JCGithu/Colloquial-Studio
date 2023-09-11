@@ -1,11 +1,10 @@
 <script lang="ts">
-  import type { EmoteDropParameters } from "./paramsEmoteDrop";
-
-  import { storage } from "../params";
+  import { storage } from "../../toolParams";
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
+  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
   import { onMount, getContext } from "svelte";
-  let toastUpdate: (i: string) => void = getContext("toast");
+  let toastUpdate: toastUpdate = getContext("toast");
   export let runApp = false;
 
   let appBody: HTMLElement, appSize: DOMRect;
@@ -35,7 +34,7 @@
   function createWorld() {
     // Create engine
     let engine = Engine.create({
-      enableSleeping: $storage.emotedrop.loaded.sleep,
+      enableSleeping: $storage.emotedrop.inProgress.sleep,
     });
     let world = engine.world;
 
@@ -95,23 +94,23 @@
     let renderedWorld = createWorld();
 
     // @ts-ignore
-    const client = new tmi.Client({
-      channels: [$storage.emotedrop.loaded.channel],
+    const client: Client = new tmi.Client({
+      channels: [$storage.emotedrop.inProgress.channel],
     });
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      toastUpdate(`Connected to ${$storage.chatter.loaded.channel} ✅`);
+      toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
     });
 
-    client.on("chat", (channel: EmoteDropParameters["channel"], tags: Tags, message: string) => {
+    client.on("chat", (channel: EmoteDropParameters["channel"], tags: ChatUserstate | SubUserstate, message: string) => {
       // Just to avoid a TS error
       console.log(channel);
 
       // Deleting emotes
       if (message.startsWith("!emotewipe")) {
-        let allowed = tags.badges.broadcaster ? true : false;
-        if ($storage.emotedrop.inProgress.modWipe && tags.badges.moderator) allowed = true;
+        let allowed = tags.badges?.broadcaster ? true : false;
+        if ($storage.emotedrop.inProgress.modWipe && tags.badges?.moderator) allowed = true;
         if (!allowed) return;
         if (message === "!emotewipe") {
           wipe(0, renderedWorld);
@@ -168,7 +167,7 @@
       }, time);
     });
 
-    if ($storage.emotedrop.loaded.channel.length) {
+    if ($storage.emotedrop.inProgress.channel.length) {
       console.log("Attempting Twitch Connection...");
       client.connect();
     }
