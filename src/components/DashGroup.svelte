@@ -29,7 +29,7 @@
 
     --shadow-color: 0deg 0% 5%;
     width: 100%;
-    font-size: 22px;
+    font-size: clamp(15px, 2vw, 22px);
     cursor: pointer;
     text-align: left;
     position: relative;
@@ -38,6 +38,7 @@
     border-style: solid;
 
     padding: 1rem;
+    padding-right: 40px;
     margin: 0;
     text-decoration: underline;
     text-decoration-thickness: 3px;
@@ -74,7 +75,7 @@
 
   .group {
     padding-top: 1.5rem;
-    padding-bottom: 1rem;
+    padding-bottom: 3rem;
     border-radius: 1rem;
     width: 100%;
     margin-top: -2rem;
