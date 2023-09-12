@@ -705,6 +705,11 @@
     cursor: pointer;
     pointer-events: all;
     z-index: 10;
+    @media screen and (max-width: d.$phone) {
+      margin: 12px 0px 0px 12px;
+      width: 20px;
+      height: 20px;
+    }
     &:hover {
       opacity: 1;
     }
