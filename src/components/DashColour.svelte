@@ -116,6 +116,7 @@
     padding: 0 !important;
     opacity: 1;
     cursor: pointer;
+    width: 100%;
     &:focus {
       box-shadow: 0px 0px 2px rgba($white, 0.8) !important;
       &::-webkit-color-swatch-wrapper {

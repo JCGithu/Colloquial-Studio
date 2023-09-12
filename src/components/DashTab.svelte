@@ -52,10 +52,15 @@
     justify-content: center;
   }
 
+  // .inputBlock {
+  //   container-type: inline-size;
+  // }
+
   :global(.radioGroup) {
     position: relative;
     //width: 100%;
-    width: fit-content;
+    width: max-content;
+    max-width: 100%;
     display: flex;
     justify-self: flex-end;
     justify-content: space-between;
@@ -69,7 +74,7 @@
     //padding: 1rem;
     border-radius: 0.6rem;
     z-index: 2;
-    margin: 0.4rem 0;
+    //margin: 0.4rem 0;
     transition: all 0.4s ease-in-out, background 0.1s ease;
     position: relative;
     overflow: hidden;
@@ -90,6 +95,7 @@
       background-color: rgba($colloquial, 0.5);
     }
   }
+
   .iconOption {
     height: 1.5em;
     max-height: 1.5em;

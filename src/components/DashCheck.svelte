@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { DialogTitle } from "@rgossiaux/svelte-headlessui";
   import { getContext } from "svelte";
   import type { Writable } from "svelte/store";
 
@@ -22,7 +23,7 @@
   }
 </script>
 
-<div class="inputBlock {customClass}" class:grid class:grouped class:faded on:keypress={EnterFlip} role="button" tabindex="0">
+<div class="inputBlock {customClass}" class:grid class:grouped class:faded class:longTitle={name.length > 15} on:keypress={EnterFlip} role="button" tabindex="0">
   <label style={subtitle ? "flex-direction: column" : ""} class="checkContainer">
     <div>
       <h2>{name}</h2>
@@ -122,5 +123,15 @@
 
   .inputBlock {
     grid-template-columns: 1fr;
+  }
+  @container (max-width: 250px) {
+    .longTitle {
+      h2 {
+        font-size: 0.8rem;
+      }
+    }
+    .inputSubtitle {
+      font-size: 0.7rem;
+    }
   }
 </style>

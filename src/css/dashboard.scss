@@ -27,16 +27,30 @@
     max-width: calc(100% - 1rem);
     padding: 0 0.5rem;
   }
-
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 50% 50%;
   transition: background-color 0.3s ease-in-out;
   @media screen and (max-width: d.$phone) {
     grid-template-columns: 1fr;
+    &:has(.radioGroup){
+      grid-template-columns: 1fr 1fr !important;
+    }
   }
   border-radius: 0.4rem;
   &:hover {
     background-color: fade-out($white, 0.9);
+  }
+
+}
+
+@container (max-width: 250px){
+  .inputBlock:has(.radioGroup){
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
+    :global(.radioGroup){
+      justify-self: center;
+      //background-color:red;
+    }
   }
 }
 
@@ -55,11 +69,12 @@ h2 {
 
 .inputSubtitle {
   color: $white;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-style: italic;
   line-height: initial;
   vertical-align: text-bottom;
   margin: 0.35em 0;
+  opacity: 0.7;
 }
 
 div {
@@ -102,4 +117,17 @@ input {
 
 .inputName{
   padding-right: 0.5rem;
+}
+
+//CONTAINERS
+@container (max-width: 350px){
+  .inputBlock:has(.radioGroup){
+    :global(.radioOption) {
+      padding: 0.4em;
+      margin: 0.1em;
+    }
+  }
+  .inputSubtitle {
+    font-size: 0.7rem;
+  }
 }

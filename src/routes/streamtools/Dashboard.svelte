@@ -296,6 +296,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
+    container-type: inline-size;
     // background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0), radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0);
     // background-size: 1.3rem 1.3rem;
     // background-position: 0 0, 0.65rem 0.65rem;
