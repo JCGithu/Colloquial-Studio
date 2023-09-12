@@ -24,9 +24,6 @@
     dispatch("refresh");
     rotate.animate([{ transform: "rotate(0)" }, { transform: "rotate(360deg)" }], { duration: 500, iterations: 1, easing: "ease-out" });
   }
-  afterUpdate(() => {
-    console.log(value);
-  });
 </script>
 
 <section class={customClass} class:grid class:group class:faded class:center>

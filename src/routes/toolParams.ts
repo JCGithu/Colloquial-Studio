@@ -125,9 +125,18 @@ export function dashReset(app: streamToolNames) {
 export async function appInit(toastUpdate: toastUpdate) {
   let existingStorage = window.localStorage.streamTools;
   if (existingStorage) {
+    console.log('App init function running');
     let jsonParsed = JSON.parse(existingStorage);
     appList.forEach(async appName => {
       jsonParsed[appName].inProgress = await reformatting[appName](jsonParsed[appName].inProgress);
+      // NEED TO TEST THE FOLLOWING PLEASE
+      let appNameDefault = defaults[appName];
+      for (const key in appNameDefault) {
+        if (!jsonParsed[appName].inProgress.hasOwnProperty(key)) {
+          console.log(`${key} is being added to settings`);
+          jsonParsed[appName].inProgress[key] = appNameDefault[key];
+        }
+      }
     })
     storage.set(jsonParsed);
     appList.forEach(async appName => {
