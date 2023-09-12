@@ -1,22 +1,27 @@
 <script lang="ts">
-  import { fly, fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import { setContext } from "svelte";
-  import SVGIcon from "../components/SVGIcon.svelte";
-
-  let toastArray: Array<{ message: string; id: number; code: string }> = [];
 
   //TOAST
   let toastID = 0;
+  let toastArray: Array<{ message: string; id: number; code: string }> = [];
+
   function ToastQueue(message: string, code: string) {
     toastID++;
     toastArray.push({ message: message, id: toastID, code: code });
     toastArray = toastArray;
     setTimeout(() => {
-      if (toastArray.length > 0) {
-        toastArray.shift();
-        toastArray = toastArray;
-      }
+      if ((toastArray.length = 0)) return;
+      //toastArray.shift();
+      toastArray = toastArray;
     }, 5000);
+  }
+  function removeToast(id: number) {
+    let index = toastArray.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      toastArray.splice(index, 1);
+      toastArray = toastArray;
+    }
   }
   export const toastUpdate = (i: string, c: string) => {
     ToastQueue(i, c);
@@ -26,9 +31,15 @@
 
 <div id="toastBox">
   {#each toastArray as toasty (toasty.id)}
-    <div transition:slide class="toast {toasty.code}">
+    <button
+      transition:slide
+      class="toast {toasty.code}"
+      on:click={() => {
+        removeToast(toasty.id);
+      }}
+    >
       {toasty.message}
-    </div>
+    </button>
   {/each}
 </div>
 <slot />
@@ -57,8 +68,8 @@
     pointer-events: none;
     @media screen and (max-width: d.$phone) {
       height: 50%;
-      bottom: 75%;
-      left: 25%;
+      //bottom: 75%;
+      //left: 25%;
       width: 50%;
     }
   }
@@ -75,7 +86,7 @@
     cursor: pointer;
     transition: all 0.3s;
     &:hover {
-      background-color: $black;
+      opacity: 0.5;
     }
   }
 </style>
