@@ -6,8 +6,6 @@
   import { storage } from "../../toolParams";
   import ChatBubble from "./ChatBubble.svelte";
 
-  type Tags = ChatUserstate | SubUserstate;
-
   const toastUpdate: toastUpdate = getContext("toast");
 
   //export let params: ChatterParameters = defaultParams;
@@ -265,13 +263,13 @@
       console.log(channel, username, method, message, tags);
       runMessage(channel, tags, message, false, "sub");
     });
-    client.on("resub", (channel: ChatterParameters["channel"], username: string, months: number, message: string, tags: Tags) => runMessage(channel, tags, message, false, "sub"));
+    client.on("resub", (channel, username, months, message, tags) => runMessage(channel, tags, message, false, "sub"));
     //@ts-ignore
     // Announcement is not in official TMI.js yet
     client.on("announcement", (channel: ChatterParameters["channel"], tags: Tags, message: string) => runMessage(channel, tags, message, false, "announcement"));
     client.on("clearchat", () => (messageList = []));
-    client.on("timeout", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
-    client.on("ban", (channel: ChatterParameters["channel"], userToBlock: string) => removeUser(userToBlock));
+    client.on("timeout", (channel, userToBlock) => removeUser(userToBlock));
+    client.on("ban", (channel, userToBlock) => removeUser(userToBlock));
 
     if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2) {
       testMessage("Chatter has had a major update! Please go back to the site and update your URL.", "announcement");
@@ -354,6 +352,7 @@
     justify-content: end;
     height: 100%;
     width: 100%;
+    padding-bottom: 5px;
     overflow: hidden;
     z-index: 1;
   }

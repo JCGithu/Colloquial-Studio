@@ -100,6 +100,12 @@ export async function loadURL(input: string, app: streamToolNames) {
   let uncrushedData = uncrush(input.split("?data=")[1]);
   let parsedData = updateURLS(uncrushedData, app);
   let reformatted = await reformatting[app](parsedData);
+  for (const key in defaults[app]) {
+    if (!reformatted.hasOwnProperty(key)) {
+      console.log(`Adding ${key} to URL`);
+      reformatted[key] = defaults[app][key];
+    }
+  }
   storage.update(currentStorage => {
     currentStorage[app].inProgress = Object.assign({}, reformatted);
     return currentStorage;

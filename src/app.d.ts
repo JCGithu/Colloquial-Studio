@@ -100,6 +100,8 @@ type toast = {
 
 type toastUpdate = (msg: string, code: string) => void
 
+type Tags = ChatUserstate | SubUserstate;
+
 //CHATTER
 type MessageChunk = {
 	code?: string;
