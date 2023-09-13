@@ -86,19 +86,8 @@ export function uncrush(set: string | null) {
   return JSON.parse(JSONCrush.uncrush(decodeURIComponent(set)));
 }
 
-export async function runningApp(urlParams: URLSearchParams, app: streamToolNames) {
-  let initParams = uncrush(urlParams.get("data"));
-  let updatedData = updateURLS(initParams, app);
-  let reformatted = await reformatting[app](updatedData);
-  storage.update(currentStorage => {
-    currentStorage[app]['inProgress'] = structuredClone(reformatted);
-    return currentStorage;
-  })
-}
-
-export async function loadURL(input: string, app: streamToolNames) {
-  let uncrushedData = uncrush(input.split("?data=")[1]);
-  let parsedData = updateURLS(uncrushedData, app);
+export async function loadingURLData(input: any, app: streamToolNames) {
+  let parsedData = updateURLS(input, app);
   let reformatted = await reformatting[app](parsedData);
   for (const key in defaults[app]) {
     if (!reformatted.hasOwnProperty(key)) {
@@ -107,9 +96,19 @@ export async function loadURL(input: string, app: streamToolNames) {
     }
   }
   storage.update(currentStorage => {
-    currentStorage[app].inProgress = Object.assign({}, reformatted);
+    currentStorage[app].inProgress = structuredClone(reformatted);
     return currentStorage;
   })
+}
+
+export async function runningApp(urlParams: URLSearchParams, app: streamToolNames) {
+  let initParams = uncrush(urlParams.get("data"));
+  loadingURLData(initParams, app)
+}
+
+export async function loadURL(input: string, app: streamToolNames) {
+  let uncrushedData = uncrush(input.split("?data=")[1]);
+  loadingURLData(uncrushedData, app);
 }
 
 //LOADING FROM LOCALSTORAGE
