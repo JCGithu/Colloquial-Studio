@@ -2,12 +2,14 @@
   import { storage } from "../../toolParams";
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
-  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
+  import type { Client } from "tmi.js";
   import { onMount, getContext } from "svelte";
+  import { beforeNavigate } from "$app/navigation";
   let toastUpdate: toastUpdate = getContext("toast");
   export let runApp = false;
 
   let appBody: HTMLElement, appSize: DOMRect;
+  let probabilityChart = [1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10];
   let ballScaleChart: { [x: number]: { img: string; scale: number; radius: number } } = {
     1: { img: "1.0", scale: 1, radius: 8 },
     2: { img: "1.0", scale: 1.3, radius: 10 },
@@ -87,6 +89,8 @@
     });
   }
 
+  let backupClient: Client;
+
   onMount(async () => {
     console.log("EmoteDrop has Loaded", $storage.emotedrop.inProgress);
 
@@ -97,13 +101,14 @@
     const client: Client = new tmi.Client({
       channels: [$storage.emotedrop.inProgress.channel],
     });
+    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
+      toastUpdate(`Connected to ${$storage.emotedrop.inProgress.channel} ✅`, "pass");
     });
 
-    client.on("chat", (channel: EmoteDropParameters["channel"], tags: ChatUserstate | SubUserstate, message: string) => {
+    client.on("chat", (channel, tags, message) => {
       // Just to avoid a TS error
       console.log(channel);
 
@@ -123,10 +128,10 @@
 
       if (document.hidden) return;
       if ($storage.emotedrop.inProgress.random) {
-        let randomNumber = getRandomInt(10);
-        img = ballScaleChart[randomNumber].img;
-        radius = ballScaleChart[randomNumber].radius;
-        Scale = ballScaleChart[randomNumber].scale;
+        let randomNumber = getRandomInt(probabilityChart.length);
+        img = ballScaleChart[probabilityChart[randomNumber]].img;
+        radius = ballScaleChart[probabilityChart[randomNumber]].radius;
+        Scale = ballScaleChart[probabilityChart[randomNumber]].scale;
       }
 
       let positionDrop = appSize.width * 0.9 + appSize.width * 0.05;
@@ -171,6 +176,12 @@
       console.log("Attempting Twitch Connection...");
       client.connect();
     }
+  });
+  beforeNavigate(async () => {
+    console.log("bye!");
+    backupClient.disconnect().catch((error: string) => {
+      console.log(error);
+    });
   });
 </script>
 
