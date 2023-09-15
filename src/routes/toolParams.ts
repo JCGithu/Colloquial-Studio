@@ -66,17 +66,8 @@ export function save(app: streamToolNames, slot: number) {
 export function updateURLS(input: streamToolParameters, app: streamToolNames) {
   //Updating Standard V1 issues
   if (!input.version || input.version === 1) {
-    if ('fontsize' in input) {
-      input.fontsize = input.fontsize * 5
-    }
-  }
-  // Adding any missing values
-  for (const [k, v] of Object.entries(input)) {
-    // This weird bit is all because TS sucks
-    let newKey = k as keyof streamToolParameters;
-    let newInput = input[newKey];
-    let newDefault = defaults[app];
-    if (v === null || v === undefined) newInput = newDefault[newKey];
+    //LISTING ALL UPDATES HERE
+    if ('fontsize' in input) input.fontsize = input.fontsize * 5;
   }
   return input;
 }
@@ -93,6 +84,8 @@ export async function loadingURLData(input: any, app: streamToolNames) {
     if (!reformatted.hasOwnProperty(key)) {
       console.log(`Adding ${key} to URL`);
       reformatted[key] = defaults[app][key];
+    } else {
+      if (reformatted[key] === null || reformatted[key] === undefined) reformatted[key] = defaults[app][key];
     }
   }
   storage.update(currentStorage => {
