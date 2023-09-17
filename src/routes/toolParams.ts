@@ -74,6 +74,7 @@ export function updateURLS(input: streamToolParameters, app: streamToolNames) {
       input.bgopacity = input.bgopacity * 10;
       input.proOutline = true;
       input.proColour = input.chatcolourCalc;
+      input.proUseCol = false;
     }
   }
   return input;

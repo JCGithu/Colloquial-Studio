@@ -270,7 +270,7 @@
 
   .pronoun {
     --proColour: #ffffff;
-    border-radius: 0.5rem;
+    border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
     color: var(--proColour);
