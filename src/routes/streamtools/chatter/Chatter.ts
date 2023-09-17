@@ -60,8 +60,9 @@ function chatColourCalculation(params: ChatterParameters) {
 function backgroundOpacity(params: ChatterParameters) {
   if (typeof params.bgopacity === 'string') params.bgopacity = parseInt(params.bgopacity);
 }
-function backgroundColour(params: ChatterParameters) {
-  if (params.bgcolour.indexOf('#') < 0) params.bgcolour = '#' + params.bgcolour;
+function addHashtoColour(input: string) {
+  if (input.indexOf('#') < 0) input = '#' + input;
+  return input;
 }
 
 // FULL REFORMATTER
@@ -77,13 +78,15 @@ export async function paramReformat(params: ChatterParameters, id?: keyof Chatte
     if (typeof params[v] === 'string') (params[v] as Array<string>) = params[v].trim().split(',');
   });
 
+  if (params.fontcolour) params.fontcolour = addHashtoColour(params.fontcolour);
+  if (params.bgcolour) params.bgcolour = addHashtoColour(params.bgcolour);
+  if (params.highcolour) params.highcolour = addHashtoColour(params.highcolour);
+
   if (id) {
     //ALIGN
     if (id === 'align') alignConvert(params);
     if (id === 'chatcolour' || id === 'chatopacity') chatColourCalculation(params);
     if (id === 'bgopacity') backgroundOpacity(params);
-    if (id === 'bgcolour') backgroundColour(params);
-    //console.log (`"${id} reformatted to "${params[id]}"`);
     return params;
   };
 
@@ -91,7 +94,6 @@ export async function paramReformat(params: ChatterParameters, id?: keyof Chatte
   alignConvert(params);
   chatColourCalculation(params);
   backgroundOpacity(params);
-  backgroundColour(params)
 
   //console.log('Params Reformatted', params);
   return params;

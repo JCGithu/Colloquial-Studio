@@ -66,8 +66,15 @@ export function save(app: streamToolNames, slot: number) {
 export function updateURLS(input: streamToolParameters, app: streamToolNames) {
   //Updating Standard V1 issues
   if (!input.version || input.version === 1) {
-    //LISTING ALL UPDATES HERE
-    if ('fontsize' in input) input.fontsize = input.fontsize * 5;
+    input.version = defaults[app].version;
+    //CHATTER
+    if ('fontsize' in input) {
+      input.fontsize = input.fontsize * 5;
+      input.nameCustom = input.togglecol;
+      input.bgopacity = input.bgopacity * 10;
+      input.proOutline = true;
+      input.proColour = input.chatcolourCalc;
+    }
   }
   return input;
 }
@@ -146,6 +153,9 @@ export async function appInit(toastUpdate: toastUpdate) {
   // This needs to be here so you don't overwrite the localstorage before checking
   storage.subscribe((value) => {
     window.localStorage.streamTools = JSON.stringify(value);
+    appList.forEach(async appName => {
+      urlBuild(appName);
+    })
   });
 
   return true;

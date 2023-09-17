@@ -48,7 +48,7 @@
   out:fade
 >
   <div class="bubbleContent">
-    <span style="color: {$storage.chatter.inProgress.fontcolour}">
+    <span style="color: {$storage.chatter.inProgress.fontcolour};">
       {#if $storage.chatter.inProgress.badges}
         {#each badges as badge}
           <img src={badge} alt="badge" class="twitchBadge" />
@@ -96,7 +96,7 @@
     --animEase: ease-in-out;
     --animTime: 500ms;
 
-    color: var(--fontCol);
+    //color: var(--fontCol);
     background-color: var(--userCol);
     color: var(--userCol);
     position: relative;
@@ -108,6 +108,7 @@
     justify-self: end;
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
+    max-height: 100%;
     border-radius: 0.5rem;
     font-weight: normal;
     overflow-wrap: break-word;
@@ -121,18 +122,23 @@
     }
 
     .bubbleContent {
-      overflow: hidden;
+      //overflow: hidden;
       display: block;
-      color: var(--fontCol);
+      padding: calc(var(--fontSize) * 0.1);
       margin: 0;
     }
     span {
-      display: contents;
+      //display: contents;
       align-items: center;
     }
     .twitchBadge:first-of-type {
       margin-left: -0.2rem;
     }
+  }
+
+  span,
+  b {
+    vertical-align: text-top;
   }
 
   .dropShadow {
@@ -265,16 +271,22 @@
   .pronoun {
     --proColour: #ffffff;
     border-radius: 0.5rem;
-    //font-size: 0.8rem;
-    display: inline !important;
     width: fit-content;
+    vertical-align: baseline;
     color: var(--proColour);
+    display: inline !important;
+    font-size: calc(var(--fontSize) * 0.8);
   }
 
   .proOutline {
     padding: 0 0.3rem;
+
+    align-self: start !important;
+    justify-self: baseline !important;
     border-width: 2px;
+    border-width: calc(var(--fontSize) * 0.15);
     border-style: solid;
+    //margin-bottom: calc(var(--fontSize) * 1);
     border-color: var(--proColour);
   }
 
