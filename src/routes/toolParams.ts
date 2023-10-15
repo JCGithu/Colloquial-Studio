@@ -35,10 +35,12 @@ function generateDefaultStorage() {
   return tempStorage as streamToolTotalStorage;
 }
 const defaultStorage = generateDefaultStorage();
-const defaultURLs = appList.reduce((o, key) => Object.assign(o, { [key]: { current: '', base: '' } }), {});
-
-export const urlFill = writable(defaultURLs) as Writable<Record<streamToolNames, { 'current': string, 'base': string }>>;
 export const storage: Writable<streamToolTotalStorage> = writable(structuredClone(defaultStorage));
+
+// URLS
+const defaultURLs = appList.reduce((o, key) => Object.assign(o, { [key]: { current: '', base: '' } }), {});
+export const urlFill = writable(defaultURLs) as Writable<Record<streamToolNames, { 'current': string, 'base': string }>>;
+
 /////////
 
 export function urlBuild(appName: streamToolNames) {
@@ -57,7 +59,7 @@ export function urlBuild(appName: streamToolNames) {
 export function save(app: streamToolNames, slot: number) {
   console.log('SAVING', app, slot);
   storage.update(currentStorage => {
-    currentStorage[app][slot] = Object.assign({}, currentStorage[app].inProgress);
+    currentStorage[app][slot] = structuredClone(currentStorage[app].inProgress);
     console.log(currentStorage);
     return currentStorage;
   })
@@ -131,7 +133,6 @@ export function dashReset(app: streamToolNames) {
 export async function appInit(toastUpdate: toastUpdate) {
   let existingStorage = window.localStorage.streamTools;
   if (existingStorage) {
-    console.log('App init function running');
     let jsonParsed = JSON.parse(existingStorage);
     appList.forEach(async appName => {
       jsonParsed[appName].inProgress = await reformatting[appName](jsonParsed[appName].inProgress);
