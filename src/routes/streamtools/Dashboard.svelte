@@ -142,6 +142,9 @@
     <button class="titleButton" on:click={toggleInfoScreen}><h1>{appDetails.title}</h1></button>
     <slot {Dash} />
     <Dash.Button
+      customClass="ResetText"
+      background={false}
+      hover={false}
       text="Reset to Default"
       on:click={() => {
         dashReset(appDetails.name);
@@ -713,6 +716,18 @@
     }
     &:hover {
       opacity: 1;
+    }
+  }
+
+  :global(.ResetText) {
+    border: none !important;
+    opacity: 0.4;
+    background: none;
+    &:hover {
+      opacity: 0.6;
+      text-decoration: underline;
+      transform: none !important;
+      border: none;
     }
   }
 </style>
