@@ -1,10 +1,11 @@
 <script lang="ts">
   export let text = "";
   export let background = true;
+  export let hover = true;
   export let customClass = "";
 </script>
 
-<button type="button" class={customClass} class:background on:click on:submit>
+<button type="button" class={customClass} class:background class:hover on:click on:submit>
   <span>
     {text}
     <slot />
@@ -33,12 +34,6 @@
     transition: all 1s cubic-bezier(0.26, 0.77, 0.06, 0.9), transform 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
     cursor: pointer;
 
-    &:hover {
-      font-weight: bold;
-      transform: scale(1.02) translateY(-4%);
-      border-color: $white;
-      box-shadow: 0px 0px 10px fade-out($colloquial, 0.5);
-    }
     &:active {
       transform: translateY(0rem);
     }
@@ -61,6 +56,15 @@
     background-position: 100% 100%;
     &:hover {
       background-position: 50% 100%;
+    }
+  }
+
+  .hover {
+    &:hover {
+      font-weight: bold;
+      transform: scale(1.02) translateY(-4%);
+      border-color: $white;
+      box-shadow: 0px 0px 10px fade-out($colloquial, 0.5);
     }
   }
 </style>
