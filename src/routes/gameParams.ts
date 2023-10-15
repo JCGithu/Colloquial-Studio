@@ -16,7 +16,6 @@ const defaultStats: Record<gameNames, gameStats> = {
 }
 
 function generateDefaultStorage() {
-  console.log('Running generate');
   const tempStorage: Partial<gameTotalStorage> = {};
   gameList.forEach(gameKey => {
     tempStorage[gameKey] = {
