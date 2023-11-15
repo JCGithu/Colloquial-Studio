@@ -3,6 +3,7 @@
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
   import type { Client } from "tmi.js";
+  import twemoji from "twemoji";
   import { onMount, getContext } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   let toastUpdate: toastUpdate = getContext("toast");
@@ -31,6 +32,18 @@
 
   function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
+  }
+
+  const emojiReg = /<img.*?src=["'](.*?)["']/;
+  function extractEmojisFromString(inputString: string) {
+    let emojiContainer = twemoji.parse(inputString);
+    console.log(emojiContainer);
+    let emojiMatch = emojiContainer.match(emojiReg);
+    if (emojiMatch) {
+      return emojiMatch[1];
+    } else {
+      return false;
+    }
   }
 
   function createWorld() {
@@ -151,6 +164,22 @@
           Composite.add(renderedWorld, [newCircle]);
           batch.push(newCircle);
         }
+      }
+
+      const emojis = extractEmojisFromString(message);
+      if (emojis) {
+        console.log(emojis);
+        let newCircle = Bodies.circle(getRandomInt(positionDrop), -25, radius, {
+          restitution: bounce,
+          render: {
+            sprite: {
+              texture: emojis,
+              xScale: Scale,
+              yScale: Scale,
+            },
+          },
+        });
+        Composite.add(renderedWorld, [newCircle]);
       }
 
       let bodyList = Composite.allBodies(renderedWorld);
