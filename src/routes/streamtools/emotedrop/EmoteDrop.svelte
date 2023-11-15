@@ -3,7 +3,6 @@
   import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
   import type { Client } from "tmi.js";
-  import twemoji from "twemoji";
   import { onMount, getContext } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   let toastUpdate: toastUpdate = getContext("toast");
@@ -34,16 +33,18 @@
     return Math.floor(Math.random() * max);
   }
 
-  const emojiReg = /<img.*?src=["'](.*?)["']/;
-  function extractEmojisFromString(inputString: string) {
-    let emojiContainer = twemoji.parse(inputString);
-    console.log(emojiContainer);
-    let emojiMatch = emojiContainer.match(emojiReg);
-    if (emojiMatch) {
-      return emojiMatch[1];
-    } else {
-      return false;
+  const fullEmojiRegex = /[\u{1F300}-\u{1F6FF}]/gu;
+  function extractEmojisFromString(inputString: string): Array<string> {
+    const emojiMatches = inputString.match(fullEmojiRegex);
+    let emojiArray: Array<string> = [];
+    if (emojiMatches) {
+      emojiMatches.forEach((v, i) => {
+        let code = emojiMatches[i].codePointAt(0);
+        let unicode = code?.toString(16);
+        emojiArray.push(`https://twemoji.maxcdn.com/v/14.0.2/72x72/${unicode}.png`);
+      });
     }
+    return emojiArray;
   }
 
   function createWorld() {
@@ -52,8 +53,6 @@
       enableSleeping: $storage.emotedrop.inProgress.sleep,
     });
     let world = engine.world;
-
-    console.log(appSize);
 
     // Create renderer
     let render = Render.create({
@@ -167,19 +166,20 @@
       }
 
       const emojis = extractEmojisFromString(message);
-      if (emojis) {
-        console.log(emojis);
-        let newCircle = Bodies.circle(getRandomInt(positionDrop), -25, radius, {
-          restitution: bounce,
-          render: {
-            sprite: {
-              texture: emojis,
-              xScale: Scale,
-              yScale: Scale,
+      if (emojis.length) {
+        emojis.forEach((e, i) => {
+          let newCircle = Bodies.circle(getRandomInt(positionDrop), -25, radius, {
+            restitution: bounce,
+            render: {
+              sprite: {
+                texture: e,
+                xScale: Scale,
+                yScale: Scale,
+              },
             },
-          },
+          });
+          Composite.add(renderedWorld, [newCircle]);
         });
-        Composite.add(renderedWorld, [newCircle]);
       }
 
       let bodyList = Composite.allBodies(renderedWorld);
@@ -226,7 +226,7 @@
 
 <style lang="scss">
   .runApp {
-    height: 100vh;
+    height: 100vh !important;
   }
   #emoteDrop {
     width: 100%;
