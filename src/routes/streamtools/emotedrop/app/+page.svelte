@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-  <title>Emote Drop</title>
+  <title>Emote Drop~{$storage.emotedrop.inProgress.channel}</title>
 </svelte:head>
 
 {#key $storage.emotedrop.inProgress.channel}
