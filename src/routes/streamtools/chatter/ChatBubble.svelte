@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { storage } from "../../toolParams";
+  import { onMount } from "svelte";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];
@@ -42,6 +43,7 @@
   class:vip={message.tags.badges?.vip}
   style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;"
   style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
+  style:--animTimeSlow={`${$storage.chatter.inProgress.animTime * 1}s`}
   style:--animEase={$storage.chatter.inProgress.animEase}
   style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : $storage.chatter.inProgress.chatcolourCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
@@ -86,34 +88,29 @@
 <style lang="scss">
   .chatBubble {
     // DEFAULTS
-    //--fontCol: #fff;
-    //--userCol: #2fa578;
-    //--bubbleCol: #2fa578;
     --marginY: 2.5px;
     --paddingY: 5px;
     --marginX: 10px;
     --paddingX: 15px;
     --animEase: ease-in-out;
     --animTime: 500ms;
-
-    //color: var(--fontCol);
     background-color: var(--userCol);
     color: var(--userCol);
     position: relative;
     display: grid;
+    //display: block;
     grid-template-rows: 1fr;
     //transition: all var(--animTime) var(--animEase);
+    transition: grid-template-rows var(--animTime) var(--animEase);
     flex-direction: row;
     flex-wrap: nowrap;
     justify-self: end;
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
-    max-height: 100%;
     border-radius: 0.5rem;
     font-weight: normal;
     overflow-wrap: break-word;
     z-index: 1;
-    //padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
     padding: 0 var(--paddingX) 0 var(--paddingX);
     margin: 0 var(--marginX) 0 var(--marginX);
 
@@ -122,7 +119,7 @@
     }
 
     .bubbleContent {
-      //overflow: hidden;
+      overflow: hidden;
       display: block;
       padding: calc(var(--fontSize) * 0.1);
       margin: 0;
@@ -143,7 +140,14 @@
 
   .dropShadow {
     //transform: translateX(-8px) translateY(-8px);
-    box-shadow: 1px 1px var(--shadowCol), 2px 2px var(--shadowCol), 3px 3px var(--shadowCol), 4px 4px var(--shadowCol), 5px 5px var(--shadowCol), 6px 6px var(--shadowCol), 7px 7px var(--shadowCol);
+    box-shadow:
+      1px 1px var(--shadowCol),
+      2px 2px var(--shadowCol),
+      3px 3px var(--shadowCol),
+      4px 4px var(--shadowCol),
+      5px 5px var(--shadowCol),
+      6px 6px var(--shadowCol),
+      7px 7px var(--shadowCol);
   }
 
   //Animations
@@ -155,9 +159,9 @@
   }
   @keyframes PopInAnimation {
     0% {
-      grid-template-rows: 0fr;
       padding: 0 var(--paddingX) 0 var(--paddingX);
       margin: 0 var(--marginX) 0 var(--marginX);
+      grid-template-rows: 0fr;
     }
     100% {
       grid-template-rows: 1fr;
