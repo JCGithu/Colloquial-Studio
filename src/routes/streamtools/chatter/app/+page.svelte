@@ -16,6 +16,12 @@
 
 <svelte:head>
   <title>Chatter~{$storage.chatter.inProgress.channel}</title>
+  <style>
+    body {
+      overflow: hidden;
+      max-height: 100vh;
+    }
+  </style>
 </svelte:head>
 
 {#key $storage.chatter.inProgress.channel}
