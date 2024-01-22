@@ -81,7 +81,6 @@
       Object.keys(data[0]["badge_sets"]).forEach((k) => {
         badgeData[k] = data[0]["badge_sets"][k];
       });
-      console.log(badgeData);
       // Process the BTTV emotes
       for (let i in data[1].channelEmotes) {
         bttvEmoteCache.push(data[1].channelEmotes[i]);
@@ -221,7 +220,7 @@
     };
     let lowerCase = newChat.user.toLowerCase();
     newChat.pronoun = userPronouns.get(lowerCase);
-    if ($storage.chatter.inProgress.pronouns && !newChat.pronoun) fetchPronoun(lowerCase);
+    if (($storage.chatter.inProgress.pronouns && !newChat.pronoun) || message === "!pronouns") fetchPronoun(lowerCase);
     console.log(newChat, newChat.tags);
     messageWrap(newChat);
   }
@@ -231,6 +230,19 @@
       if (msg.user === userToBlock) messageList.splice(msgI, 1);
     });
     messageList = messageList;
+  }
+
+  function removeMessage(messageToRemove: string, messageUser: string) {
+    messageList.forEach((msg, msgI) => {
+      if (msg.user === messageUser) {
+        let fullMessage = "";
+        msg.message.forEach((v) => {
+          fullMessage = fullMessage + (fullMessage.length ? " " : "") + v.text;
+        });
+        console.log(fullMessage, messageToRemove);
+        if (fullMessage === messageToRemove) messageList.splice(msgI, 1);
+      }
+    });
   }
 
   let backupClient: Client;
@@ -270,6 +282,7 @@
     client.on("clearchat", () => (messageList = []));
     client.on("timeout", (channel, userToBlock) => removeUser(userToBlock));
     client.on("ban", (channel, userToBlock) => removeUser(userToBlock));
+    client.on("messagedeleted", (channel, username, deletedMessage, userstate) => removeMessage(deletedMessage, username));
 
     if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2) {
       testMessage("Chatter has had a major update! Please go back to the site and update your URL.", "announcement");
@@ -317,11 +330,9 @@
 
 <section class:runApp>
   <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'};--fontSize: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; ' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
-    <div class="chatCrop" class:fade={$storage.chatter.inProgress.fade}>
-      {#each messageList as message (message.tags.id)}
-        <ChatBubble {message} {badgeData} />
-      {/each}
-    </div>
+    {#each messageList as message (message.tags.id)}
+      <ChatBubble {message} {badgeData} />
+    {/each}
     <div id="chatBackground" style="opacity:{$storage.chatter.inProgress.bgopacity / 100}; --bgColour:{$storage.chatter.inProgress.bgcolour}; height:{$storage.chatter.inProgress.shrink ? '0px !important' : 'auto'}" />
   </div>
 </section>
@@ -337,7 +348,9 @@
     --padding: 1rem;
     display: flex;
     width: calc(100% - (2 * var(--padding)));
-    height: calc(100% - (2 * var(--padding)));
+    --height: calc(100% - (2 * var(--padding)));
+    height: var(--height) !important;
+    min-height: var(--height);
     padding: var(--padding);
     flex-direction: var(--flex);
     overflow: hidden;
@@ -374,14 +387,14 @@
 
   section {
     min-width: 100%;
-    min-height: 100%;
-    //background-color: #262d36;
+    min-height: calc(100% - 0.5rem);
+    max-height: calc(100% - 0.5rem);
+    padding-bottom: 0.5rem;
     border-radius: 1rem;
   }
 
   #chatBackground {
     --bgColour: #262d36;
-
     background-color: var(--bgColour);
     position: absolute;
     border-radius: 1rem;
