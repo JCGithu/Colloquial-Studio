@@ -235,7 +235,9 @@
       z-index: 1;
     }
     $mainEase: cubic-bezier(0.13, 1.08, 0.67, 1);
-    transition: 4s transform $mainEase, filter 4s $mainEase;
+    transition:
+      4s transform $mainEase,
+      filter 4s $mainEase;
   }
 
   .titleButton {
@@ -348,7 +350,7 @@
     display: flex;
     position: relative;
     flex-grow: 1;
-    overflow: none;
+    overflow: hidden;
     z-index: 3;
     max-height: calc(100% - 4rem);
     width: calc(100% - 2rem);
