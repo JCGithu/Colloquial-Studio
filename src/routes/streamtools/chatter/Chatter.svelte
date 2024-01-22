@@ -329,7 +329,7 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'};--fontSize: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; ' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
+  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'};--fontSize: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; min-height:auto;' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {message} {badgeData} />
     {/each}
@@ -349,7 +349,7 @@
     display: flex;
     width: calc(100% - (2 * var(--padding)));
     --height: calc(100% - (2 * var(--padding)));
-    height: var(--height) !important;
+    height: var(--height);
     min-height: var(--height);
     padding: var(--padding);
     flex-direction: var(--flex);
