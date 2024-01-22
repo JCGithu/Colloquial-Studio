@@ -78,7 +78,7 @@
       <Dash.CheckBox name="Wide Emote Command" subtitle="Chatters can put w! before emotes" id="wideEmotes" bind:value={$storage.chatter.inProgress.wideEmotes} />
       <Dash.CheckBox subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" bind:value={$storage.chatter.inProgress.emoteOnly} />
     </Dash.Group>
-    <Dash.CheckBox name="Show Badges" id="badges" bind:value={$storage.chatter.inProgress.badges} />
+    <Dash.CheckBox name="Show Badges" id="badges" subtitle="Currently broken for custom subs! Working on it..." bind:value={$storage.chatter.inProgress.badges} />
     <Dash.CheckBox name="Set Chat On-Screen Duration" id="removeChats" bind:value={$storage.chatter.inProgress.removeChats} />
     {#if $storage.chatter.inProgress.removeChats}
       <Dash.Group title="Remove Chats">
