@@ -116,7 +116,8 @@
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
     border-radius: 0.5rem;
-    font-weight: 500, normal;
+    font-weight: normal;
+    font-weight: 500;
     overflow-wrap: break-word;
     z-index: 1;
     padding: 0 var(--paddingX) 0 var(--paddingX);
