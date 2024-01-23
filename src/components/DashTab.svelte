@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RadioGroup, RadioGroupOption } from "@rgossiaux/svelte-headlessui";
-  import { getContext } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
   import SvgIcon from "./SVGIcon.svelte";
 
   export let name = "";
@@ -14,8 +14,14 @@
 
   export let faded = false;
 
+  const dispatch = createEventDispatcher();
+
   let grouped = getContext("grouped");
   let grid = getContext("grid");
+  $: {
+    dispatch("change");
+    let dudd = value;
+  }
 </script>
 
 <div class="inputBlock {customClass}" class:grid class:grouped class:faded class:center>
@@ -75,7 +81,9 @@
     border-radius: 0.6rem;
     z-index: 2;
     //margin: 0.4rem 0;
-    transition: all 0.4s ease-in-out, background 0.1s ease;
+    transition:
+      all 0.4s ease-in-out,
+      background 0.1s ease;
     position: relative;
     overflow: hidden;
     &:focus {
