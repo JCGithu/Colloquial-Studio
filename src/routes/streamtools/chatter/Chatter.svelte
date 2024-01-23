@@ -298,7 +298,6 @@
     }
   });
   beforeNavigate(async () => {
-    console.log("bye!");
     backupClient.disconnect().catch((error: string) => {
       console.log(error);
     });
@@ -329,7 +328,7 @@
 </svelte:head>
 
 <section class:runApp>
-  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'};--fontSize: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; min-height:auto;' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
+  <div id="chatBoundary" class={$storage.chatter.inProgress.align} class:banner={$storage.chatter.inProgress.banner} class:up={$storage.chatter.inProgress.direction === "Up"} style="font-size: {$storage.chatter.inProgress.fontsize + 'px'};--fontSize: {$storage.chatter.inProgress.fontsize + 'px'}; align-items: {$storage.chatter.inProgress.align};{$storage.chatter.inProgress.shrink ? 'height:auto; min-height:auto;' : ''}--padding:{$storage.chatter.inProgress.padding + 'rem'};">
     {#each messageList as message (message.tags.id)}
       <ChatBubble {message} {badgeData} />
     {/each}
@@ -356,6 +355,9 @@
     overflow: hidden;
     //align-items: var(--align);
     justify-content: end;
+  }
+  .up {
+    justify-content: normal !important;
   }
 
   .chatCrop {
