@@ -31,9 +31,11 @@
     <Dash.Channel placeholder="In here!" on:refresh={() => reload++} bind:value={$storage.chatter.inProgress.channel} />
     <Dash.Grid>
       <Dash.Tab id="align" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.align} name="Align" options={{ Left: { value: "flex-start", icon: "align-left" }, Center: { value: "center", icon: "align-center" }, Right: { value: "flex-end", icon: "align-right" } }} />
-      <Dash.Tab on:change={() => reload++} id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
+      {#if !$storage.chatter.inProgress.banner}
+        <Dash.Tab on:change={() => reload++} id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
+        <Dash.CheckBox name="Fit to Chat" id="shrink" bind:value={$storage.chatter.inProgress.shrink} />
+      {/if}
       <Dash.CheckBox name="Banner Mode" id="banner" faded={$storage.chatter.inProgress.shrink} bind:value={$storage.chatter.inProgress.banner} />
-      <Dash.CheckBox name="Fit to Chat" id="shrink" faded={$storage.chatter.inProgress.banner} bind:value={$storage.chatter.inProgress.shrink} />
     </Dash.Grid>
     <Dash.Group title="Font Settings">
       <Dash.Text name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="font" bind:value={$storage.chatter.inProgress.font} />
