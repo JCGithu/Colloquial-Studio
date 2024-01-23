@@ -65,7 +65,7 @@
     <Dash.Group title="Animation">
       <Dash.Select name="Animation" id="animation" options={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow", None: "None" }} bind:value={$storage.chatter.inProgress.animation} />
       <Dash.Number name="Speed (seconds)" id="animTime" bind:value={$storage.chatter.inProgress.animTime} />
-      <Dash.Text name="CSS Easing" id="animEase" bind:value={$storage.chatter.inProgress.animEase} />
+      <Dash.Text name="CSS Easing" subtitle="Try cubic-bezier.com for animations" id="animEase" bind:value={$storage.chatter.inProgress.animEase} />
     </Dash.Group>
     <Dash.Group title="Moderation">
       <Dash.Text name="Hide Users" subtitle="Split accounts with commas e.g. Nightbot, Streamelements" id="hidebot" bind:value={$storage.chatter.inProgress.hidebot} />
