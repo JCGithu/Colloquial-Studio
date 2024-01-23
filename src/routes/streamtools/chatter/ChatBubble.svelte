@@ -58,7 +58,15 @@
       {/if}
       <b class="chatName" style="color: {$storage.chatter.inProgress.nameCustom ? message.tags.color : 'inherit'}">{message.tags["display-name"]}</b>
       {#if $storage.chatter.inProgress.pronouns && message.pronoun}
-        <span class="pronoun" class:proOutline={$storage.chatter.inProgress.proOutline} class:proBG={$storage.chatter.inProgress.proBG} style="font-family:{$storage.chatter.inProgress.proFont}; --proColour:{$storage.chatter.inProgress.proUseCol ? message.tags.color : $storage.chatter.inProgress.proColour}; color: {$storage.chatter.inProgress.proBG ? $storage.chatter.inProgress.proColour : 'var(--proColour)'}">{message.pronoun}</span>
+        <span
+          class="pronoun"
+          class:proOut={$storage.chatter.inProgress.proOutline > 1}
+          class:customOut={$storage.chatter.inProgress.proOutline > 2}
+          class:proBG={$storage.chatter.inProgress.proBG > 1}
+          class:customBG={$storage.chatter.inProgress.proBG > 2}
+          class:customText={!$storage.chatter.inProgress.proUseCol}
+          style="font-family:{$storage.chatter.inProgress.proFont}; --userColour:{message.tags.color}; --customText:{$storage.chatter.inProgress.proColour}; --customBG: {$storage.chatter.inProgress.proBGColour}; --customOutline:{$storage.chatter.inProgress.proOutColour}">{message.pronoun}</span
+        >
       {/if}
       {": "}
       {#each message.message as word, i}
@@ -108,7 +116,7 @@
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
     border-radius: 0.5rem;
-    font-weight: normal;
+    font-weight: 500, normal;
     overflow-wrap: break-word;
     z-index: 1;
     padding: 0 var(--paddingX) 0 var(--paddingX);
@@ -277,25 +285,33 @@
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
-    color: var(--proColour);
+    color: var(--userColour);
+    font-weight: bold;
     display: inline !important;
     font-size: calc(var(--fontSize) * 0.8);
   }
 
-  .proOutline {
+  .proOut {
     padding: 0 0.3rem;
-
     align-self: start !important;
     justify-self: baseline !important;
     border-width: 2px;
     border-width: calc(var(--fontSize) * 0.15);
     border-style: solid;
     //margin-bottom: calc(var(--fontSize) * 1);
-    border-color: var(--proColour);
+    border-color: var(--userColour);
   }
-
+  .customText {
+    color: var(--customText);
+  }
+  .customOut {
+    border-color: var(--customOutline);
+  }
   .proBG {
     padding: 0 0.3rem;
-    background-color: var(--proColour);
+    background-color: var(--userColour);
+  }
+  .customBG {
+    background-color: var(--customBG);
   }
 </style>
