@@ -41,10 +41,12 @@ type ChatterParameters = {
 	splitLetters: boolean;
 	banner: boolean;
 	proFont: string;
-	proOutline: boolean | string;
+	proOutline: number;
+	proBG: number;
 	proUseCol: boolean | string;
+	proOutColour: string,
+	proBGColour: string,
 	proColour: string;
-	proBG: any;
 	replies: boolean | string;
 	links: boolean | string;
 	removeChats: boolean | string;

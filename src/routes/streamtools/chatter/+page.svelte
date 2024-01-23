@@ -31,7 +31,7 @@
     <Dash.Channel placeholder="In here!" on:refresh={() => reload++} bind:value={$storage.chatter.inProgress.channel} />
     <Dash.Grid>
       <Dash.Tab id="align" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.align} name="Align" options={{ Left: { value: "flex-start", icon: "align-left" }, Center: { value: "center", icon: "align-center" }, Right: { value: "flex-end", icon: "align-right" } }} />
-      <Dash.Tab id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
+      <Dash.Tab on:change={() => reload++} id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
       <Dash.CheckBox name="Banner Mode" id="banner" faded={$storage.chatter.inProgress.shrink} bind:value={$storage.chatter.inProgress.banner} />
       <Dash.CheckBox name="Fit to Chat" id="shrink" faded={$storage.chatter.inProgress.banner} bind:value={$storage.chatter.inProgress.shrink} />
     </Dash.Grid>
@@ -89,10 +89,18 @@
     {#if $storage.chatter.inProgress.pronouns}
       <Dash.Group title="Pronouns">
         <Dash.Text name="Custom Font" subtitle="You will need to put the exact font name installed on your computer" id="proFont" bind:value={$storage.chatter.inProgress.proFont} />
-        <Dash.CheckBox name="Outline" id="proOutline" bind:value={$storage.chatter.inProgress.proOutline} />
         <Dash.CheckBox name="Use User Custom Colours" subtitle="Use Twitch users custom colours, if they have one." id="proUseCol" bind:value={$storage.chatter.inProgress.proUseCol} />
-        <Dash.CheckBox name="Background" id="proBG" bind:value={$storage.chatter.inProgress.proBG} />
-        <Dash.Colour name="Default Colour" id="proColour" bind:value={$storage.chatter.inProgress.proColour} />
+        {#if !$storage.chatter.inProgress.proUseCol}
+          <Dash.Colour name="Text Colour" id="proColour" faded={$storage.chatter.inProgress.proUseCol} bind:value={$storage.chatter.inProgress.proColour} />
+        {/if}
+        <Dash.Tab id="Outline" name="Outline" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.proOutline} options={{ Off: { value: 1 }, User: { value: 2 }, Custom: { value: 3 } }} />
+        {#if $storage.chatter.inProgress.proOutline === 3}
+          <Dash.Colour name="Outline Colour" id="proOutColour" bind:value={$storage.chatter.inProgress.proOutColour} />
+        {/if}
+        <Dash.Tab id="proBG" name="Background" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.proBG} options={{ Off: { value: 1 }, User: { value: 2 }, Custom: { value: 3 } }} />
+        {#if $storage.chatter.inProgress.proBG === 3}
+          <Dash.Colour name="Background Colour" id="proOutColour" bind:value={$storage.chatter.inProgress.proBGColour} />
+        {/if}
       </Dash.Group>
     {/if}
   </slot>

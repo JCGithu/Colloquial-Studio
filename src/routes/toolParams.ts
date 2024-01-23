@@ -74,7 +74,7 @@ export function updateURLS(input: streamToolParameters, app: streamToolNames) {
       input.fontsize = input.fontsize * 5;
       input.nameCustom = input.togglecol;
       input.bgopacity = input.bgopacity * 10;
-      input.proOutline = true;
+      input.proOutline = 2;
       input.proColour = input.chatcolourCalc;
       input.proUseCol = false;
     }

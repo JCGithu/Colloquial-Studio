@@ -29,10 +29,12 @@ export const defaultParams: ChatterParameters = {
   bubbleCustom: false,
   points: false,
   proFont: "Poppins",
-  proOutline: false,
+  proOutline: 1,
   proUseCol: true,
   proColour: "#f7f7ff",
-  proBG: false,
+  proBG: 1,
+  proOutColour: '#ffffff',
+  proBGColour: '#ffffff',
   replies: false,
   links: false,
   removeChats: false,
@@ -47,7 +49,7 @@ export const defaultParams: ChatterParameters = {
 };
 
 let arrays: Array<keyof ChatterParameters> = ['hidebot', 'hidecom'];
-let booleans: Array<keyof ChatterParameters> = ['togglecol', 'badges', 'bttv', 'ffz', 'pronouns', 'emoteOnly', 'nameCustom', 'bubbleCustom', 'points', 'proOutline', 'proUseCol', 'proBG', 'replies', 'links', 'removeChats', 'highlight'];
+let booleans: Array<keyof ChatterParameters> = ['togglecol', 'badges', 'bttv', 'ffz', 'pronouns', 'emoteOnly', 'nameCustom', 'bubbleCustom', 'points', 'proOutline', 'proUseCol', 'replies', 'links', 'removeChats', 'highlight'];
 
 // INDIVIDUAL FUNCTIONS
 function alignConvert(params: ChatterParameters) {
