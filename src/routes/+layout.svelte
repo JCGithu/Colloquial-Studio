@@ -31,13 +31,7 @@
 
 <div id="toastBox">
   {#each toastArray as toasty (toasty.id)}
-    <button
-      transition:slide
-      class="toast {toasty.code}"
-      on:click={() => {
-        removeToast(toasty.id);
-      }}
-    >
+    <button transition:slide class="toast {toasty.code}" on:click={() => removeToast(toasty.id)}>
       {toasty.message}
     </button>
   {/each}
