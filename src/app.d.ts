@@ -24,7 +24,6 @@ type ChatterParameters = {
 	animation: string;
 	badges: string | boolean;
 	border: any;
-	fade: boolean;
 	bttv: string | boolean;
 	ffz: string | boolean;
 	hidebot: any;

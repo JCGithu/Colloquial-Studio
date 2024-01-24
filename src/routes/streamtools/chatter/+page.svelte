@@ -60,7 +60,6 @@
       <Dash.Colour name="Background Colour" id="bgcolour" bind:value={$storage.chatter.inProgress.bgcolour} />
       <Dash.Range name="Opacity" max={100} min={0} id="bgopacity" bind:value={$storage.chatter.inProgress.bgopacity} />
       <Dash.Range name="Padding" min={0} max={3} step={0.1} id="padding" bind:value={$storage.chatter.inProgress.padding} />
-      <Dash.CheckBox name="Fade Chat" id="fade" bind:value={$storage.chatter.inProgress.fade} />
     </Dash.Group>
     <Dash.Group title="Animation">
       <Dash.Select name="Animation" id="animation" options={{ "Pop In": "Pop In", "Slide Left": "Slide Left", "Slide Right": "Slide Right", "Fade In": "Fade In", Grow: "Grow", None: "None" }} bind:value={$storage.chatter.inProgress.animation} />
