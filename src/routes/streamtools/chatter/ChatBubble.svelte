@@ -21,7 +21,8 @@
   }
 
   //ANIMATIONS
-  let userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${$storage.chatter.inProgress.chatopacity / 100})`;
+  $: chatBackgroundCalc = `rgba(${parseInt($storage.chatter.inProgress.chatcolour.slice(-6, -4), 16)},${parseInt($storage.chatter.inProgress.chatcolour.slice(-4, -2), 16)},${parseInt($storage.chatter.inProgress.chatcolour.slice(-2), 16)},${$storage.chatter.inProgress.chatopacity / 100})`;
+  $: userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${$storage.chatter.inProgress.chatopacity / 100})`;
   let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
 
   if ($storage.chatter.inProgress.emoteOnly) {
@@ -45,7 +46,7 @@
   style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
   style:--animTimeSlow={`${$storage.chatter.inProgress.animTime * 1}s`}
   style:--animEase={$storage.chatter.inProgress.animEase}
-  style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : $storage.chatter.inProgress.chatcolourCalc}
+  style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
   out:fade
 >

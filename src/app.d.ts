@@ -15,7 +15,6 @@ type ChatterParameters = {
 	fontsize: any;
 	align: string;
 	chatcolour: string;
-	chatcolourCalc: string;
 	highcolour: string;
 	bgcolour: string;
 	fontcolour: string;
