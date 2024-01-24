@@ -13,7 +13,6 @@ export const defaultParams: ChatterParameters = {
   togglecol: true,
   animation: "Pop In",
   badges: true,
-  fade: false,
   border: 50,
   bttv: false,
   ffz: false,
