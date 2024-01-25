@@ -27,7 +27,7 @@
   <label style={subtitle ? "flex-direction: column" : ""} class="checkContainer">
     <div>
       <h2>{name}</h2>
-      <input type="checkbox" {id} aria-label={id} bind:checked={value} />
+      <input type="checkbox" {id} aria-label={id} bind:checked={value} on:change />
       <span class="checkmark" />
     </div>
     {#if subtitle}

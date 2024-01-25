@@ -35,7 +35,7 @@
     <p class="inputSubtitle">{subtitle}</p>
   {/if}
   <p class="rangeValue" style="--width:{rangeWidth}">{value}</p>
-  <input type="range" {id} {min} {max} {step} aria-label={id} bind:value />
+  <input type="range" {id} {min} {max} {step} aria-label={id} bind:value on:change />
 </div>
 
 <style lang="scss">

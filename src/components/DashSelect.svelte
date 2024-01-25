@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
   import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
   import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@rgossiaux/svelte-headlessui";
@@ -17,7 +17,12 @@
 
   let grouped = getContext("grouped");
   let grid = getContext("grid");
-  $: currentValue = Object.keys(options).find((key) => options[key] === value) || "";
+  let currentValue = value;
+  const dispatch = createEventDispatcher();
+  $: () => {
+    currentValue = Object.keys(options).find((key) => options[key] === value) || "";
+    dispatch("change");
+  };
 </script>
 
 <div class="inputBlock {customClass} inputBlockSelect" class:grid class:grouped class:faded style:--flex={"row"}>
@@ -79,7 +84,9 @@
     padding: 1rem;
     border-radius: 1rem;
     z-index: 2;
-    transition: all 0.4s ease-in-out, background 0.1s ease;
+    transition:
+      all 0.4s ease-in-out,
+      background 0.1s ease;
     &:hover {
       border-color: white;
       background-position: 50% 0%;

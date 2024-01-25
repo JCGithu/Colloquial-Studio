@@ -19,7 +19,7 @@
   {#if subtitle.length}
     <p class="inputSubtitle">{subtitle}</p>
   {/if}
-  <input type="number" {id} aria-label={id} bind:value />
+  <input type="number" {id} aria-label={id} bind:value on:change />
 </div>
 
 <style lang="scss">

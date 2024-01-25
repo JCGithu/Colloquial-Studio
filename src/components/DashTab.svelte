@@ -14,10 +14,10 @@
 
   export let faded = false;
 
-  const dispatch = createEventDispatcher();
-
   let grouped = getContext("grouped");
   let grid = getContext("grid");
+
+  const dispatch = createEventDispatcher();
   $: {
     dispatch("change");
     let dudd = value;

@@ -48,7 +48,7 @@
   {/if}
   <div class="colourBlock">
     <label for={id} class:invert={colourCheck(value)}>{value}</label>
-    <input type="color" {id} aria-label={id} bind:value />
+    <input type="color" {id} aria-label={id} bind:value on:change />
   </div>
 </div>
 

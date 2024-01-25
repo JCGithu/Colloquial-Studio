@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
   import { Switch } from "@rgossiaux/svelte-headlessui";
 
   //PROPS
@@ -13,6 +13,12 @@
   //CONTEXT
   let grouped = getContext("grouped");
   let grid = getContext("grid");
+
+  const dispatch = createEventDispatcher();
+  $: {
+    dispatch("change");
+    let dudd = value;
+  }
 </script>
 
 <div class="inputBlock inputBlockVert {customClass}" class:grid class:grouped class:faded class:center style:--flex={"column"}>
