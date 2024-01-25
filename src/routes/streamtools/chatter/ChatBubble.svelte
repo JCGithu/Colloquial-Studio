@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
+  import { fly } from "svelte/transition";
   import { storage } from "../../toolParams";
   import { onMount } from "svelte";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];
   let bigEmote = true;
+  let deleteChat = false;
 
   //PARSING BADGES
   if ($storage.chatter.inProgress.badges && message.tags.badges) {
@@ -42,13 +43,15 @@
   class:bits={message.tags.bits}
   class:mod={message.tags.mod}
   class:vip={message.tags.badges?.vip}
+  class:deleteChat
   style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;"
   style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
   style:--animTimeSlow={`${$storage.chatter.inProgress.animTime * 1}s`}
   style:--animEase={$storage.chatter.inProgress.animEase}
   style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
-  out:fade
+  out:fly={{ y: 0, duration: $storage.chatter.inProgress.animTime * 1000 }}
+  on:outrostart={() => (deleteChat = true)}
 >
   <div class="bubbleContent">
     <span style="color: {$storage.chatter.inProgress.fontcolour};">
@@ -107,9 +110,7 @@
     color: var(--userCol);
     position: relative;
     display: grid;
-    //display: block;
     grid-template-rows: 1fr;
-    //transition: all var(--animTime) var(--animEase);
     transition: grid-template-rows var(--animTime) var(--animEase);
     flex-direction: row;
     flex-wrap: nowrap;
@@ -213,7 +214,6 @@
       font-size: 1px;
     }
     100% {
-      transition: var(--transformAmount);
       grid-template-rows: 1fr;
       padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
       margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
@@ -238,6 +238,24 @@
     }
     to {
       transform: translateX(0);
+    }
+  }
+
+  .deleteChat {
+    animation: shrink var(--animTime) var(--animEase) forwards !important;
+  }
+
+  @keyframes shrink {
+    from {
+      grid-template-rows: 1fr;
+      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    }
+    to {
+      grid-template-rows: 0fr;
+      padding: 0 var(--paddingX) 0 var(--paddingX);
+      margin: 0 var(--marginX) 0 var(--marginX);
+      height: 0;
     }
   }
 
@@ -282,6 +300,7 @@
     padding-bottom: 0.2rem;
   }
 
+  //Pronouns
   .pronoun {
     --proColour: #ffffff;
     border-radius: 2rem;
@@ -292,7 +311,6 @@
     display: inline !important;
     font-size: calc(var(--fontSize) * 0.8);
   }
-
   .proOut {
     padding: 0 0.3rem;
     align-self: start !important;
