@@ -11,7 +11,7 @@
   let reload = 0;
 
   import Dashboard from "../Dashboard.svelte";
-  import EmoteDrop from "./EmoteDrop.svelte";
+  import EmoteDrop from "./EmoteDrop2.svelte";
   setContext("appDetails", appDetails);
   setContext("store", storage);
 </script>

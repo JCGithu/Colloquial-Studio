@@ -1,6 +1,6 @@
 <script lang="ts">
   // Add app and name
-  import EmoteDrop from "../EmoteDrop.svelte";
+  import EmoteDrop from "../EmoteDrop2.svelte";
   let appName: streamToolNames = "emotedrop";
   //
 
