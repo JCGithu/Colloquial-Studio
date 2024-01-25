@@ -39,7 +39,7 @@ export const defaultParams: ChatterParameters = {
   wideEmotes: false,
   banner: false,
   removeTime: 60,
-  version: 2,
+  version: 2.1,
   intro: false,
   splitLetters: false,
   shrink: false,
@@ -54,9 +54,6 @@ function alignConvert(params: ChatterParameters) {
   if (params.align === 'left') params.align = 'flex-start';
   if (params.align === 'right') params.align = 'flex-end';
 }
-// function backgroundOpacity(params: ChatterParameters) {
-//   if (typeof params.bgopacity === 'string') params.bgopacity = parseInt(params.bgopacity);
-// }
 function addHashtoColour(input: string) {
   if (input.indexOf('#') < 0) input = '#' + input;
   return input;
