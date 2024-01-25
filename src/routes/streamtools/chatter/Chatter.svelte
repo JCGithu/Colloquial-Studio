@@ -145,7 +145,7 @@
     }
     if ($storage.chatter.inProgress.removeChats) {
       setTimeout(() => {
-        messageList.shift();
+        $storage.chatter.inProgress.direction === "Up" ? messageList.pop() : messageList.shift();
         messageList = messageList;
       }, $storage.chatter.inProgress.removeTime * 1000);
     }
@@ -284,8 +284,8 @@
     client.on("ban", (channel, userToBlock) => removeUser(userToBlock));
     client.on("messagedeleted", (channel, username, deletedMessage, userstate) => removeMessage(deletedMessage, username));
 
-    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2) {
-      testMessage("Chatter has had a major update! Please go back to the site and update your URL.", "announcement");
+    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2.1) {
+      testMessage("Chatter has an update! Please go back to the site and get a new URL.", "announcement");
     }
     if ($storage.chatter.inProgress.channel === "" || !$storage.chatter.inProgress.channel) {
       testMessage("Give me a Twitch channel name to test! 📺", "announcement");
@@ -301,21 +301,6 @@
     backupClient.disconnect().catch((error: string) => {
       console.log(error);
     });
-  });
-  // This is for the console really. Turning back on deleting chats when it's toggled on the dashboard
-  let deletingChats = $storage.chatter.inProgress.removeChats;
-  afterUpdate(() => {
-    if (deletingChats === $storage.chatter.inProgress.removeChats) return;
-    deletingChats = $storage.chatter.inProgress.removeChats;
-    if ($storage.chatter.inProgress.removeChats === false) return;
-    let intervalID = setInterval(() => {
-      if (messageList.length > 0) {
-        messageList.shift();
-        messageList = messageList;
-      } else {
-        clearInterval(intervalID);
-      }
-    }, $storage.chatter.inProgress.removeTime * 1000);
   });
 </script>
 
@@ -372,12 +357,6 @@
     z-index: 1;
   }
 
-  .fade {
-    //background-color: red;
-    -webkit-mask-image: linear-gradient(to top, black 95%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
-  }
-
   .banner {
     flex-direction: row !important;
     align-items: center !important;
@@ -392,6 +371,7 @@
   .shrink {
     height: auto !important;
     min-height: auto !important;
+    max-height: calc(100% - 2 * (var(--padding))) !important;
   }
 
   section {
