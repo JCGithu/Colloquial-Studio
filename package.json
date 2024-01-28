@@ -14,7 +14,7 @@
   "devDependencies": {
     "@rgossiaux/svelte-headlessui": "^2.0.0",
     "@sveltejs/adapter-static": "^3.0.0",
-    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/kit": "^2.5.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@types/matter-js": "^0.18.5",
     "@types/tmi.js": "^1.8.3",
