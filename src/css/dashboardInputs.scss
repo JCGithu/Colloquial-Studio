@@ -1,0 +1,28 @@
+@use "./colours.scss" as *;
+
+input {
+  padding: 1rem 1.5rem;
+  margin-top: 0.2rem;
+  border-radius: 1rem;
+  border: none;
+  font-family: "Poppins";
+  background-color: $whiteFade;
+  //background: white;
+  color: $black;
+  width: 90%;
+  width: calc(100% - 3rem);
+  //margin-left: 5%;
+  box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
+  transition: all 1s;
+  &:focus {
+    outline: none;
+    color: black;
+    background-color: $white !important;
+    box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0);
+  }
+  &:hover {
+    background-color: $whiteFade;
+    box-shadow: inset 0px 0px 10px rgba(256, 256, 256, 0.5);
+    font-weight: bold;
+  }
+}

@@ -51,16 +51,12 @@
 <style lang="scss">
   @use "../css/default.scss" as d;
   @use "../css/colours.scss" as *;
-  @import "../css/dashboard.scss";
+  @use "../css/dashboard.scss";
 
   .center {
     display: flex;
     justify-content: center;
   }
-
-  // .inputBlock {
-  //   container-type: inline-size;
-  // }
 
   :global(.radioGroup) {
     position: relative;

@@ -25,7 +25,8 @@
 <style lang="scss">
   @use "../css/default.scss" as d;
   @use "../css/colours.scss" as *;
-  @import "../css/dashboard.scss";
+  @use "../css/dashboard.scss";
+  @use "../css/dashboardInputs.scss";
 
   input[type="number"] {
     padding-left: 1rem;

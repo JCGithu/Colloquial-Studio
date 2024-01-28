@@ -55,7 +55,8 @@
 <style lang="scss">
   @use "../css/default.scss" as d;
   @use "../css/colours.scss" as *;
-  @import "../css/dashboard.scss";
+  @use "../css/dashboard.scss";
+  @use "../css/dashboardInputs.scss";
 
   .invert {
     color: black !important;
