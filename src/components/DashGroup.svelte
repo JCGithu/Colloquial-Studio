@@ -1,5 +1,6 @@
 <script lang="ts">
-  import collapse from "svelte-collapse";
+  //import collapse from "svelte-collapse";
+  import collapse from "./collapse";
   import { setContext, getContext } from "svelte";
   import { fly, slide } from "svelte/transition";
   import Dash from "./DashExport";
@@ -12,7 +13,7 @@
 
 <div in:fly={{ x: 200, duration: 500 }} out:slide class="groupBox {customClass}" class:groupBoxOpen={opened}>
   <button type="button" class:opened title="Click to show options" on:click={() => (opened = !opened)}>{title}</button>
-  <div class="group" class:groupOpen={opened} class:groupShut={!opened} use:collapse={{ open: opened, duration: 0.35, easing: "cubic-bezier(.71,.7,.41,1.14)" }}>
+  <div class="group" class:groupOpen={opened} class:groupShut={!opened} use:collapse={{ open: opened }}>
     <slot {Dash} />
   </div>
   <div class:buffer={!opened} />
@@ -50,7 +51,10 @@
     z-index: 0;
     transform-style: preserve-3d;
     filter: saturate(1);
-    transition: all 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s, background-position 0.5s ease-in-out, background-size 0.5s ease-in-out !important;
+    transition:
+      all 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s,
+      background-position 0.5s ease-in-out,
+      background-size 0.5s ease-in-out !important;
     &:hover {
       text-decoration-color: $white;
     }
@@ -143,7 +147,11 @@
     border: fade-out($whiteFade, 0.6) solid;
     border-width: 3px 3px 5px 3px;
     text-decoration-color: transparent;
-    box-shadow: 0.2px 0.4px 0.5px hsl(var(--shadow-color) / 0.43), 0.7px 1.2px 1.5px -0.9px hsl(var(--shadow-color) / 0.41), 1.8px 3.1px 3.9px -1.8px hsl(var(--shadow-color) / 0.39), 4.5px 7.8px 9.8px -2.7px hsl(var(--shadow-color) / 0.37);
+    box-shadow:
+      0.2px 0.4px 0.5px hsl(var(--shadow-color) / 0.43),
+      0.7px 1.2px 1.5px -0.9px hsl(var(--shadow-color) / 0.41),
+      1.8px 3.1px 3.9px -1.8px hsl(var(--shadow-color) / 0.39),
+      4.5px 7.8px 9.8px -2.7px hsl(var(--shadow-color) / 0.37);
     transition: transform box-shadow text-decoration-color 0.15s cubic-bezier(0.71, 0.7, 0.41, 1.14) 0s;
     cursor: pointer;
     &:hover {
