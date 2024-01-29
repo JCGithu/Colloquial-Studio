@@ -2,153 +2,61 @@
   import { storage } from "../../toolParams";
   import "../../../js/tmi";
   import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
-  import { onMount, getContext, onDestroy } from "svelte";
-
-  import RAPIER from "@dimforge/rapier2d-compat";
-
-  import * as PIXI from "pixi.js";
-  import { AnimatedGIF } from "@pixi/gif";
-  import { Sprite, onTick, Graphics } from "svelte-pixi";
-  import { AnimatedGIFAsset } from "@pixi/gif";
-  import { draw } from "svelte/transition";
+  import { onMount, getContext, onDestroy, createEventDispatcher } from "svelte";
 
   export let width = 400;
   export let height = 400;
-  const starSize = 2;
 
-  type star = AnimatedGIF | PIXI.Sprite;
+  import * as PIXI from "pixi.js";
+  import { AnimatedGIF } from "@pixi/gif";
+  import { Sprite, onTick, Container, Graphics } from "svelte-pixi";
 
-  let container: PIXI.Graphics;
-  let amount = 100;
-  let stars: Array<star> = [];
-  let emoteArray: Array<star>;
+  import type { World, Collider, RigidBody, Ball } from "@dimforge/rapier2d";
+  import { loadWorld } from "./physics";
 
-  async function run_simulation() {
-    await RAPIER.init();
-    console.log("WOW");
-    // Use the RAPIER module here.
-    let scaleFactor = 50;
-    let gravity = new RAPIER.Vector2(0.0, -9.81 * scaleFactor);
-    let world = new RAPIER.World(gravity);
+  export let rapier2d: RAPIER;
+  export let world: World;
+  let emoteMap: Map<number, mappedEmote> = new Map();
+  let container: PIXI.Container;
 
-    const emoteSprites = [];
-
-    // Create the ground
-    let groundBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, height);
-    let groundBody = world.createRigidBody(groundBodyDesc);
-    let groundColliderDesc = RAPIER.ColliderDesc.cuboid(width, 1);
-    world.createCollider(groundColliderDesc, groundBody);
-
-    //Create left wall
-    let leftWallBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, 0);
-    let leftWallBody = world.createRigidBody(leftWallBodyDesc);
-    let leftWallColliderDesc = RAPIER.ColliderDesc.cuboid(1, height);
-    world.createCollider(leftWallColliderDesc, leftWallBody);
-
-    //Create right wall
-    let rightWallBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(width, 0);
-    let rightWallBody = world.createRigidBody(rightWallBodyDesc);
-    let rightWallColliderDesc = RAPIER.ColliderDesc.cuboid(1, height);
-    world.createCollider(rightWallColliderDesc, rightWallBody);
-
-    async function addEmote(img: string) {
-      let x = Math.random() * width;
-      let y = 0;
-      let bodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(x, y);
-      let body = world.createRigidBody(bodyDesc);
-      let colliderDesc = RAPIER.ColliderDesc.ball(8);
-      world.createCollider(colliderDesc, body);
-      let curr = PIXI.Sprite.from(img);
-      emoteArray.push(curr);
-    }
-  }
-
-  async function updateStar(star: star) {
-    star.y++;
-    if (star.y > height) star.destroy();
-  }
   function starWipe() {
-    if (!stars.length) return;
-    stars.forEach((star) => {
-      if (star !== null && star.destroy) {
-        star.destroy();
-      }
-    });
+    loadWorld(rapier2d, world, width, height, true);
   }
-
-  let gifURL = "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_8d528caa0c7641528afdecc21963ccab/default/dark/1.0";
-
-  const createInitialStars = async (container: PIXI.ParticleContainer<any>) => {
-    if (!container) return;
-    starWipe();
-
-    console.log("initial");
-
-    // create stars
-    stars = new Array(amount).fill(null).map(() => {
-      let star = new PIXI.Sprite(PIXI.Texture.from("/star.png"));
-      star.x = Math.random() * width;
-      star.y = Math.random() * height;
-      star.scale.set(Math.random() * starSize);
-      star.anchor.set(0.5, 0.7);
-      return star;
-    });
-    if (stars.length) container.addChild(...stars);
-  };
-
-  // setInterval(() => {
-  //   console.log("new star!");
-  //   fetch(gifURL)
-  //     .then((res) => res.arrayBuffer())
-  //     .then(AnimatedGIF.fromBuffer)
-  //     .then((test) => {
-  //       test.x = Math.random() * width;
-  //       test.y = Math.random() * height;
-  //       test.scale.set(Math.random() * starSize);
-  //       test.anchor.set(0.5, 0.7);
-  //       stars.push(test);
-  //       console.log(stars.length);
-  //       if (stars.length) container.addChild(test);
-  //     });
-  // }, 1000);
-
-  $: createInitialStars(container);
-
-  // move the camera forward
-  onTick((delta) => {
-    //stars.forEach(updateStar);
-    // world.step();
-    // let pos = rigidBody.translation();
-    // console.log(pos.x, pos.y);
-  });
-
-  // NOT PHYSICS RELATED
-
-  let toastUpdate: toastUpdate = getContext("toast");
-
-  let probabilityChart = [1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10];
-  let ballScaleChart: { [x: number]: { img: string; scale: number; radius: number } } = {
-    1: { img: "1.0", scale: 1, radius: 8 },
-    2: { img: "1.0", scale: 1.3, radius: 10 },
-    3: { img: "2.0", scale: 0.7, radius: 15 },
-    4: { img: "2.0", scale: 0.85, radius: 18 },
-    5: { img: "2.0", scale: 1, radius: 22 },
-    6: { img: "2.0", scale: 1.2, radius: 25 },
-    7: { img: "3.0", scale: 0.75, radius: 30 },
-    8: { img: "3.0", scale: 0.9, radius: 35 },
-    9: { img: "3.0", scale: 1, radius: 40 },
-    10: { img: "3.0", scale: 1.2, radius: 45 },
-  };
-  $: img = ballScaleChart[$storage.emotedrop.inProgress.esize].img || "2.0";
-  $: radius = ballScaleChart[$storage.emotedrop.inProgress.esize].radius || 20;
-  $: Scale = ballScaleChart[$storage.emotedrop.inProgress.esize].scale || 1;
-  $: limit = $storage.emotedrop.inProgress.blimit;
-  $: time = $storage.emotedrop.inProgress.etime * 1000;
-  $: bounce = $storage.emotedrop.inProgress.bounce / 10;
 
   function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
+
+  //$: gifURL = `https://static-cdn.jtvnw.net/emoticons/v2/307121710/default/dark/${$storage.emotedrop.inProgress.quality}.0`;
+  $: gifURL = `https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_0fa6f640cb3a4b04b675cde9d03d2be4/default/light/${$storage.emotedrop.inProgress.quality}.0`;
+
+  let toastUpdate: toastUpdate = getContext("toast");
+
+  $: defaultChart = [
+    [5.5, $storage.emotedrop.inProgress.shape === 1 ? 0.15 : 0.1],
+    [10, $storage.emotedrop.inProgress.shape === 1 ? 0.2 : 0.17],
+    [13, $storage.emotedrop.inProgress.shape === 1 ? 0.25 : 0.225],
+    [16, $storage.emotedrop.inProgress.shape === 1 ? 0.3 : 0.28],
+    [20, $storage.emotedrop.inProgress.shape === 1 ? 0.375 : 0.35],
+    [23, $storage.emotedrop.inProgress.shape === 1 ? 0.435 : 0.4],
+    [26, $storage.emotedrop.inProgress.shape === 1 ? 0.5 : 0.46],
+    [32, $storage.emotedrop.inProgress.shape === 1 ? 0.6 : 0.57],
+    [37, $storage.emotedrop.inProgress.shape === 1 ? 0.7 : 0.65],
+    [42, $storage.emotedrop.inProgress.shape === 1 ? 0.8 : 0.73],
+    [47.5, $storage.emotedrop.inProgress.shape === 1 ? 0.9 : 0.85],
+  ];
+  let scaleChart = defaultChart;
+
+  $: {
+    if ($storage.emotedrop.inProgress.quality === 2) {
+      scaleChart = defaultChart.map(([x, y]) => [x, 2 * y]);
+    } else if ($storage.emotedrop.inProgress.quality === 1) {
+      scaleChart = defaultChart.map(([x, y]) => [x, 4 * y]);
+    } else {
+      scaleChart = defaultChart;
+    }
+  }
+  $: removeTime = $storage.emotedrop.inProgress.time * 1000;
 
   const fullEmojiRegex = /[\u{1F300}-\u{1F6FF}]/gu;
   function extractEmojisFromString(inputString: string): Array<string> {
@@ -158,10 +66,25 @@
       emojiMatches.forEach((v, i) => {
         let code = emojiMatches[i].codePointAt(0);
         let unicode = code?.toString(16);
-        emojiArray.push(`https://twemoji.maxcdn.com/v/14.0.2/72x72/${unicode}.png`);
+        emojiArray.push(`https://cdn.jsdelivr.net/gh/twitter/twemoji@v14.0.2/assets/72x72/${unicode}.png`);
       });
     }
     return emojiArray;
+  }
+
+  //const check = (headers, options = { offset: 0 }) => buffers => headers.every((header, index) => header === buffers[options.offset + index]);
+  function isPNG(uint8Array: Uint8Array) {
+    return uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4e && uint8Array[3] === 0x47 && uint8Array[4] === 0x0d && uint8Array[5] === 0x0a && uint8Array[6] === 0x1a && uint8Array[7] === 0x0a;
+  }
+
+  function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, shape: Collider, body: RigidBody, x: number, y: number, rotation: number) {
+    curr.anchor.set(0.5);
+    curr.scale.set(scaleChart[scale][1]);
+    curr.x = x;
+    curr.y = y;
+    curr.rotation = -rotation;
+    emoteMap.set(shape.handle, { shape, body, curr, time: Date.now() });
+    container.addChild(curr);
   }
 
   export let chatClient: Client;
@@ -175,44 +98,102 @@
         let allowed = tags.badges?.broadcaster ? true : false;
         if ($storage.emotedrop.inProgress.modWipe && tags.badges?.moderator) allowed = true;
         if (!allowed) return;
+        starWipe();
         return;
       }
       if (document.hidden) return;
 
-      if ($storage.emotedrop.inProgress.random) {
-        let randomNumber = getRandomInt(probabilityChart.length);
-        img = ballScaleChart[probabilityChart[randomNumber]].img;
-        radius = ballScaleChart[probabilityChart[randomNumber]].radius;
-        Scale = ballScaleChart[probabilityChart[randomNumber]].scale;
-      }
-
-      let positionDrop = width * 0.9 + width * 0.05;
       for (let i in tags.emotes) {
+        console.log(i);
         for (let k in tags.emotes[i]) {
-          // FOR EACH EMOTE
+          addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`);
         }
       }
 
-      const emojis = extractEmojisFromString(message);
-      if (emojis.length) {
-        emojis.forEach((e, i) => {
-          // FOR EACH EMOJI
-        });
-      }
-
-      //Delete above limit
-
-      setTimeout(function () {
-        // Delete after time
-      }, time);
+      let emojis = extractEmojisFromString(message);
+      if (emojis.length) emojis.forEach((e) => addEmote(e));
     });
+
+    async function addEmote(img: string) {
+      let scale = $storage.emotedrop.inProgress.random ? getRandomInt(10) : $storage.emotedrop.inProgress.scale;
+      let x = Math.random() * (width - 100) + 50;
+      let y = Math.random() * -50;
+      let rotation = Math.random() * 360;
+      let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y);
+      let body = world.createRigidBody(bodyDesc);
+      body.setAngularDamping(2);
+      //body.setGravityScale(0.5, true);
+      body.setRotation(rotation, true);
+      let colliderDesc = $storage.emotedrop.inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(scaleChart[scale][0]) : rapier2d.ColliderDesc.cuboid(scaleChart[scale][0], scaleChart[scale][0]);
+      let shape = world.createCollider(colliderDesc, body);
+      shape.setDensity(2);
+      shape.setFriction($storage.emotedrop.inProgress.friction / 5);
+      shape.setRestitution($storage.emotedrop.inProgress.bounce / 8.5);
+      if ($storage.emotedrop.inProgress.animated) {
+        fetch(img)
+          .then((res) => res.arrayBuffer())
+          .then((buff) => {
+            const uint8Array = new Uint8Array(buff);
+            let png = isPNG(uint8Array);
+            return [buff, png];
+          })
+          .then(([buff, png]) => {
+            if (png) {
+              return PIXI.Sprite.from(img);
+            } else {
+              //@ts-ignore
+              writeToCache(img, buff);
+              //@ts-ignore
+              return AnimatedGIF.fromBuffer(buff);
+            }
+          })
+          .then((curr) => {
+            applyImgStats(curr, scale, shape, body, x, y, rotation);
+          });
+      } else {
+        let curr = PIXI.Sprite.from(img);
+        applyImgStats(curr, scale, shape, body, x, y, rotation);
+      }
+    }
+    //setInterval(async () => await addEmote(gifURL), 1000);
   });
 
-  function drawing(graphics: PIXI.Graphics) {
-    graphics.clear();
+  let graphics: PIXI.Graphics;
+
+  function deleteThisEmote(mappedEmote: mappedEmote, key: number) {
+    emoteMap.delete(key);
+    if (mappedEmote.body) world.removeRigidBody(mappedEmote.body);
+    if (mappedEmote.curr) mappedEmote.curr.destroy();
   }
+
+  function deleteFirstEmote() {
+    let emote = emoteMap.values().next().value;
+    let emoteKey = emoteMap.keys().next().value;
+    deleteThisEmote(emote, emoteKey);
+  }
+
+  onTick((delta) => {
+    world.step();
+    graphics.clear();
+    world.forEachCollider((elt) => {
+      let translation = elt.translation();
+      let rotation = elt.rotation();
+      let item = emoteMap.get(elt.handle);
+      if (!item) return;
+      item.curr.x = translation.x;
+      item.curr.y = translation.y;
+      item.curr.rotation = rotation;
+      if ($storage.emotedrop.inProgress.timeon && item.time < Date.now() - removeTime) deleteThisEmote(item, elt.handle);
+      // graphics.beginFill(0xde3249);
+      // graphics.drawCircle(translation.x, translation.y, 20);
+      // graphics.endFill();
+    });
+    if (emoteMap.size > $storage.emotedrop.inProgress.limit) deleteFirstEmote();
+  });
 
   onDestroy(starWipe);
 </script>
 
-<Graphics bind:instance={container} draw={(graphics) => drawing(graphics)} />
+<Container bind:instance={container}>
+  <Graphics bind:instance={graphics}></Graphics>
+</Container>

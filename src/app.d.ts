@@ -59,12 +59,16 @@ type ChatterParameters = {
 
 type EmoteDropParameters = {
 	channel: string;
-	blimit: number;
-	esize: number;
+	limit: number;
+	scale: number;
 	bounce: number;
-	etime: number;
-	sleep: boolean;
+	friction: number;
+	quality: number;
+	shape: number;
+	time: number;
+	timeon: boolean;
 	random: boolean;
+	animated: boolean;
 	modWipe: boolean;
 	version: number;
 	intro: boolean
@@ -159,6 +163,10 @@ interface appDetails {
 	name: streamToolNames,
 	description: string,
 }
+
+//Emote Drop
+type RAPIER = typeof import("@dimforge/rapier2d");
+type mappedEmote = { shape: Collider, body: RigidBody, curr: PIXI.Sprite, time: number }
 
 //Games
 interface gameSelect {

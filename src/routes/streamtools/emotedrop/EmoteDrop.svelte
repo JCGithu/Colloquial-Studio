@@ -1,103 +1,30 @@
 <script lang="ts">
   import { storage } from "../../toolParams";
-  import { Engine, Render, Runner, Composite, World, Body, Bodies, Sleeping } from "matter-js";
   import "../../../js/tmi";
   import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
   import { onMount, getContext } from "svelte";
   import { beforeNavigate } from "$app/navigation";
+
   let toastUpdate: toastUpdate = getContext("toast");
+
+  import { Application } from "svelte-pixi";
+  import EmotePhysics from "./EmotePhysics.svelte";
   export let runApp = false;
 
-  let appBody: HTMLElement, appSize: DOMRect;
-  let probabilityChart = [1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8, 8, 8, 9, 9, 10];
-  let ballScaleChart: { [x: number]: { img: string; scale: number; radius: number } } = {
-    1: { img: "1.0", scale: 1, radius: 8 },
-    2: { img: "1.0", scale: 1.3, radius: 10 },
-    3: { img: "2.0", scale: 0.7, radius: 15 },
-    4: { img: "2.0", scale: 0.85, radius: 18 },
-    5: { img: "2.0", scale: 1, radius: 22 },
-    6: { img: "2.0", scale: 1.2, radius: 25 },
-    7: { img: "3.0", scale: 0.75, radius: 30 },
-    8: { img: "3.0", scale: 0.9, radius: 35 },
-    9: { img: "3.0", scale: 1, radius: 40 },
-    10: { img: "3.0", scale: 1.2, radius: 45 },
-  };
-  $: img = ballScaleChart[$storage.emotedrop.inProgress.esize].img || "2.0";
-  $: radius = ballScaleChart[$storage.emotedrop.inProgress.esize].radius || 20;
-  $: Scale = ballScaleChart[$storage.emotedrop.inProgress.esize].scale || 1;
-  $: limit = $storage.emotedrop.inProgress.blimit;
-  $: time = $storage.emotedrop.inProgress.etime * 1000;
-  $: bounce = $storage.emotedrop.inProgress.bounce / 10;
+  let appHeight: number, appWidth: number;
 
-  function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-  }
+  import type { World } from "@dimforge/rapier2d";
+  import { newWorld } from "./physics";
+  let rapier2d: RAPIER;
+  let rapierPromise = loadRapier();
+  let world: World;
 
-  const fullEmojiRegex = /[\u{1F300}-\u{1F6FF}]/gu;
-  function extractEmojisFromString(inputString: string): Array<string> {
-    const emojiMatches = inputString.match(fullEmojiRegex);
-    let emojiArray: Array<string> = [];
-    if (emojiMatches) {
-      emojiMatches.forEach((v, i) => {
-        let code = emojiMatches[i].codePointAt(0);
-        let unicode = code?.toString(16);
-        emojiArray.push(`https://twemoji.maxcdn.com/v/14.0.2/72x72/${unicode}.png`);
-      });
-    }
-    return emojiArray;
-  }
-
-  function createWorld() {
-    // Create engine
-    let engine = Engine.create({
-      enableSleeping: $storage.emotedrop.inProgress.sleep,
-    });
-    let world = engine.world;
-
-    // Create renderer
-    let render = Render.create({
-      element: appBody,
-      engine: engine,
-      options: {
-        width: appSize.width,
-        height: appSize.height + 20,
-        wireframes: false,
-        background: "transparent",
-        wireframeBackground: "transparent",
-        showSleeping: false,
-      },
-    });
-    Render.run(render);
-    Render.lookAt(render, {
-      min: { x: 0, y: 0 },
-      max: { x: appSize.width, y: appSize.height },
-    });
-
-    let FPS = 60;
-    setInterval(function () {
-      Engine.update(engine, 950 / FPS);
-    }, 1000 / FPS);
-
-    let halfHeight = appSize.height * 0.5;
-    let halfWidth = appSize.width * 0.5;
-    let showBoundaries = false;
-
-    Composite.add(world, [Bodies.rectangle(halfWidth, appSize.height + 10, appSize.width, 40, { isStatic: true, render: { fillStyle: "#14151f", visible: showBoundaries } }), Bodies.rectangle(0, halfHeight, 1, appSize.height, { isStatic: true, render: { visible: showBoundaries } }), Bodies.rectangle(appSize.width, halfHeight, 1, appSize.height, { isStatic: true, render: { visible: showBoundaries } })]);
-    return world;
-  }
-
-  function wipe(num: number, targetWorld: World) {
-    let bodyList = Composite.allBodies(targetWorld);
-    if (num) {
-      for (let numDel = 1; numDel <= num; numDel++) {
-        Composite.remove(targetWorld, bodyList[numDel + 3]);
-      }
+  async function loadRapier() {
+    await import("@dimforge/rapier2d").then(async (rap) => {
+      world = newWorld(rap, appWidth, appHeight);
+      rapier2d = rap;
+      console.log("RAPIER Loaded");
       return;
-    }
-    bodyList.forEach((body) => {
-      if (body.label === "Circle Body") {
-        Composite.remove(targetWorld, body);
-      }
     });
   }
 
@@ -105,9 +32,6 @@
 
   onMount(async () => {
     console.log("EmoteDrop has Loaded", $storage.emotedrop.inProgress);
-
-    appSize = appBody.getBoundingClientRect();
-    let renderedWorld = createWorld();
 
     // @ts-ignore
     const client: Client = new tmi.Client({
@@ -120,99 +44,23 @@
       toastUpdate(`Connected to ${$storage.emotedrop.inProgress.channel} ✅`, "pass");
     });
 
-    client.on("chat", (channel, tags, message) => {
-      // Just to avoid a TS error
-      console.log(channel);
-
-      // Deleting emotes
-      if (message.startsWith("!emotewipe")) {
-        let allowed = tags.badges?.broadcaster ? true : false;
-        if ($storage.emotedrop.inProgress.modWipe && tags.badges?.moderator) allowed = true;
-        if (!allowed) return;
-        if (message === "!emotewipe") {
-          wipe(0, renderedWorld);
-        } else {
-          let num = parseInt(message.split(" ")[1]);
-          wipe(num, renderedWorld);
-        }
-        return;
-      }
-
-      if (document.hidden) return;
-      if ($storage.emotedrop.inProgress.random) {
-        let randomNumber = getRandomInt(probabilityChart.length);
-        img = ballScaleChart[probabilityChart[randomNumber]].img;
-        radius = ballScaleChart[probabilityChart[randomNumber]].radius;
-        Scale = ballScaleChart[probabilityChart[randomNumber]].scale;
-      }
-
-      let positionDrop = appSize.width * 0.9 + appSize.width * 0.05;
-      let batch: Array<Bodies> = [];
-      for (let i in tags.emotes) {
-        for (let k in tags.emotes[i]) {
-          let newCircle = Bodies.circle(getRandomInt(positionDrop), -25, radius, {
-            restitution: bounce,
-            render: {
-              sprite: {
-                texture: `http://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${img}`,
-                xScale: Scale,
-                yScale: Scale,
-              },
-            },
-          });
-          Composite.add(renderedWorld, [newCircle]);
-          batch.push(newCircle);
-        }
-      }
-
-      const emojis = extractEmojisFromString(message);
-      if (emojis.length) {
-        emojis.forEach((e, i) => {
-          let newCircle = Bodies.circle(getRandomInt(positionDrop), -25, radius, {
-            restitution: bounce,
-            render: {
-              sprite: {
-                texture: e,
-                xScale: Scale,
-                yScale: Scale,
-              },
-            },
-          });
-          Composite.add(renderedWorld, [newCircle]);
-        });
-      }
-
-      let bodyList = Composite.allBodies(renderedWorld);
-      if (bodyList.length > limit + 3) {
-        for (let obj in bodyList) {
-          if (bodyList.length > limit + 3) {
-            Composite.remove(renderedWorld, bodyList[3]);
-          } else {
-            break;
-          }
-        }
-      }
-
-      setTimeout(function () {
-        //@ts-ignore
-        Composite.remove(renderedWorld, batch);
-        Composite.allBodies(renderedWorld).forEach((bod) => {
-          Sleeping.set(bod, false);
-        });
-      }, time);
-    });
-
     if ($storage.emotedrop.inProgress.channel.length) {
       console.log("Attempting Twitch Connection...");
       client.connect();
     }
   });
-  beforeNavigate(async () => {
-    console.log("bye!");
-    backupClient.disconnect().catch((error: string) => {
-      console.log(error);
-    });
-  });
+
+  function disconnectChat() {
+    backupClient
+      .disconnect()
+      .then(() => {
+        console.log("Disconnecting from Chat");
+      })
+      .catch((error: string) => {
+        console.log(error);
+      });
+  }
+  beforeNavigate(disconnectChat);
 </script>
 
 <svelte:head>
@@ -223,11 +71,37 @@
   </style>
 </svelte:head>
 
-<section class:runApp class:testApp={!runApp} id="emoteDrop" bind:this={appBody} />
+<section class:runApp class:testApp={!runApp} id="emoteDrop">
+  <div id="appBoundary" bind:clientHeight={appHeight} bind:clientWidth={appWidth}>
+    {#await rapierPromise}
+      <p>Loading Physics</p>
+    {:then rapierPromise}
+      <Application height={appHeight} width={appWidth} backgroundAlpha={0}>
+        <EmotePhysics height={appHeight} width={appWidth} chatClient={backupClient} {rapier2d} {world}></EmotePhysics>
+      </Application>
+    {/await}
+  </div>
+</section>
 
 <style lang="scss">
   .runApp {
     height: 100vh !important;
+  }
+  section {
+    min-width: 100%;
+    min-height: calc(100% - 0.5rem);
+    max-height: calc(100% - 0.5rem);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  #appBoundary {
+    position: relative;
+    --flex: column;
+    --align: flex-start;
+    width: 100%;
+    --height: 100%;
+    height: var(--height);
+    min-height: var(--height);
   }
   #emoteDrop {
     width: 100%;

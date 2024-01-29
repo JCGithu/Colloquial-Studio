@@ -1,19 +1,23 @@
 export const defaultParams: EmoteDropParameters = {
   channel: '',
   version: 2,
-  blimit: 100,
-  esize: 2,
-  etime: 60,
+  limit: 100,
+  scale: 2,
+  friction: 10,
+  time: 60,
   bounce: 5,
+  shape: 1,
+  quality: 2,
+  animated: false,
   random: false,
-  sleep: true,
+  timeon: true,
   modWipe: true,
   intro: false,
 };
 
 // Put IDs of relevant inputs
 //let arrays:Array<keyof EmoteDropParameters> = [''];
-let booleans: Array<keyof EmoteDropParameters> = ['sleep', 'random'];
+let booleans: Array<keyof EmoteDropParameters> = ['random', 'timeon', 'modWipe', 'intro'];
 
 //Individual Functions
 
