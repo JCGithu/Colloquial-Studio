@@ -77,7 +77,7 @@
       <p>Loading Physics</p>
     {:then rapierPromise}
       <Application height={appHeight} width={appWidth} backgroundAlpha={0}>
-        <EmotePhysics height={appHeight} width={appWidth} chatClient={backupClient} {rapier2d} {world}></EmotePhysics>
+        <EmotePhysics height={appHeight} width={appWidth} chatClient={backupClient} {rapier2d} {world} />
       </Application>
     {/await}
   </div>
