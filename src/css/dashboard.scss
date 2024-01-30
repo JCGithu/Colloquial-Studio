@@ -43,7 +43,13 @@
 
 }
 
-@container (max-width: 250px){
+@container (max-width: 500px){
+  .inputBlock:has(.radioGroup){
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+@container (max-width: 350px){
   .inputBlock:has(.radioGroup){
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr;
