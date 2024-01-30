@@ -4,11 +4,11 @@
   import { onMount, getContext, afterUpdate } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { storage } from "../../toolParams";
+  import { defaultParams } from "./Chatter";
   import ChatBubble from "./ChatBubble.svelte";
 
   const toastUpdate: toastUpdate = getContext("toast");
 
-  //export let params: ChatterParameters = defaultParams;
   export let runApp = false;
   let messageIndex = 0;
 
@@ -284,7 +284,7 @@
     client.on("ban", (channel, userToBlock) => removeUser(userToBlock));
     client.on("messagedeleted", (channel, username, deletedMessage, userstate) => removeMessage(deletedMessage, username));
 
-    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version !== 2.1) {
+    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version < defaultParams.version) {
       testMessage("Chatter has an update! Please go back to the site and get a new URL.", "announcement");
     }
     if ($storage.chatter.inProgress.channel === "" || !$storage.chatter.inProgress.channel) {
