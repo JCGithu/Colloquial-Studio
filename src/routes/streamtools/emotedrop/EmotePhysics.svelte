@@ -84,6 +84,7 @@
     curr.y = y;
     curr.rotation = -rotation;
     emoteMap.set(shape.handle, { shape, body, curr, time: Date.now() });
+    //@ts-ignore
     container.addChild(curr);
   }
 
@@ -142,8 +143,6 @@
               return PIXI.Sprite.from(img);
             } else {
               //@ts-ignore
-              writeToCache(img, buff);
-              //@ts-ignore
               return AnimatedGIF.fromBuffer(buff);
             }
           })
@@ -174,6 +173,8 @@
 
   onTick((delta) => {
     world.step();
+    if (delta > 0.6) world.step();
+    if (delta > 0.9) world.step();
     graphics.clear();
     world.forEachCollider((elt) => {
       let translation = elt.translation();
@@ -195,5 +196,5 @@
 </script>
 
 <Container bind:instance={container}>
-  <Graphics bind:instance={graphics}></Graphics>
+  <Graphics bind:instance={graphics} />
 </Container>
