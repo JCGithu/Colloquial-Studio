@@ -100,15 +100,6 @@
       }
     }
   }
-  @container (min-width: 250px) {
-    :global(.inputBlockSelect) {
-      :global(.listBoxOptions) {
-        :nth-child(1) {
-          //padding-top: 0;
-        }
-      }
-    }
-  }
 
   .groupOpen {
     visibility: visible;
