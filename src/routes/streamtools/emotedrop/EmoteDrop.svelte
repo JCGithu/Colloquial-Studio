@@ -46,7 +46,10 @@
 
     if ($storage.emotedrop.inProgress.channel.length) {
       console.log("Attempting Twitch Connection...");
-      client.connect();
+      client.connect().catch((error: string) => {
+        console.log(error);
+        if (!runApp) toastUpdate(`Error connecting to ${$storage.emotedrop.inProgress.channel}`, "error");
+      });
     }
   });
 
