@@ -19,7 +19,10 @@ const defaults: Record<streamToolNames, streamToolParameters> = {
 }
 
 export const compareObjects = (oldObj: Record<string, any>, newObj: Record<string, any>): Record<string, any> => (
-  Object.keys(newObj).forEach(key => oldObj[key] = newObj[key]),
+  Object.keys(newObj).forEach((key) => {
+    oldObj[key] = newObj[key];
+    console.log(key + ' has been updated');
+  }),
   Object.keys(oldObj).filter(key => !(key in newObj)).forEach(key => delete oldObj[key]),
   oldObj
 );
