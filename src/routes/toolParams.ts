@@ -18,6 +18,12 @@ const defaults: Record<streamToolNames, streamToolParameters> = {
   'emotedrop': defaultEmote,
 }
 
+export const compareObjects = (oldObj: Record<string, any>, newObj: Record<string, any>): Record<string, any> => (
+  Object.keys(newObj).forEach(key => oldObj[key] = newObj[key]),
+  Object.keys(oldObj).filter(key => !(key in newObj)).forEach(key => delete oldObj[key]),
+  oldObj
+);
+
 // DEFAULT STORAGE CREATION
 import { writable, get, type Writable } from "svelte/store";
 

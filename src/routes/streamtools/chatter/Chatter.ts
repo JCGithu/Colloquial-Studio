@@ -1,3 +1,4 @@
+import { compareObjects } from "../../toolParams";
 export const defaultParams: ChatterParameters = {
   channel: '',
   font: "Poppins",
@@ -63,6 +64,7 @@ function addHashtoColour(input: string) {
 export async function paramReformat(params: ChatterParameters, id?: keyof ChatterParameters) {
   // If the function is provided an ID it only changes that value then returns nothing
   if (!params.version) params.fontsize = params.fontsize * 16;
+  if (params.version < defaultParams.version) compareObjects(params, defaultParams);
 
   booleans.forEach((b) => {
     if (typeof params[b] === 'string') (params[b] as boolean) = (params[b] === 'true');

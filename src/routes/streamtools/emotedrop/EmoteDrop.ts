@@ -1,3 +1,4 @@
+import { compareObjects } from "../../toolParams";
 export const defaultParams: EmoteDropParameters = {
   channel: '',
   version: 2,
@@ -17,14 +18,14 @@ export const defaultParams: EmoteDropParameters = {
 
 // Put IDs of relevant inputs
 //let arrays:Array<keyof EmoteDropParameters> = [''];
-let booleans: Array<keyof EmoteDropParameters> = ['random', 'timeon', 'modWipe', 'intro'];
+let booleans: Array<keyof EmoteDropParameters> = ['random', 'timeon', 'modWipe', 'intro', 'animated'];
 
 //Individual Functions
 
 // Main Reformat
 export async function paramReformat(params: EmoteDropParameters, id: keyof EmoteDropParameters) {
   // If the function is provided an ID it only changes that value then returns nothing
-
+  if (params.version < defaultParams.version) compareObjects(params, defaultParams);
   booleans.forEach((b) => {
     if (typeof params[b] === 'string') (params[b] as boolean) = (params[b] === 'true');
   });
