@@ -43,7 +43,7 @@
     {#if !$storage.emotedrop.inProgress.random}
       <Dash.Range name="Emote Size" min={0} max={10} bind:value={$storage.emotedrop.inProgress.scale} faded={$storage.emotedrop.inProgress.random} />
     {/if}
-    <Dash.Tab name="Shape" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.shape} options={{ Circle: { value: 1 }, Square: { value: 2 } }} />
+    <Dash.Tab name="Shape" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.shape} options={{ "Circle ⬤": { value: 1 }, "Square ◼": { value: 2 } }} />
     <Dash.Tab id="quality" name="Emote Quality" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.quality} options={{ Low: { value: 1 }, Mid: { value: 2 }, High: { value: 3 } }} />
     <Dash.Range name="Bounce" id="bounce" min={0} max={10} bind:value={$storage.emotedrop.inProgress.bounce} />
     <Dash.Range name="Friction" id="friction" min={0} max={10} bind:value={$storage.emotedrop.inProgress.friction} />
@@ -52,7 +52,7 @@
     {#if $storage.emotedrop.inProgress.timeon}
       <Dash.Number name="Expiration Time" subtitle="(in seconds)" bind:value={$storage.emotedrop.inProgress.time} />
     {/if}
-    <Dash.CheckBox name="Allow animated emotes" subtitle="Can lower performance" bind:value={$storage.emotedrop.inProgress.animated} />
+    <Dash.CheckBox name="Allow animated emotes" subtitle="Will lower performance" bind:value={$storage.emotedrop.inProgress.animated} />
     <Dash.CheckBox name="Let Mods Reset" subtitle="Mods can wipe all emotes with command !emotewipe" bind:value={$storage.emotedrop.inProgress.modWipe} />
   </slot>
 </Dashboard>
