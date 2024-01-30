@@ -46,12 +46,15 @@
     [47.5, $storage.emotedrop.inProgress.shape === 1 ? 0.9 : 0.85],
   ];
   let scaleChart = defaultChart;
+  $: x2Chart = defaultChart.map(([x, y]) => [x, 2 * y]);
+  $: x2_5Chart = defaultChart.map(([x, y]) => [x, 2.5 * y]);
+  $: x4Chart = defaultChart.map(([x, y]) => [x, 4 * y]);
 
   $: {
     if ($storage.emotedrop.inProgress.quality === 2) {
-      scaleChart = defaultChart.map(([x, y]) => [x, 2 * y]);
+      scaleChart = x2Chart;
     } else if ($storage.emotedrop.inProgress.quality === 1) {
-      scaleChart = defaultChart.map(([x, y]) => [x, 4 * y]);
+      scaleChart = x4Chart;
     } else {
       scaleChart = defaultChart;
     }
@@ -107,25 +110,26 @@
       for (let i in tags.emotes) {
         console.log(i);
         for (let k in tags.emotes[i]) {
-          addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`);
+          addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`, "twitch");
         }
       }
 
       let emojis = extractEmojisFromString(message);
-      if (emojis.length) emojis.forEach((e) => addEmote(e));
+      if (emojis.length) emojis.forEach((e) => addEmote(e, "emoji"));
     });
 
-    async function addEmote(img: string) {
+    async function addEmote(img: string, type: string) {
       let scale = $storage.emotedrop.inProgress.random ? getRandomInt(10) : $storage.emotedrop.inProgress.scale;
+      let emoteChart = type === "twitch" ? scaleChart : x2_5Chart;
       let x = Math.random() * (width - 100) + 50;
       let y = Math.random() * -50;
       let rotation = Math.random() * 360;
       let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y);
       let body = world.createRigidBody(bodyDesc);
       body.setAngularDamping(2);
-      //body.setGravityScale(0.5, true);
+      if ($storage.emotedrop.inProgress.gravity === 1) body.setGravityScale(0.5, true);
       body.setRotation(rotation, true);
-      let colliderDesc = $storage.emotedrop.inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(scaleChart[scale][0]) : rapier2d.ColliderDesc.cuboid(scaleChart[scale][0], scaleChart[scale][0]);
+      let colliderDesc = $storage.emotedrop.inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(emoteChart[scale][0]) : rapier2d.ColliderDesc.cuboid(emoteChart[scale][0], emoteChart[scale][0]);
       let shape = world.createCollider(colliderDesc, body);
       shape.setDensity(2);
       shape.setFriction($storage.emotedrop.inProgress.friction / 5);

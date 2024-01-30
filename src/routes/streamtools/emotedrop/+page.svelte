@@ -10,6 +10,14 @@
   };
   let reload = 0;
 
+  let resizeTimeout: NodeJS.Timeout;
+  const resize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      reload++;
+    }, 500);
+  };
+
   import Dashboard from "../Dashboard.svelte";
   import EmoteDrop from "./EmoteDrop.svelte";
   setContext("appDetails", appDetails);
@@ -20,7 +28,7 @@
   <title>{appDetails.title} - Dashboard</title>
 </svelte:head>
 
-<svelte:window on:resize={() => reload++} />
+<svelte:window on:resize={resize} />
 
 <Dashboard let:Dash>
   <slot slot="app">
@@ -39,6 +47,7 @@
     <Dash.Tab id="quality" name="Emote Quality" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.quality} options={{ Low: { value: 1 }, Mid: { value: 2 }, High: { value: 3 } }} />
     <Dash.Range name="Bounce" id="bounce" min={0} max={10} bind:value={$storage.emotedrop.inProgress.bounce} />
     <Dash.Range name="Friction" id="friction" min={0} max={10} bind:value={$storage.emotedrop.inProgress.friction} />
+    <Dash.Tab name="Gravity" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.gravity} options={{ Low: { value: 1 }, Normal: { value: 2 } }} />
     <Dash.CheckBox name="Remove over time" bind:value={$storage.emotedrop.inProgress.timeon} />
     {#if $storage.emotedrop.inProgress.timeon}
       <Dash.Number name="Expiration Time" subtitle="(in seconds)" bind:value={$storage.emotedrop.inProgress.time} />

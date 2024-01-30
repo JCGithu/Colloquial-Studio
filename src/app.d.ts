@@ -63,6 +63,7 @@ type EmoteDropParameters = {
 	scale: number;
 	bounce: number;
 	friction: number;
+	gravity: number;
 	quality: number;
 	shape: number;
 	time: number;

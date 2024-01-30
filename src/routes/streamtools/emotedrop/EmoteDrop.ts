@@ -9,6 +9,7 @@ export const defaultParams: EmoteDropParameters = {
   bounce: 5,
   shape: 1,
   quality: 2,
+  gravity: 2,
   animated: false,
   random: false,
   timeon: true,
