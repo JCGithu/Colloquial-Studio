@@ -1,15 +1,17 @@
 <script lang="ts">
   import { fly, fade, slide } from "svelte/transition";
-  import { onMount, getContext, setContext } from "svelte";
+  import { onMount, getContext } from "svelte";
   import { get } from "svelte/store";
   import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
-  import { appInit, loadURL, loadSave, urlBuild, save, storage, urlFill, dashReset } from "../toolParams";
+  import { appInit, loadURL, urlBuild, storage, urlFill, dashReset } from "../toolParams";
   import Dash from "../../components/DashExport";
   import SVGIcon from "../../components/SVGIcon.svelte";
+  import SaveMenu from "./saveMenu.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
+  const toastUpdate: toastUpdate = getContext("toast");
 
   export let showInfo = false;
   export let showButtons = true;
@@ -17,8 +19,6 @@
 
   let baseURL = "";
   let userBackground = "#242423";
-
-  const toastUpdate: toastUpdate = getContext("toast");
 
   let saveMenu = false;
   function toggleInfoScreen() {
@@ -53,37 +53,6 @@
     toastUpdate("Settings loaded from URL", "pass");
   }
 
-  //DATA FUNCTIONS
-  function saveData(num: number) {
-    saveMenu = !saveMenu;
-    save(appDetails.name, num);
-    toastUpdate("Saved to File " + (num + 1), "pass");
-    setTimeout(saveMenuReload, 1000);
-  }
-  async function loadData(num: number) {
-    await loadSave(appDetails.name, num);
-    saveMenu = !saveMenu;
-    urlBuild(appDetails.name);
-    toastUpdate("Loaded from Save " + (num + 1), "pass");
-  }
-
-  function saveMenuReload() {
-    let appStorage = get(storage);
-    for (let i = 0; i < 3; i++) {
-      saves[i] = appStorage[appDetails.name][i].intro;
-    }
-  }
-
-  function checkSave(saveExists: boolean, num: number) {
-    if (!saveExists) {
-      saveData(num);
-      return;
-    }
-    let check = window.confirm("Overwrite Existing Save?");
-    if (!check) return;
-    saveData(num);
-  }
-
   onMount(async () => {
     //Pulling actual base URL
     baseURL = window.location.href.split("?data=")[0];
@@ -94,7 +63,6 @@
       return urls;
     });
     setTimeout(() => {
-      saveMenuReload();
       urlBuild(appDetails.name);
       if (!$storage[appDetails.name].inProgress.intro) showInfo = true;
     }, 500);
@@ -124,18 +92,7 @@
 {/if}
 <main style:--userBackground={userBackground} class:blur={showInfo}>
   {#if saveMenu}
-    <div id="saveMenu" class="infoScreen" transition:fade>
-      <div class="saveCollection">
-        {#each saves as save, i}
-          <span class:blank={!save}>
-            <p>Save {i + 1}:</p>
-            <button type="button" on:click={() => checkSave(saves[i], i)}>Save</button>
-            <button type="button" on:click={() => loadData(i)}>Load</button>
-          </span>
-        {/each}
-        <Dash.Button text="Close" on:click={() => (saveMenu = !saveMenu)} on:submit={() => (saveMenu = !saveMenu)} />
-      </div>
-    </div>
+    <SaveMenu {saves} on:savemenu={() => (saveMenu = !saveMenu)} />
   {/if}
   <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
   <div id="dashControls">
@@ -504,19 +461,24 @@
     background-color: transparent;
     //border-radius: 0.3rem;
     padding-top: 0.2rem;
-    padding: 0;
+    padding: 0rem;
     height: 100%;
     max-height: 2rem;
+    margin-right: 0.5rem;
     width: 100%;
     fill: $white;
     position: relative;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.4s cubic-bezier(0.34, 1.71, 0.37, 0.92);
     &:hover {
       transform: scale(1.1);
-      //background-color: fade-out($colloquial, 0.2);
     }
-    &:focus {
+    // Only keyboard focus
+    &:focus-visible {
       border: solid 1px $white;
+      transform: scale(1.1);
+    }
+    &:focus:not(:focus-visible) {
+      border: none;
     }
     img {
       height: 100%;
@@ -634,69 +596,6 @@
   ::-webkit-color-swatch-wrapper {
     border: none;
     padding: 0;
-  }
-  .blank {
-    opacity: 0.3;
-    transition: 1s all;
-    &:hover {
-      opacity: 0.7;
-    }
-  }
-  //SAVES
-  .saveCollection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 1rem;
-    border: fade-out($whiteFade, 0.6) solid;
-    border-width: 3px 3px 5px 3px;
-    background-color: $black;
-    span {
-      display: flex;
-      align-items: center;
-      color: white;
-      margin: 1rem;
-      padding: 0.2rem 2rem;
-      border-radius: 1rem;
-      border-width: 1px;
-      border-color: $white;
-      border-style: solid;
-    }
-    button {
-      //font-weight: bold;
-      font-size: large;
-      padding: 0.5rem;
-      margin-right: 0.5rem;
-      border-radius: 0.5rem;
-      color: white;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
-      transition: all 250ms cubic-bezier(0.25, 0.25, 0.5, 1.9);
-      transform: translateY(-0.1rem);
-      &:hover {
-        transform: translateY(-0.2rem);
-        //box-shadow: 0px 3px 0px 0px rgba(255, 255, 255, 1);
-      }
-      &:active {
-        transform: translateY(0rem);
-        //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
-      }
-    }
-  }
-
-  #saveMenu {
-    display: flex;
-    flex-direction: column;
-    p {
-      margin-right: 0.5rem;
-    }
-    button {
-      background-color: $colloquial;
-      border-radius: 0.5rem;
-      margin: 0.25rem;
-    }
   }
 
   //Backlink
