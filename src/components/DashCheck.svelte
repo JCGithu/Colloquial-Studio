@@ -5,7 +5,7 @@
 
   //PROPS
   export let name: string;
-  export let id: keyof streamToolCombined;
+  export let id = name;
   export let subtitle = "";
   export let faded = false;
   export let value = false;

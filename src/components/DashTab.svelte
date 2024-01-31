@@ -6,7 +6,7 @@
   export let name = "";
   export let subtitle = "";
   export let fill = "white";
-  export let id: string;
+  export let id = name;
   export let options: Record<string, { value: any; icon: string; rotate?: number }>;
   export let value = options[0].value;
   export let center = false;

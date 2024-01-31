@@ -1,15 +1,11 @@
 <script lang="ts">
   import { getContext, createEventDispatcher } from "svelte";
-  import type { Writable } from "svelte/store";
   import { slide } from "svelte/transition";
   import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@rgossiaux/svelte-headlessui";
 
-  const store = getContext("store") as Writable<streamToolTotalStorage>;
-  let appDetails: appDetails = getContext("appDetails");
-
   export let name: string;
   export let subtitle = "";
-  export let id: string;
+  export let id = name;
   export let options: Record<string, any>;
   export let value = options[0];
   export let faded = false;
