@@ -19,9 +19,9 @@ const defaults: Record<streamToolNames, streamToolParameters> = {
 }
 
 export const compareObjects = (oldObj: Record<string, any>, newObj: Record<string, any>): Record<string, any> => (
-  Object.keys(newObj).forEach((key) => {
+  Object.keys(newObj).filter(key => !(key in oldObj)).forEach((key) => {
     oldObj[key] = newObj[key];
-    console.log(key + ' has been updated');
+    console.log(key + ' has been added');
   }),
   Object.keys(oldObj).filter(key => !(key in newObj)).forEach(key => delete oldObj[key]),
   oldObj
@@ -49,7 +49,6 @@ export const storage: Writable<streamToolTotalStorage> = writable(structuredClon
 // URLS
 const defaultURLs = appList.reduce((o, key) => Object.assign(o, { [key]: { current: '', base: '' } }), {});
 export const urlFill = writable(defaultURLs) as Writable<Record<streamToolNames, { 'current': string, 'base': string }>>;
-
 /////////
 
 export function urlBuild(appName: streamToolNames) {
@@ -74,11 +73,9 @@ export function save(app: streamToolNames, slot: number) {
   })
 }
 
+//Updating Standard V1 issues
 export function updateURLS(input: streamToolParameters, app: streamToolNames) {
-  //Updating Standard V1 issues
   if (!input.version || input.version === 1) {
-    input.version = defaults[app].version;
-    //CHATTER
     if ('fontsize' in input) {
       input.fontsize = input.fontsize * 5;
       input.nameCustom = input.togglecol;
