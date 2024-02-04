@@ -72,19 +72,19 @@ function checkFFZ(ffzCache: Array<ffzEmote>, splitText: Array<MessageChunk>) {
 }
 
 
-export function formatEmotes(text: string, emotes: ChatUserstate['emotes'], bttvEmoteCache: Array<bttvEmote>, ffzCache: Array<ffzEmote>, bits: number | undefined): Array<MessageChunk> {
-  var splitText: Array<any> = text.split(' ');
+export function formatEmotes(text: string, splitText: Array<string>, emotes: ChatUserstate['emotes'], bttvEmoteCache: Array<bttvEmote>, ffzCache: Array<ffzEmote>, bits: number | undefined): Array<MessageChunk> {
+  let textArray: Array<MessageChunk> = [];
   for (let i in splitText) {
-    splitText[i] = {
-      code: null,
+    textArray[i] = {
+      code: undefined,
       text: splitText[i],
       num: undefined
     }
   }
-  if (emotes) splitText = checkEmotes(emotes, splitText, text);
-  if (bits) splitText = checkBits(splitText);
+  if (emotes) textArray = checkEmotes(emotes, textArray, text);
+  if (bits) textArray = checkBits(textArray);
   let params = get(storage);
-  if (bttvEmoteCache && params.chatter.inProgress.bttv) splitText = checkBTTV(bttvEmoteCache, splitText);
-  if (ffzCache && params.chatter.inProgress.ffz) splitText = checkFFZ(ffzCache, splitText);
-  return splitText;
+  if (bttvEmoteCache && params.chatter.inProgress.bttv) textArray = checkBTTV(bttvEmoteCache, textArray);
+  if (ffzCache && params.chatter.inProgress.ffz) textArray = checkFFZ(ffzCache, textArray);
+  return textArray;
 }

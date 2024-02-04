@@ -58,13 +58,9 @@
     fetch(`https://pronouns.alejo.io/api/users/${username}`)
       .then((res) => res.json())
       .then((proData) => {
-        if (!proData.length) {
-          userPronouns.set(username, "");
-        } else {
-          userPronouns.set(username, pronouns[proData[0].pronoun_id]);
-        }
-        let newPronoun = userPronouns.get(username);
-        if (newPronoun && newPronoun.length > 1) console.log(`${username} has been set ${newPronoun} pronouns`);
+        let newPronoun = !proData.length ? "" : pronouns[proData[0].pronoun_id];
+        userPronouns.set(username, newPronoun);
+        if (newPronoun.length) console.log(`${username} has been set ${newPronoun} pronouns`);
         messageList.forEach((msg) => {
           if (msg.user === username) msg.pronoun = newPronoun;
         });
@@ -152,9 +148,9 @@
     messageList = messageList;
   }
 
-  function testMessage(message: string, type: string) {
+  function testMessage(message: string, splitText: Array<string>, type: string) {
     console.log("Test Message:", message, type);
-    let messageArray = formatEmotes(message, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits);
+    let messageArray = formatEmotes(message, splitText, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits);
     let newChat: Message = {
       message: messageArray,
       user: "Test_User",
@@ -179,40 +175,35 @@
     messageWrap(newChat);
   }
 
+  let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
+
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
     if (self || !channel) return;
-    if (typeof $storage.chatter.inProgress.hidebot === "object") {
-      if ($storage.chatter.inProgress.hidebot.includes(tags.username)) return;
-    }
-    if (typeof $storage.chatter.inProgress.hidecom === "object") {
-      let comCheck = message.split(" ")[0];
-      if ($storage.chatter.inProgress.hidecom.includes(comCheck)) return;
-    }
-    if ($storage.chatter.inProgress.links) {
-      if (message.includes("http://") || message.includes("https://")) return;
-    }
+    if (typeof $storage.chatter.inProgress.hidebot === "object" && $storage.chatter.inProgress.hidebot.includes(tags.username)) return;
+    if ($storage.chatter.inProgress.links && (message.includes("http://") || message.includes("https://"))) return;
     if ($storage.chatter.inProgress.points && tags["custom-reward-id"]) return;
     if ($storage.chatter.inProgress.replies && tags["reply-parent-display-name"]) return;
 
-    //Testing Commands
-    let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
-    if (tags.badges?.broadcaster) {
-      let splitMessage = message.split(" ");
-      if (testCommands.includes(splitMessage[0])) {
-        testMessage(message.replace(splitMessage[0] + " ", ""), splitMessage[0].slice(9));
-        return;
-      }
-    }
+    let splitMessage = message.split(" ");
 
+    if (typeof $storage.chatter.inProgress.hidecom === "object" && $storage.chatter.inProgress.hidecom.includes(splitMessage[0])) return;
     if (firstMessage) {
       fetchBadges(tags);
       firstMessage = false;
     }
 
-    let messageArray = formatEmotes(message, tags.emotes, bttvEmoteCache, ffzCache, tags.bits);
+    //Testing Commands
+    if (tags.badges?.broadcaster) {
+      if (testCommands.includes(splitMessage[0])) {
+        testMessage(message, splitMessage, splitMessage[0].slice(9));
+        return;
+      }
+    }
+
+    let messageArray = formatEmotes(message, splitMessage, tags.emotes, bttvEmoteCache, ffzCache, tags.bits);
     let newChat: Message = {
       message: messageArray,
-      user: tags.username || "",
+      user: tags.username,
       color: tags.color || $storage.chatter.inProgress.highcolour,
       tags: tags,
       type: type,
@@ -221,7 +212,6 @@
     let lowerCase = newChat.user.toLowerCase();
     newChat.pronoun = userPronouns.get(lowerCase);
     if (($storage.chatter.inProgress.pronouns && !newChat.pronoun) || message === "!pronouns") fetchPronoun(lowerCase);
-    console.log(newChat, newChat.tags);
     messageWrap(newChat);
   }
 
@@ -261,7 +251,7 @@
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
       if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
-      testMessage(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "announcement");
+      testMessage(`Connected to ${$storage.chatter.inProgress.channel} ✅`, ["Connected", "To", $storage.chatter.inProgress.channel, "✅"], "announcement");
       if (!runApp) toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
     });
     client.on("disconnected", () => {
@@ -285,10 +275,12 @@
     client.on("messagedeleted", (channel, username, deletedMessage, userstate) => removeMessage(deletedMessage, username));
 
     if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version < defaultParams.version) {
-      testMessage("Chatter has an update! Please go back to the site and get a new URL.", "announcement");
+      let testMessageString = "Chatter has an update! Please go back to the site and get a new URL.";
+      testMessage(testMessageString, testMessageString.split(" "), "announcement");
     }
     if ($storage.chatter.inProgress.channel === "" || !$storage.chatter.inProgress.channel) {
-      testMessage("Give me a Twitch channel name to test! 📺", "announcement");
+      let testMessageString = "Give me a Twitch channel name to test! 📺";
+      testMessage(testMessageString, testMessageString.split(" "), "announcement");
     } else {
       console.log("Attempting Twitch Connection...");
       client.connect().catch((error: string) => {
