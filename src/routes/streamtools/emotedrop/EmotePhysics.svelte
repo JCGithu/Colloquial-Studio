@@ -1,8 +1,8 @@
 <script lang="ts">
   import { storage } from "../../toolParams";
   import "../../../js/tmi";
-  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
-  import { onMount, getContext, onDestroy, createEventDispatcher } from "svelte";
+  import type { Client } from "tmi.js";
+  import { onMount, onDestroy } from "svelte";
 
   export let width = 400;
   export let height = 400;
@@ -20,17 +20,17 @@
   let container: PIXI.Container;
 
   function starWipe() {
+    world.forEachCollider((elt) => {
+      let item = emoteMap.get(elt.handle);
+      if (!item) return;
+      deleteThisEmote(item, elt.handle);
+    });
     loadWorld(rapier2d, world, width, height, true);
   }
 
   function getRandomInt(max: number) {
     return Math.floor(Math.random() * max);
   }
-
-  //$: gifURL = `https://static-cdn.jtvnw.net/emoticons/v2/307121710/default/dark/${$storage.emotedrop.inProgress.quality}.0`;
-  $: gifURL = `https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_0fa6f640cb3a4b04b675cde9d03d2be4/default/light/${$storage.emotedrop.inProgress.quality}.0`;
-
-  let toastUpdate: toastUpdate = getContext("toast");
 
   $: defaultChart = [
     [5.5, $storage.emotedrop.inProgress.shape === 1 ? 0.15 : 0.1],
@@ -108,7 +108,6 @@
       if (document.hidden) return;
 
       for (let i in tags.emotes) {
-        console.log(i);
         for (let k in tags.emotes[i]) {
           addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`, "twitch");
         }
@@ -161,8 +160,6 @@
     //setInterval(async () => await addEmote(gifURL), 1000);
   });
 
-  let graphics: PIXI.Graphics;
-
   function deleteThisEmote(mappedEmote: mappedEmote, key: number) {
     emoteMap.delete(key);
     if (mappedEmote.body) world.removeRigidBody(mappedEmote.body);
@@ -179,7 +176,6 @@
     world.step();
     if (delta > 0.6) world.step();
     if (delta > 0.9) world.step();
-    graphics.clear();
     world.forEachCollider((elt) => {
       let translation = elt.translation();
       let rotation = elt.rotation();
@@ -199,6 +195,4 @@
   onDestroy(starWipe);
 </script>
 
-<Container bind:instance={container}>
-  <Graphics bind:instance={graphics} />
-</Container>
+<Container bind:instance={container} />
