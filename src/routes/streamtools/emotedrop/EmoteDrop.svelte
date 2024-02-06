@@ -2,7 +2,7 @@
   import { storage } from "../../toolParams";
   import "../../../js/tmi";
   import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
 
   let toastUpdate: toastUpdate = getContext("toast");
@@ -28,20 +28,22 @@
     });
   }
 
-  let backupClient: Client;
+  let client: Client;
 
   onMount(async () => {
     console.log("EmoteDrop has Loaded", $storage.emotedrop.inProgress);
 
     // @ts-ignore
-    const client: Client = new tmi.Client({
+    client = new tmi.Client({
       channels: [$storage.emotedrop.inProgress.channel],
     });
-    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
       toastUpdate(`Connected to ${$storage.emotedrop.inProgress.channel} ✅`, "pass");
+    });
+    client.on("disconnected", () => {
+      console.log("Disconnected from Twitch");
     });
 
     if ($storage.emotedrop.inProgress.channel.length) {
@@ -54,16 +56,12 @@
   });
 
   function disconnectChat() {
-    backupClient
-      .disconnect()
-      .then(() => {
-        console.log("Disconnecting from Chat");
-      })
-      .catch((error: string) => {
-        console.log(error);
-      });
+    client.disconnect().catch((error: string) => {
+      console.log(error);
+    });
   }
   beforeNavigate(disconnectChat);
+  onDestroy(disconnectChat);
 </script>
 
 <svelte:head>
@@ -80,7 +78,7 @@
       <p>Loading Physics</p>
     {:then rapierPromise}
       <Application height={appHeight} width={appWidth} backgroundAlpha={0}>
-        <EmotePhysics height={appHeight} width={appWidth} chatClient={backupClient} {rapier2d} {world} />
+        <EmotePhysics height={appHeight} width={appWidth} {client} {rapier2d} {world} />
       </Application>
     {/await}
   </div>

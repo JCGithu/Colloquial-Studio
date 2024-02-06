@@ -91,12 +91,12 @@
     container.addChild(curr);
   }
 
-  export let chatClient: Client;
+  export let client: Client;
 
   onMount(async () => {
     starWipe();
-    if (!chatClient) return;
-    chatClient.on("chat", (channel, tags, message) => {
+    if (!client) return;
+    client.on("chat", (channel, tags, message) => {
       // Deleting emotes
       if (message.startsWith("!emotewipe")) {
         let allowed = tags.badges?.broadcaster ? true : false;
