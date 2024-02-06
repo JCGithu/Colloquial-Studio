@@ -43,7 +43,7 @@
   <img src={logo} alt="logo" id="logo" />
   <h1>colloquial</h1>
   {#each structure as folder}
-    <h2
+    <button
       class="category"
       class:open={folder.on}
       on:click={() => {
@@ -54,7 +54,7 @@
       }}
     >
       {folder.title}
-    </h2>
+    </button>
     {#if folder.on}
       <ul transition:slide|local>
         {#each folder.list as page, j}
@@ -91,12 +91,14 @@
 
     ::selection {
       color: $colloquial;
-      background: rgba(255, 255, 255, 0.7);
+      background: white;
+      border-radius: 1rem !important;
+      overflow: hidden !important;
+      padding: 10rem;
+      margin: 100px;
+      transform: scale(2) !important;
     }
-    .category {
-      cursor: pointer;
-      transition: all 0.5s ease-in-out;
-    }
+
     ul {
       margin: 0;
       text-transform: capitalize;
@@ -105,6 +107,8 @@
     }
     h1 {
       font-size: 30pt;
+      border-radius: 1rem !important;
+      overflow: hidden !important;
     }
     h2 {
       font-size: 15pt;
@@ -117,15 +121,29 @@
         transform: scale(1.1);
       }
     }
-    .open {
-      opacity: 0.5;
-      &:hover {
-        opacity: 0.7;
-      }
-    }
+
     a {
       text-decoration: none;
       color: white;
+    }
+  }
+
+  .category {
+    background-color: transparent;
+    border: none;
+    font-size: 15pt;
+    margin: 0;
+    font-family: "Poppins";
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+  }
+
+  .open {
+    opacity: 0.5;
+    &:hover {
+      opacity: 0.7;
     }
   }
 </style>
