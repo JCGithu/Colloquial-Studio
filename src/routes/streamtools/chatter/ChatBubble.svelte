@@ -72,7 +72,7 @@
           style="font-family:{$storage.chatter.inProgress.proFont}; --userColour:{message.tags.color}; --customText:{$storage.chatter.inProgress.proColour}; --customBG: {$storage.chatter.inProgress.proBGColour}; --customOutline:{$storage.chatter.inProgress.proOutColour}">{message.pronoun}</span
         >
       {/if}
-      {": "}
+      <span class="divider"></span>
       {#each message.message as word, i}
         {#if word.code}
           <img src={word.code} alt={word.text} class="emote" class:bigEmote class:wideEmote={$storage.chatter.inProgress.wideEmotes && i > 0 && message.message[i - 1].text === "w!"} />
@@ -129,18 +129,28 @@
       white-space: pre;
     }
 
-    .bubbleContent {
-      overflow: hidden;
-      display: block;
-      padding: calc(var(--fontSize) * 0.1);
-      margin: 0;
-    }
     span {
       //display: contents;
       align-items: center;
     }
     .twitchBadge:first-of-type {
       margin-left: -0.2rem;
+    }
+  }
+
+  .bubbleContent {
+    overflow: hidden;
+    display: block;
+    //padding: calc(var(--fontSize) * 0.1);
+    animation: bubblePad var(--animTime) var(--animEase) forwards;
+    margin: 0;
+  }
+  @keyframes bubblePad {
+    from {
+      padding: 0;
+    }
+    to {
+      padding: calc(var(--fontSize) * 0.1);
     }
   }
 
@@ -170,8 +180,8 @@
   }
   @keyframes PopInAnimation {
     0% {
-      padding: 0 var(--paddingX) 0 var(--paddingX);
-      margin: 0 var(--marginX) 0 var(--marginX);
+      padding: 0 var(--paddingX) 0 var(--paddingX) !important;
+      margin: 0 var(--marginX) 0 var(--marginX) !important;
       grid-template-rows: 0fr;
     }
     100% {
@@ -306,9 +316,11 @@
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
+    //height: 100% !important;
     color: var(--userColour);
     font-weight: bold;
-    display: inline !important;
+    transform: translateY(-1px) !important;
+    display: inline-block !important;
     font-size: calc(var(--fontSize) * 0.8);
   }
   .proOut {
@@ -333,5 +345,8 @@
   }
   .customBG {
     background-color: var(--customBG);
+  }
+  .divider:before {
+    content: ": ";
   }
 </style>
