@@ -56,6 +56,7 @@
   });
 
   function disconnectChat() {
+    if (!client) return;
     client.disconnect().catch((error: string) => {
       console.log(error);
     });
