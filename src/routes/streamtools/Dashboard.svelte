@@ -116,17 +116,18 @@
         </PopoverButton>
         <PopoverPanel class="PopOverPanel">
           <div class="panel-contents" transition:slide>
-            <h4>URL Links</h4>
+            <h4>Settings</h4>
             <button type="button" id="go" on:click={openURL}>Open Link</button>
             <button type="button" id="copy" on:click={copyURL}>Copy Link</button>
             <button type="button" id="load" on:click={loadFromURL}>Load existing URL</button>
-            <h4>Settings</h4>
-            <button type="button" on:click={toggleInfoScreen}>Info</button>
+            <!-- <h4>Settings</h4> -->
+
             <button type="button" id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</button>
             <div class="panelInput">
-              <label for="userBackgroundColour" style="--bg:{userBackground}">Background Colour</label>
+              <label for="userBackgroundColour">Background Colour</label>
               <input id="userBackgroundColour" type="color" bind:value={userBackground} />
             </div>
+            <button type="button" on:click={toggleInfoScreen}>Info</button>
           </div>
         </PopoverPanel>
       </Popover>
@@ -528,7 +529,6 @@
     div {
       //width: calc(100% - 0.6rem);
       position: relative;
-      padding: 0.2rem 1rem;
       display: flex;
       margin: 0 0.3rem;
     }
@@ -539,17 +539,17 @@
       margin: 0 0.3rem;
       position: relative;
       cursor: pointer;
-      padding: 0.2rem 1rem;
+      padding: 0.2rem 0.5rem;
       display: flex;
       flex-direction: row;
       border-radius: 0rem;
-      transition: 0.3s all ease-in-out;
+      transition: 0.3s padding-left ease-in-out;
       &:hover {
         color: white;
-        border-radius: 1rem;
-        padding-left: 1.2rem;
-        padding-right: 0.8rem;
-        background-color: lighten($black, 3);
+        //border-radius: 1rem;
+        padding-left: 0.7rem;
+        padding-right: 0.3rem;
+        background-color: fade-out(lighten($black, 10), 0.2);
       }
     }
     input {
@@ -565,11 +565,13 @@
       background-color: transparent;
       border: none !important;
       border-color: transparent;
+      border-radius: 0 !important;
       &:hover {
         outline: none;
         border: none !important;
       }
       &::-webkit-color-swatch-wrapper {
+        visibility: hidden;
         height: 100%;
         width: 100%;
         position: absolute;
@@ -578,17 +580,20 @@
         background-color: transparent;
       }
     }
-    label {
-      z-index: 10;
-      position: relative;
-      color: var(--bg);
-      pointer-events: none;
-      filter: invert(1) saturate(0) contrast(10);
-    }
   }
   .panelInput {
+    label {
+      pointer-events: none;
+      z-index: 10;
+    }
+    position: relative;
+    transition: 0.3s padding ease-in-out;
+    padding: 0.2rem 0.5rem;
     &:hover {
-      background-color: transparent !important;
+      color: white;
+      padding-left: 0.7rem;
+      padding-right: 0.3rem;
+      background-color: fade-out(lighten($black, 10), 0.2);
     }
   }
 
