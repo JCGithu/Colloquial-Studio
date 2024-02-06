@@ -1,7 +1,7 @@
 <script lang="ts">
   import "../../../js/tmi";
   import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
-  import { onMount, getContext, afterUpdate } from "svelte";
+  import { onMount, getContext, afterUpdate, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { storage } from "../../toolParams";
   import { defaultParams } from "./Chatter";
@@ -17,6 +17,8 @@
 
   import { formatEmotes } from "./messageParser";
   import { badge_sets } from "./badges.json";
+  import Cell from "../../games/twordle/game/cell.svelte";
+  import { error } from "@sveltejs/kit";
 
   let exampleTags: Tags = {
     color: $storage.chatter.inProgress.highcolour,
@@ -67,26 +69,51 @@
         return;
       });
   }
-  async function fetchBadges(tags: ChatUserstate | SubUserstate) {
-    const urls = [`https://badges.twitch.tv/v1/badges/channels/${tags["room-id"]}/display`, `https://api.betterttv.net/3/cached/users/twitch/${tags["room-id"]}`];
 
-    try {
-      const responses = await Promise.all(urls.map((url) => fetch(url)));
-      const data = await Promise.all(responses.map((response) => response.json()));
-      // Process the badge data
-      Object.keys(data[0]["badge_sets"]).forEach((k) => {
-        badgeData[k] = data[0]["badge_sets"][k];
+  let badgeData: BadgeData = {};
+  Object.keys(badge_sets).forEach((k) => {
+    badgeData[k] = (badge_sets as unknown as BadgeData)[k];
+  });
+  console.log(badgeData);
+
+  type ChatterWorker = Record<string, Record<string, string>>;
+  async function fetchBadges(channel: string) {
+    const chatterWorker = await fetch(`https://chatter-worker.colloquial.workers.dev/c/${channel}`)
+      .then((res) => res.json())
+      .then((data) => {
+        return data as ChatterWorker;
       });
-      // Process the BTTV emotes
-      for (let i in data[1].channelEmotes) {
-        bttvEmoteCache.push(data[1].channelEmotes[i]);
-      }
-      for (let i in data[1].sharedEmotes) {
-        bttvEmoteCache.push(data[1].sharedEmotes[i]);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    let userID = chatterWorker.userID.id;
+    let newBadges: BadgeData = {
+      bits: {
+        versions: {},
+      },
+      subscriber: {
+        versions: {},
+      },
+    };
+    Object.keys(chatterWorker.bits).forEach((k) => {
+      newBadges.bits.versions[k] = {
+        image_url_2x: chatterWorker.bits[k],
+      };
+    });
+    Object.keys(chatterWorker.subscriber).forEach((k) => {
+      newBadges.subscriber.versions[k] = {
+        image_url_2x: chatterWorker.subscriber[k],
+      };
+    });
+    badgeData = { ...badgeData, ...newBadges };
+    await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`)
+      .then((res) => res.json())
+      .then((data) => {
+        for (let i in data.channelEmotes) {
+          bttvEmoteCache.push(data.channelEmotes[i]);
+        }
+        for (let i in data.sharedEmotes) {
+          bttvEmoteCache.push(data.sharedEmotes[i]);
+        }
+      })
+      .catch(error);
   }
 
   fetch("https://api.betterttv.net/3/cached/emotes/global")
@@ -122,11 +149,6 @@
         console.log(error);
       });
   }
-
-  let badgeData: BadgeData = {};
-  Object.keys(badge_sets).forEach((k) => {
-    badgeData[k] = (badge_sets as unknown as BadgeData)[k];
-  });
 
   // This is broken out because the test and regular message use this.
   function messageWrap(newChat: Message) {
@@ -187,10 +209,6 @@
     let splitMessage = message.split(" ");
 
     if (typeof $storage.chatter.inProgress.hidecom === "object" && $storage.chatter.inProgress.hidecom.includes(splitMessage[0])) return;
-    if (firstMessage) {
-      fetchBadges(tags);
-      firstMessage = false;
-    }
 
     //Testing Commands
     if (tags.badges?.broadcaster) {
@@ -235,7 +253,7 @@
     });
   }
 
-  let backupClient: Client;
+  let client: Client;
 
   onMount(async () => {
     console.log("Chatter has Loaded", $storage.chatter.inProgress);
@@ -243,14 +261,14 @@
 
     //@ts-ignore
     // It can't seem to find the export from the custom TMI.js
-    let client: Client = new tmi.Client({
+    client = new tmi.Client({
       channels: [$storage.chatter.inProgress.channel],
     }) as Client;
-    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
       if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
+      fetchBadges($storage.chatter.inProgress.channel);
       testMessage(`Connected to ${$storage.chatter.inProgress.channel} ✅`, ["Connected", "To", $storage.chatter.inProgress.channel, "✅"], "announcement");
       if (!runApp) toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
     });
@@ -289,11 +307,15 @@
       });
     }
   });
-  beforeNavigate(async () => {
-    backupClient.disconnect().catch((error: string) => {
+
+  function destroyChatter() {
+    client.disconnect().catch((error: string) => {
       console.log(error);
     });
-  });
+  }
+
+  onDestroy(destroyChatter);
+  beforeNavigate(destroyChatter);
 </script>
 
 <svelte:head>
