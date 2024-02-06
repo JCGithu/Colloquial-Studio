@@ -12,13 +12,11 @@
   export let runApp = false;
   let messageIndex = 0;
 
-  let bttvEmoteCache: Array<bttvEmote>,
-    ffzCache: Array<ffzEmote> = [];
-
+  let bttvEmoteCache: Array<bttvEmote> = [];
+  let ffzCache: Array<ffzEmote> = [];
   import { formatEmotes } from "./messageParser";
   import { badge_sets } from "./badges.json";
-  import Cell from "../../games/twordle/game/cell.svelte";
-  import { error } from "@sveltejs/kit";
+  import { initialFetches } from "./apiFetching";
 
   let exampleTags: Tags = {
     color: $storage.chatter.inProgress.highcolour,
@@ -53,10 +51,9 @@
     xexem: "Xe/Xem",
     ziehir: "Zie/Hir",
   };
-  let firstMessage = true;
 
   async function fetchPronoun(username: string) {
-    console.log(`...Looking for ${username} pronouns`);
+    //console.log(`...Looking for ${username} pronouns`);
     fetch(`https://pronouns.alejo.io/api/users/${username}`)
       .then((res) => res.json())
       .then((proData) => {
@@ -75,80 +72,20 @@
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
 
-  type ChatterWorker = Record<string, Record<string, string>>;
-  async function fetchBadges(channel: string) {
-    const chatterWorker = await fetch(`https://chatter-worker.colloquial.workers.dev/c/${channel}`)
-      .then((res) => res.json())
-      .then((data) => {
-        return data as ChatterWorker;
-      });
-    let userID = chatterWorker.userID.id;
-    let newBadges: BadgeData = {
-      bits: {
-        versions: {},
-      },
-      subscriber: {
-        versions: {},
-      },
-    };
-    Object.keys(chatterWorker.bits).forEach((k) => {
-      newBadges.bits.versions[k] = {
-        image_url_2x: chatterWorker.bits[k],
-      };
-    });
-    Object.keys(chatterWorker.subscriber).forEach((k) => {
-      newBadges.subscriber.versions[k] = {
-        image_url_2x: chatterWorker.subscriber[k],
-      };
-    });
-    badgeData = { ...badgeData, ...newBadges };
-    await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`)
-      .then((res) => res.json())
-      .then((data) => {
-        for (let i in data.channelEmotes) {
-          bttvEmoteCache.push(data.channelEmotes[i]);
-        }
-        for (let i in data.sharedEmotes) {
-          bttvEmoteCache.push(data.sharedEmotes[i]);
-        }
-      })
-      .catch(error);
+  $: {
+    if ($storage.chatter.inProgress.ffz) {
+      fetch(`https://api.frankerfacez.com/v1/room/${$storage.chatter.inProgress.channel}`)
+        .then((response) => response.json())
+        .then((data) => {
+          for (let [key, value] of Object.entries(data.sets as ffzData)) {
+            ffzCache = ffzCache.concat(value.emoticons);
+          }
+        })
+        .catch((error) => console.error(error));
+    }
   }
 
-  fetch("https://api.betterttv.net/3/cached/emotes/global")
-    .then((response) => response.json())
-    .then((data) => {
-      bttvEmoteCache = data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-  fetch(`https://api.frankerfacez.com/v1/set/global`)
-    .then((response) => response.json())
-    .then((data) => {
-      for (let [key, value] of Object.entries(data.sets as ffzData)) {
-        ffzCache = ffzCache.concat(value.emoticons);
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-  function ffzChannel(name: string) {
-    fetch(`https://api.frankerfacez.com/v1/room/${name}`)
-      .then((response) => response.json())
-      .then((data) => {
-        for (let [key, value] of Object.entries(data.sets as ffzData)) {
-          ffzCache = ffzCache.concat(value.emoticons);
-        }
-        console.log(ffzCache);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
+  $: removeTimeS = $storage.chatter.inProgress.removeTime * 1000;
   // This is broken out because the test and regular message use this.
   function messageWrap(newChat: Message) {
     newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
@@ -159,12 +96,6 @@
     } else {
       messageList = messageList.concat(newChat);
       if (messageList.length > 50) messageList.shift();
-    }
-    if ($storage.chatter.inProgress.removeChats) {
-      setTimeout(() => {
-        $storage.chatter.inProgress.direction === "Up" ? messageList.pop() : messageList.shift();
-        messageList = messageList;
-      }, $storage.chatter.inProgress.removeTime * 1000);
     }
     messageList = messageList;
   }
@@ -179,6 +110,7 @@
       tags: Object.assign({}, exampleTags),
       type: type,
       pronoun: "Any",
+      time: Date.now(),
     };
     if (type === "sub") Object.assign(newChat.tags, { badges: { subscriber: 0 } });
     if (type === "vip") Object.assign(newChat.tags, { badges: { vip: 1 } });
@@ -210,11 +142,9 @@
     if (typeof $storage.chatter.inProgress.hidecom === "object" && $storage.chatter.inProgress.hidecom.includes(splitMessage[0])) return;
 
     //Testing Commands
-    if (tags.badges?.broadcaster) {
-      if (testCommands.includes(splitMessage[0])) {
-        testMessage(message, splitMessage, splitMessage[0].slice(9));
-        return;
-      }
+    if (tags.badges?.broadcaster && testCommands.includes(splitMessage[0])) {
+      testMessage(message, splitMessage, splitMessage[0].slice(9));
+      return;
     }
 
     let messageArray = formatEmotes(message, splitMessage, tags.emotes, bttvEmoteCache, ffzCache, tags.bits);
@@ -225,6 +155,7 @@
       tags: tags,
       type: type,
       pronoun: undefined,
+      time: Date.now(),
     };
     let lowerCase = newChat.user.toLowerCase();
     newChat.pronoun = userPronouns.get(lowerCase);
@@ -241,15 +172,14 @@
 
   function removeMessage(messageToRemove: string, messageUser: string) {
     messageList.forEach((msg, msgI) => {
-      if (msg.user === messageUser) {
-        let fullMessage = "";
-        msg.message.forEach((v) => {
-          fullMessage = fullMessage + (fullMessage.length ? " " : "") + v.text;
-        });
-        console.log(fullMessage, messageToRemove);
-        if (fullMessage === messageToRemove) messageList.splice(msgI, 1);
-      }
+      if (msg.user != messageUser) return;
+      let fullMessage = "";
+      msg.message.forEach((v) => {
+        fullMessage = (fullMessage.length ? fullMessage + " " : "") + v.text;
+      });
+      if (fullMessage === messageToRemove) messageList.splice(msgI, 1);
     });
+    messageList = messageList;
   }
 
   let client: Client;
@@ -262,12 +192,11 @@
     // It can't seem to find the export from the custom TMI.js
     client = new tmi.Client({
       channels: [$storage.chatter.inProgress.channel],
-    }) as Client;
+    });
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
-      if ($storage.chatter.inProgress.ffz) ffzChannel($storage.chatter.inProgress.channel);
-      fetchBadges($storage.chatter.inProgress.channel);
+      initialFetches($storage.chatter.inProgress.channel, bttvEmoteCache, ffzCache, badgeData);
       testMessage(`Connected to ${$storage.chatter.inProgress.channel} ✅`, ["Connected", "To", $storage.chatter.inProgress.channel, "✅"], "announcement");
       if (!runApp) toastUpdate(`Connected to ${$storage.chatter.inProgress.channel} ✅`, "pass");
     });
@@ -304,6 +233,16 @@
         console.log(error);
         if (!runApp) toastUpdate(`Error connecting to ${$storage.chatter.inProgress.channel}`, "error");
       });
+    }
+    if ($storage.chatter.inProgress.removeChats) {
+      setTimeout(() => {
+        let current = Date.now();
+        if ($storage.chatter.inProgress.direction === "Up") {
+          if (messageList[0].time > current + removeTimeS) messageList.shift();
+        } else {
+          if (messageList[messageList.length - 1].time > current + removeTimeS) messageList.pop();
+        }
+      }, 1000);
     }
   });
 

@@ -121,6 +121,7 @@ type Message = {
 	color: string;
 	tags: Tags;
 	type: string;
+	time: number;
 }
 
 interface BadgeData {
