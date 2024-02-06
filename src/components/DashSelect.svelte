@@ -63,14 +63,11 @@
   :global(.listBoxButton) {
     position: relative;
     width: 100%;
-    //max-width: 70%;
-    border: none;
     outline: none;
     font-family: "Poppins";
     color: $black;
     font-weight: 500;
     cursor: pointer;
-    border-radius: 0.2rem;
     border-width: 0px;
     border-color: fade-out($colloquial, 0.8) fade-out($colloquial, 0.9);
     border-style: solid;
@@ -80,6 +77,7 @@
     padding: 1rem;
     border-radius: 1rem;
     z-index: 2;
+    overflow: hidden;
     transition:
       all 0.4s ease-in-out,
       background 0.1s ease;
@@ -88,8 +86,7 @@
       background-position: 50% 0%;
       font-weight: bold;
     }
-    position: relative;
-    overflow: hidden;
+
     &::after {
       content: url("data:image/svg+xml, %3Csvg fill='#{$black}' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m11.125 16.313 7.688-7.688 3.594 3.719-11.094 11.063L0 12.094l3.5-3.531z' /%3E%3C/svg%3E%0A");
       display: block;
@@ -160,14 +157,12 @@
     border-radius: 0;
     &:hover,
     &:focus {
-      border-radius: 1rem;
       background-color: lighten($black, 3);
       //color: $black;
       font-weight: bold;
     }
   }
   :global(.listBoxActive) {
-    border-radius: 1rem;
     background-color: lighten($black, 3);
     //color: $black;
     font-weight: bold;
@@ -177,5 +172,12 @@
     //color: $colloquial;
     text-decoration: underline;
     text-decoration-color: $colloquial;
+  }
+  .grouped {
+    :global(.listBox) {
+      :global(.listBoxButton) {
+        border-radius: 8px;
+      }
+    }
   }
 </style>

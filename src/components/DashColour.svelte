@@ -63,6 +63,7 @@
   }
 
   .colourBlock {
+    --radius: 10px;
     display: flex;
     position: relative;
     width: 100%;
@@ -94,7 +95,7 @@
 
   ::-webkit-color-swatch {
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius);
     padding: 0;
     position: absolute;
     //background-color: transparent !important;
@@ -108,7 +109,7 @@
     outline: none;
     position: relative;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: var(--radius);
     background-color: transparent !important;
     padding: 0;
   }
@@ -123,6 +124,11 @@
       &::-webkit-color-swatch-wrapper {
         border: solid $white 2px !important;
       }
+    }
+  }
+  .grouped {
+    .colourBlock {
+      --radius: 8px;
     }
   }
 </style>

@@ -57,4 +57,10 @@
       }
     }
   }
+
+  .grouped {
+    input {
+      border-radius: 8px;
+    }
+  }
 </style>

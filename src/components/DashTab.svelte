@@ -68,15 +68,14 @@
     justify-content: space-between;
     border: none;
     outline: none;
+    padding: 1px;
     font-family: "Poppins";
     color: $black;
     font-weight: 500;
     border-width: 0px;
     background-color: $whiteFade;
-    //padding: 1rem;
-    border-radius: 0.6rem;
+    border-radius: 10px;
     z-index: 2;
-    //margin: 0.4rem 0;
     transition:
       all 0.4s ease-in-out,
       background 0.1s ease;
@@ -89,7 +88,7 @@
   :global(.radioOption) {
     cursor: pointer;
     padding: 0.5em;
-    border-radius: 0.5em;
+    border-radius: 8px;
     margin: 0.2em;
     opacity: 0.7;
     background-color: rgba(black, 0.05);

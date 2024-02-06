@@ -32,4 +32,9 @@
     margin-bottom: 0.5rem;
     height: 1.2rem;
   }
+  .grouped {
+    input {
+      border-radius: 8px;
+    }
+  }
 </style>
