@@ -74,7 +74,6 @@
   Object.keys(badge_sets).forEach((k) => {
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
-  console.log(badgeData);
 
   type ChatterWorker = Record<string, Record<string, string>>;
   async function fetchBadges(channel: string) {
@@ -309,6 +308,7 @@
   });
 
   function destroyChatter() {
+    if (!client) return;
     client.disconnect().catch((error: string) => {
       console.log(error);
     });
