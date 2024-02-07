@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { storage } from "../../toolParams";
-  import type { BitmapText } from "svelte-pixi";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];
@@ -33,10 +32,11 @@
   let box: HTMLElement;
   let animHeight = "0px";
   onMount(() => {
-    let target = box.getBoundingClientRect().height;
-    animHeight = `${target + 10}px`;
-    console.log(target);
-    box.style.maxHeight = "0px";
+    if ($storage.chatter.inProgress.animation === "Pop In") {
+      let target = box.getBoundingClientRect().height;
+      animHeight = `${target + 24}px`;
+      box.style.maxHeight = "0px";
+    }
   });
 </script>
 
@@ -121,13 +121,12 @@
     justify-self: end;
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
-    border-radius: 0.5rem;
     font-weight: normal;
     font-weight: 500;
     overflow-wrap: break-word;
     z-index: 1;
-    padding: 0 var(--paddingX) 0 var(--paddingX);
-    margin: 0 var(--marginX) 0 var(--marginX);
+    //padding: 0 var(--paddingX) 0 var(--paddingX);
+    //margin: 0 var(--marginX) 0 var(--marginX);
     b {
       white-space: pre;
     }
@@ -144,8 +143,6 @@
   .bubbleContent {
     overflow: hidden;
     display: block;
-    //padding: calc(var(--fontSize) * 0.1);
-    animation: bubblePad var(--animTime) var(--animEase) forwards;
     margin: 0;
   }
   @keyframes bubblePad {
@@ -181,19 +178,10 @@
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
+    .bubbleContent {
+      animation: bubblePad var(--animTime) var(--animEase) forwards;
+    }
   }
-  // @keyframes PopInAnimation {
-  //   0% {
-  //     padding: 0 var(--paddingX) 0 var(--paddingX) !important;
-  //     margin: 0 var(--marginX) 0 var(--marginX) !important;
-  //     grid-template-rows: 0fr;
-  //   }
-  //   100% {
-  //     grid-template-rows: 1fr;
-  //     padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-  //     margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
-  //   }
-  // }
   @keyframes PopInAnimation {
     0% {
       padding: 0 var(--paddingX) 0 var(--paddingX) !important;
@@ -222,10 +210,10 @@
     animation: FadeInAnimation var(--animTime) var(--animEase) forwards;
   }
   @keyframes FadeInAnimation {
-    from {
+    0% {
       opacity: 0;
     }
-    to {
+    100% {
       opacity: 1;
     }
   }
@@ -236,21 +224,11 @@
   @keyframes GrowAnimation {
     0% {
       transform: scale(0);
-      grid-template-rows: 0fr;
       font-size: 1px;
     }
     100% {
-      grid-template-rows: 1fr;
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      transform: var(--transformAmount);
     }
-  }
-  .Slide_Left,
-  .Slide_Right,
-  .Fade_In {
-    padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-    margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
-    animation: slideAnimation var(--animTime) var(--animEase) forwards;
   }
   .Slide_Left {
     --transformAmount: translateX(-100%);
@@ -258,7 +236,20 @@
   .Slide_Right {
     --transformAmount: translateX(100%);
   }
-  @keyframes slideAnimation {
+  .Slide_Left,
+  .Slide_Right,
+  .Fade_In,
+  .None,
+  .Grow {
+    transform-origin: center;
+    padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+    margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+  }
+  .Slide_Left,
+  .Slide_Right {
+    animation: singleAnimation var(--animTime) var(--animEase) forwards;
+  }
+  @keyframes singleAnimation {
     from {
       transform: var(--transformAmount);
     }
