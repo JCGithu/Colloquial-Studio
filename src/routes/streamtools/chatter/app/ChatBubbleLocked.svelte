@@ -139,7 +139,7 @@
   }
   @keyframes bubblePad {
     from {
-      padding: 0;
+      padding: 0 calc(var(--fontSize) * 0.1);
     }
     to {
       padding: calc(var(--fontSize) * 0.1);
@@ -165,6 +165,8 @@
 
   //Animations
   .Pop_In {
+    padding: 0 var(--paddingX) 0 var(--paddingX);
+    margin: 0 var(--marginX) 0 var(--marginX);
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
     animation-delay: 1ms;
     &.bubbleBanner {
