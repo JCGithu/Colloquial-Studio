@@ -41,7 +41,7 @@
     <Dash.Number name="Ball Limit" bind:value={$storage.emotedrop.inProgress.limit} />
     <Dash.CheckBox name="Randomise Size" bind:value={$storage.emotedrop.inProgress.random} faded={!$storage.emotedrop.inProgress.random} />
     {#if !$storage.emotedrop.inProgress.random}
-      <Dash.Range name="Emote Size" min={0} max={10} bind:value={$storage.emotedrop.inProgress.scale} faded={$storage.emotedrop.inProgress.random} />
+      <Dash.Range name="Emote Size" min={1} max={10} bind:value={$storage.emotedrop.inProgress.scale} faded={$storage.emotedrop.inProgress.random} />
     {/if}
     <Dash.Tab name="Shape" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.shape} options={{ "Circle ⬤": { value: 1 }, "Square ◼": { value: 2 } }} />
     <Dash.Tab id="quality" name="Emote Quality" fill="rgb(36, 36, 35)" bind:value={$storage.emotedrop.inProgress.quality} options={{ Low: { value: 1 }, Mid: { value: 2 }, High: { value: 3 } }} />
