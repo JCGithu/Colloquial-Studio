@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   export let inProgress: ChatterParameters;
   export let message: Message, badgeData: BadgeData;
 
@@ -28,9 +30,18 @@
       if (!el.code) bigEmote = false;
     });
   }
+  let box: HTMLElement;
+  let animHeight = "0px";
+  onMount(() => {
+    let target = box.getBoundingClientRect().height;
+    animHeight = `${target + 10}px`;
+    console.log(target);
+    box.style.maxHeight = "0px";
+  });
 </script>
 
 <div
+  bind:this={box}
   class="chatBubble {message.type} {inProgress.animation.replace(' ', '_')} {inProgress.align} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}"
   class:dropShadow={inProgress.highlight}
   class:bubbleBanner={inProgress.banner}
@@ -44,6 +55,7 @@
   style:--animEase={inProgress.animEase}
   style:--userCol={inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={inProgress.togglecol ? userColAlpha : inProgress.highcolour}
+  style:--animHeight={animHeight}
 >
   <div class="bubbleContent">
     <span style="color: {inProgress.fontcolour};">
@@ -89,6 +101,7 @@
     --paddingX: 15px;
     --animEase: ease-in-out;
     --animTime: 500ms;
+    --animHeight: 24px;
     background-color: var(--userCol);
     color: var(--userCol);
     position: relative;
@@ -97,6 +110,7 @@
     transition: grid-template-rows var(--animTime) var(--animEase);
     flex-direction: row;
     flex-wrap: nowrap;
+    transform-origin: bottom center;
     justify-self: end;
     width: max-content;
     max-width: calc(100% - 25px - 20px - 0.5rem);
@@ -157,20 +171,33 @@
   //Animations
   .Pop_In {
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
+    animation-delay: 1ms;
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
   }
+  // @keyframes PopInAnimation {
+  //   0% {
+  //     padding: 0 var(--paddingX) 0 var(--paddingX) !important;
+  //     margin: 0 var(--marginX) 0 var(--marginX) !important;
+  //     grid-template-rows: 0fr;
+  //   }
+  //   100% {
+  //     grid-template-rows: 1fr;
+  //     padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+  //     margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+  //   }
+  // }
   @keyframes PopInAnimation {
     0% {
       padding: 0 var(--paddingX) 0 var(--paddingX) !important;
       margin: 0 var(--marginX) 0 var(--marginX) !important;
-      grid-template-rows: 0fr;
+      max-height: 0;
     }
     100% {
-      grid-template-rows: 1fr;
       padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
       margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      max-height: var(--animHeight);
     }
   }
   @keyframes PopInBanner {

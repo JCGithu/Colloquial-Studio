@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { storage } from "../../toolParams";
+  import type { BitmapText } from "svelte-pixi";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];
@@ -28,9 +30,18 @@
       if (!el.code) bigEmote = false;
     });
   }
+  let box: HTMLElement;
+  let animHeight = "0px";
+  onMount(() => {
+    let target = box.getBoundingClientRect().height;
+    animHeight = `${target + 10}px`;
+    console.log(target);
+    box.style.maxHeight = "0px";
+  });
 </script>
 
 <div
+  bind:this={box}
   class="chatBubble {message.type} {$storage.chatter.inProgress.animation.replace(' ', '_')} {$storage.chatter.inProgress.align} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}"
   class:dropShadow={$storage.chatter.inProgress.highlight}
   class:bubbleBanner={$storage.chatter.inProgress.banner}
@@ -44,6 +55,7 @@
   style:--animEase={$storage.chatter.inProgress.animEase}
   style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
+  style:--animHeight={animHeight}
 >
   <div class="bubbleContent">
     <span style="color: {$storage.chatter.inProgress.fontcolour};">
@@ -97,12 +109,13 @@
     --paddingX: 15px;
     --animEase: ease-in-out;
     --animTime: 500ms;
+    --animHeight: 24px;
     background-color: var(--userCol);
     color: var(--userCol);
     position: relative;
     display: grid;
     grid-template-rows: 1fr;
-    transition: grid-template-rows var(--animTime) var(--animEase);
+    //transition: grid-template-rows var(--animTime) var(--animEase);
     flex-direction: row;
     flex-wrap: nowrap;
     justify-self: end;
@@ -115,7 +128,6 @@
     z-index: 1;
     padding: 0 var(--paddingX) 0 var(--paddingX);
     margin: 0 var(--marginX) 0 var(--marginX);
-
     b {
       white-space: pre;
     }
@@ -165,20 +177,33 @@
   //Animations
   .Pop_In {
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
+    animation-delay: 1ms;
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
   }
+  // @keyframes PopInAnimation {
+  //   0% {
+  //     padding: 0 var(--paddingX) 0 var(--paddingX) !important;
+  //     margin: 0 var(--marginX) 0 var(--marginX) !important;
+  //     grid-template-rows: 0fr;
+  //   }
+  //   100% {
+  //     grid-template-rows: 1fr;
+  //     padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+  //     margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+  //   }
+  // }
   @keyframes PopInAnimation {
     0% {
       padding: 0 var(--paddingX) 0 var(--paddingX) !important;
       margin: 0 var(--marginX) 0 var(--marginX) !important;
-      grid-template-rows: 0fr;
+      max-height: 0;
     }
     100% {
-      grid-template-rows: 1fr;
       padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
       margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      max-height: var(--animHeight);
     }
   }
   @keyframes PopInBanner {

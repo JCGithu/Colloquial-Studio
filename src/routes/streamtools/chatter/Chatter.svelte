@@ -150,7 +150,7 @@
   let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
 
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
-    if (self || !channel) return;
+    if (self || !channel || !message) return;
     if (typeof $storage.chatter.inProgress.hidebot === "object" && $storage.chatter.inProgress.hidebot.includes(tags.username)) return;
     if ($storage.chatter.inProgress.links && (message.includes("http://") || message.includes("https://"))) return;
     if ($storage.chatter.inProgress.points && tags["custom-reward-id"]) return;
@@ -226,10 +226,7 @@
     client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, self, "chat"));
     client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, self, "action"));
     client.on("cheer", (channel, tags, message) => runMessage(channel, tags, message, false, "cheer"));
-    client.on("subscription", (channel, username, method, message, tags) => {
-      console.log(channel, username, method, message, tags);
-      runMessage(channel, tags, message, false, "sub");
-    });
+    client.on("subscription", (channel, username, method, message, tags) => runMessage(channel, tags, message, false, "sub"));
     client.on("resub", (channel, username, months, message, tags) => runMessage(channel, tags, message, false, "sub"));
     //@ts-ignore
     // Announcement is not in official TMI.js yet

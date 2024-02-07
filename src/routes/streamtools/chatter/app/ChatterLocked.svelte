@@ -53,7 +53,6 @@
   };
 
   async function fetchPronoun(username: string) {
-    //console.log(`...Looking for ${username} pronouns`);
     fetch(`https://pronouns.alejo.io/api/users/${username}`)
       .then((res) => res.json())
       .then((proData) => {
@@ -146,7 +145,7 @@
   let testCommands = ["!chatter-sub", "!chatter-mod", "!chatter-vip", "!chatter-partner", "!chatter-user", "!chatter-bits"];
 
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
-    if (self || !channel) return;
+    if (self || !channel || !message) return;
     if (typeof inProgress.hidebot === "object" && inProgress.hidebot.includes(tags.username)) return;
     if (inProgress.links && (message.includes("http://") || message.includes("https://"))) return;
     if (inProgress.points && tags["custom-reward-id"]) return;
@@ -222,7 +221,6 @@
     client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, self, "action"));
     client.on("cheer", (channel, tags, message) => runMessage(channel, tags, message, false, "cheer"));
     client.on("subscription", (channel, username, method, message, tags) => {
-      console.log(channel, username, method, message, tags);
       runMessage(channel, tags, message, false, "sub");
     });
     client.on("resub", (channel, username, months, message, tags) => runMessage(channel, tags, message, false, "sub"));
