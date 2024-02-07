@@ -1,12 +1,8 @@
 <script lang="ts">
-  import { fly } from "svelte/transition";
   import { storage } from "../../toolParams";
-  import { onMount } from "svelte";
   export let message: Message, badgeData: BadgeData;
 
   let badges: Array<string> = [];
-  let bigEmote = true;
-  let deleteChat = false;
 
   //PARSING BADGES
   if ($storage.chatter.inProgress.badges && message.tags.badges) {
@@ -26,12 +22,11 @@
   $: userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${$storage.chatter.inProgress.chatopacity / 100})`;
   let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
 
-  if ($storage.chatter.inProgress.emoteOnly) {
+  let bigEmote = $storage.chatter.inProgress.emoteOnly;
+  if (bigEmote) {
     message.message.forEach((el) => {
       if (!el.code) bigEmote = false;
     });
-  } else {
-    bigEmote = false;
   }
 </script>
 
@@ -43,15 +38,12 @@
   class:bits={message.tags.bits}
   class:mod={message.tags.mod}
   class:vip={message.tags.badges?.vip}
-  class:deleteChat
   style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;"
   style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
   style:--animTimeSlow={`${$storage.chatter.inProgress.animTime * 1}s`}
   style:--animEase={$storage.chatter.inProgress.animEase}
   style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
-  out:fly={{ y: 0, duration: $storage.chatter.inProgress.animTime * 1000 }}
-  on:outrostart={() => (deleteChat = true)}
 >
   <div class="bubbleContent">
     <span style="color: {$storage.chatter.inProgress.fontcolour};">
@@ -89,7 +81,6 @@
               {word.text}
             {/if}
           </span>
-          <!-- {word.text}{" "} -->
         {/if}
       {/each}
     </span>
@@ -248,24 +239,6 @@
     }
     to {
       transform: translateX(0);
-    }
-  }
-
-  .deleteChat {
-    animation: shrink var(--animTime) var(--animEase) forwards !important;
-  }
-
-  @keyframes shrink {
-    from {
-      grid-template-rows: 1fr;
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
-    }
-    to {
-      grid-template-rows: 0fr;
-      padding: 0 var(--paddingX) 0 var(--paddingX);
-      margin: 0 var(--marginX) 0 var(--marginX);
-      height: 0;
     }
   }
 
