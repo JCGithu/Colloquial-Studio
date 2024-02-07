@@ -15,10 +15,10 @@
   let grid = getContext("grid");
   let currentValue = value;
   const dispatch = createEventDispatcher();
-  $: () => {
+  $: {
     currentValue = Object.keys(options).find((key) => options[key] === value) || "";
     dispatch("change");
-  };
+  }
 </script>
 
 <div class="inputBlock {customClass} inputBlockSelect" class:grid class:grouped class:faded style:--flex={"row"}>
