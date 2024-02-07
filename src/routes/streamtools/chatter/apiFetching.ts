@@ -30,7 +30,6 @@ export async function initialFetches(channel: string, bttvEmoteCache: Array<bttv
       }
     });
   }
-  console.log(badgeData);
   await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`)
     .then((res) => res.json())
     .then((data) => {
@@ -39,22 +38,6 @@ export async function initialFetches(channel: string, bttvEmoteCache: Array<bttv
       }
       for (let i in data.sharedEmotes) {
         bttvEmoteCache.push(data.sharedEmotes[i]);
-      }
-    })
-    .catch(error => console.error(error));
-
-  fetch("https://api.betterttv.net/3/cached/emotes/global")
-    .then((response) => response.json())
-    .then((data) => {
-      bttvEmoteCache = data;
-    })
-    .catch(error => console.error(error));
-
-  fetch(`https://api.frankerfacez.com/v1/set/global`)
-    .then((response) => response.json())
-    .then((data) => {
-      for (let [key, value] of Object.entries(data.sets as ffzData)) {
-        ffzCache = ffzCache.concat(value.emoticons);
       }
     })
     .catch(error => console.error(error));
