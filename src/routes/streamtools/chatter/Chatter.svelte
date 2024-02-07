@@ -264,6 +264,7 @@
 
   function destroyChatter() {
     if (!client) return;
+    badgeData = {};
     client.disconnect().catch((error: string) => {
       console.log(error);
     });
