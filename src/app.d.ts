@@ -30,7 +30,7 @@ type ChatterParameters = {
 	hidecom: any;
 	pronouns: string | boolean;
 	direction: string;
-	animTime: string;
+	animTime: number;
 	animEase: string;
 	highlight: string | boolean;
 	emoteOnly: string | boolean;
