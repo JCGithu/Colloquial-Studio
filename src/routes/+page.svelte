@@ -110,10 +110,6 @@
       border-radius: 1rem !important;
       overflow: hidden !important;
     }
-    h2 {
-      font-size: 15pt;
-      margin: 0;
-    }
     li {
       list-style: none;
       transition: 1s all cubic-bezier(0.075, 0.82, 0.165, 1);
