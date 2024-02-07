@@ -8,6 +8,7 @@
   import Dash from "../../components/DashExport";
   import SVGIcon from "../../components/SVGIcon.svelte";
   import SaveMenu from "./saveMenu.svelte";
+  import JSONCrush from "jsoncrush";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
@@ -58,6 +59,14 @@
     baseURL = window.location.href.split("?data=")[0];
     let urlData = new URLSearchParams(window.location.search);
     if (urlData.has("data")) window.location.replace(`${window.location.href.split("?data")[0]}/app` + document.location.search);
+    //EmoteDrop V1 Fix
+    if (urlData.has("channel")) {
+      let channelObj = {
+        channel: urlData.get("channel"),
+      };
+      let crushed = JSONCrush.crush(JSON.stringify(channelObj));
+      window.location.replace(`${window.location.href.split("?channel")[0]}/app?data=` + crushed);
+    }
     urlFill.update((urls) => {
       urls[appDetails.name].base = baseURL;
       return urls;
