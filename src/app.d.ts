@@ -55,6 +55,7 @@ type ChatterParameters = {
 	intro: boolean;
 	shrink: boolean;
 	padding: number;
+	limit: number;
 }
 
 type EmoteDropParameters = {

@@ -19,6 +19,7 @@ export const defaultParams: ChatterParameters = {
   ffz: false,
   hidebot: "",
   hidecom: "",
+  limit: 40,
   pronouns: false,
   direction: "Down",
   animTime: "0.5",

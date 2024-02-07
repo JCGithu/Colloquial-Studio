@@ -92,10 +92,10 @@
     messageIndex++;
     if (($storage.chatter.inProgress.banner && $storage.chatter.inProgress.align === "flex-start") || $storage.chatter.inProgress.direction === "Up") {
       messageList.unshift(newChat);
-      if (messageList.length > 50) messageList.pop();
+      if (messageList.length > $storage.chatter.inProgress.limit) messageList.pop();
     } else {
       messageList = messageList.concat(newChat);
-      if (messageList.length > 50) messageList.shift();
+      if (messageList.length > $storage.chatter.inProgress.limit) messageList.shift();
     }
     messageList = messageList;
   }

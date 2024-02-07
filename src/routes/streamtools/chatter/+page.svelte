@@ -104,6 +104,7 @@
         {/if}
       </Dash.Group>
     {/if}
+    <Dash.Number name="Chat Limit" id="limit" subtitle="Number of chats in memory. Reduce to optimise." bind:value={$storage.chatter.inProgress.limit} />
   </slot>
 </Dashboard>
 
