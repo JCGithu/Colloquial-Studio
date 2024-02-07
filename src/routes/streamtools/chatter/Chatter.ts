@@ -23,7 +23,7 @@ export const defaultParams: ChatterParameters = {
   pronouns: false,
   direction: "Down",
   animTime: 0.5,
-  animEase: "ease-in-out",
+  animEase: "cubic-bezier(.35,.07,.17,1)",
   emoteOnly: false,
   nameCustom: false,
   bubbleCustom: false,
