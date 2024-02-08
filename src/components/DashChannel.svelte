@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, createEventDispatcher, afterUpdate } from "svelte";
+  import { getContext, createEventDispatcher, afterUpdate, setContext } from "svelte";
 
   //PROPS
   export let name = "Channel Name";
@@ -17,6 +17,7 @@
   const dispatch = createEventDispatcher();
 
   import SvgIcon from "./SVGIcon.svelte";
+  import tooltip from "../js/tooltip";
 
   let rotate: HTMLElement;
 
@@ -41,7 +42,11 @@
       {id}
       bind:value
     />
-    <span bind:this={rotate} on:click={refresh} on:keypress={refresh} role="button" tabindex="0"><SvgIcon icon="refresh" fill="black" /></span>
+    <span use:tooltip={"reload"} on:click={refresh} on:keypress={refresh} role="button" tabindex="0">
+      <div bind:this={rotate} class="reloadButton">
+        <SvgIcon icon="refresh" fill="black" />
+      </div>
+    </span>
   </div>
 </section>
 
@@ -109,6 +114,11 @@
     right: 1rem;
     top: calc(1.6rem - 0.75rem);
     cursor: pointer;
+  }
+
+  .reloadButton {
+    height: 100%;
+    margin: 0;
   }
 
   input {
