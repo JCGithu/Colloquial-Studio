@@ -3,6 +3,9 @@
   import { onMount } from "svelte";
   import { fly, fade } from "svelte/transition";
   import JSConfetti from "js-confetti";
+  import type { Client } from "tmi.js";
+  import { beforeNavigate } from "$app/navigation";
+  import DashCheck from "../../../components/DashCheck.svelte";
   let channel = "";
   let channelInput: string;
   let canvas: HTMLCanvasElement;
@@ -18,7 +21,7 @@
   let attempts = 0;
 
   //Settings
-  let intro = false;
+  let playGame = 0;
   let done = false;
   let easyMode = false;
   let blurry = false;
@@ -61,11 +64,6 @@
   }
 
   function runMessage(channel: string, tags: Tags, message: string, misc: { [x: string]: any }) {
-    if (done) {
-      // Just to remove the TS error
-      console.log(channel, misc);
-      return;
-    }
     if (message.length > 1) return fail(tags.username);
     message = message.toUpperCase();
     if (currNum === 64 && message === "A") {
@@ -85,33 +83,47 @@
     } else fail(tags.username);
   }
 
+  function deBlur(k: KeyboardEvent) {
+    if (k.key != "Enter") return;
+    blurry = false;
+    let button = document.getElementById("button");
+    button ? button.focus() : document.body.focus();
+  }
+
+  let client: Client;
   onMount(() => {
     let URldata = new URLSearchParams(window.location.search);
     channel = URldata.get("channel") || "";
+    playGame = channel.length ? 1 : 2;
     overlay = URldata.get("overlay") === "true" || false;
 
     confettiTarget = new JSConfetti({ canvas });
 
     //@ts-ignore
-    let client = new tmi.Client({
+    client = new tmi.Client({
       channels: [channel],
     });
-    client.on("connected", () => {
-      console.log("Reading from Twitch! ✅");
-    });
-
-    client.on("chat", runMessage);
-    client.on("action", runMessage);
-    client.on("cheer", runMessage);
-    client.on("subscription", (channel: string, username: string, method: string, message: string, tags: Tags) => runMessage(channel, tags, message, { username: username, method: method }));
-    client.on("resub", (channel: string, username: string, months: number, message: string, tags: Tags) => runMessage(channel, tags, message, { username: username, months: months }));
+    client.on("connected", () => console.log("Reading from Twitch! ✅"));
+    client.on("chat", (channel, tags, message, self) => runMessage(channel, tags, message, { self }));
+    client.on("action", (channel, tags, message, self) => runMessage(channel, tags, message, { self }));
+    client.on("cheer", (channel, tags, message) => runMessage(channel, tags, message, { self }));
+    client.on("subscription", (channel, username, method, message, tags) => runMessage(channel, tags, message, { username, method }));
+    client.on("resub", (channel, username, months, message, tags) => runMessage(channel, tags, message, { username, months }));
 
     // ADD WAY FOR EASY AND OVERLAY MODE
-    if (channel != "") {
+    if (channel.length) {
       client.connect();
-      intro = true;
+      playGame = 1;
     }
   });
+
+  function disconnectChat() {
+    if (!client) return;
+    client.disconnect().catch((error: string) => {
+      console.log(error);
+    });
+  }
+  beforeNavigate(disconnectChat);
 </script>
 
 <svelte:head>
@@ -128,7 +140,7 @@
 </svelte:head>
 
 <main class:red class:overlay>
-  {#if intro}
+  {#if playGame === 1}
     <canvas bind:this={canvas} />
     <div id="game">
       {#if highscore <= 0}<p>Current letter:</p>{/if}
@@ -136,18 +148,21 @@
       {#if currNum < highscore}<p id="users" transition:fade>{userText}</p>{/if}
       {#if extraText}<p id="extra" transition:fly={{ y: 200, duration: 500 }}>{extraText}</p>{/if}
     </div>
-  {:else}
+  {:else if playGame === 2}
     <div class:blurry>
       <h1 id="title">Alphabet Challenge</h1>
       <h4 id="credit">Original idea by <a href="https://www.twitch.tv/Lenamoon">Lenamoon</a>, made by <a href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a></h4>
       <p>In order to play with chat you'll need to put in your channel below</p>
     </div>
-    <input type="text" on:blur={() => (blurry = false)} on:focus={() => (blurry = true)} bind:value={channelInput} />
-    <label class:blurry>
-      {overlay ? "Transparent background" : "Original background"}
-      <input type="checkbox" bind:checked={overlay} />
-    </label>
-    <button class:blurry on:click={reloadGame}>Play</button>
+    <input type="text" on:keypress={deBlur} on:blur={() => (blurry = false)} on:focus={() => (blurry = true)} bind:value={channelInput} />
+    <div class="checkDiv">
+      <DashCheck customClass={blurry ? "blurry alphabetCheck" : "alphabetCheck"} name="No Background" bind:value={overlay} />
+    </div>
+    <!-- <label class:blurry>
+    {overlay ? "Swap to traditional background" : "Swap to transparent background"}
+    <input type="checkbox" bind:checked={overlay} />
+  </label> -->
+    <button id="button" class:blurry on:click={reloadGame}>Play</button>
   {/if}
 </main>
 
@@ -187,8 +202,22 @@
       color: white;
     }
   }
-  .blurry {
+  :global(.blurry) {
     filter: blur(5px);
+  }
+  :global(h2.alphabetCheck) {
+    font-size: 1rem !important;
+    color: $colloquial !important;
+  }
+  :global(span.alphabetCheck) {
+    border-color: $colloquial !important;
+    background-color: transparent !important;
+    &::after {
+      color: black !important;
+    }
+  }
+  .checkDiv {
+    width: calc(200px + 3rem);
   }
   .shake {
     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
@@ -225,6 +254,9 @@
   }
   h4 {
     margin: 0;
+    margin-top: -0.2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem !important;
     font-size: small;
   }
   #current {
@@ -265,6 +297,7 @@
     border-radius: 0.5rem;
     border: none;
     margin-top: 1rem;
+    width: 200px;
     font-family: "Poppins";
     height: 1.5rem;
     opacity: 0.6;
@@ -322,6 +355,7 @@
     border: none;
     background-color: black;
     color: white;
+    padding: 0.3rem 1rem;
     border-radius: 0.5rem;
     cursor: pointer;
   }
