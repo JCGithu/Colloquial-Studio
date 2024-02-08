@@ -7,6 +7,7 @@
   import HowTo from "./howTo.svelte";
   import Settings from "./settings.svelte";
   import Keyboard from "./keyboard.svelte";
+  import EventBox from "./eventBox.svelte";
   let showSettings = false;
   let currentMenu = 1;
 </script>
@@ -52,7 +53,9 @@
       <Keyboard />
     </div>
   {/if}
-  <slot />
+  <div id="bottom" class:fade={showSettings}>
+    <EventBox on:buttonPress />
+  </div>
 </div>
 
 <style lang="scss">
@@ -96,18 +99,21 @@
     background-color: var(--mainDarken20);
     z-index: 1;
     border-radius: 0.5rem;
-    width: calc(100% - 2rem);
-    padding: 0.5rem 1rem;
+    --padding: 30px;
+    width: calc(100% - 2 * var(--padding));
+    padding: 0.5rem var(--padding);
     margin: 0;
     margin-top: 0.3rem;
-    height: calc(100% - 1.4rem);
+    height: calc(100% - 3rem);
     display: flex;
     flex-direction: column;
     justify-content: baseline;
     align-items: center;
+    overflow-x: hidden;
     overflow-y: auto;
     &::-webkit-scrollbar {
-      width: 0;
+      visibility: hidden;
+      width: 0px;
     }
   }
   :global(.TwordleDashButton) {
@@ -141,6 +147,20 @@
         opacity: 1;
         background-color: $twordlePurple;
       }
+    }
+  }
+  #bottom {
+    //position: absolute;
+    position: relative;
+    bottom: 0%;
+    //transform: translateY(100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: max-content;
+    @media only screen and (max-height: "830px") {
+      flex-direction: row;
     }
   }
 </style>

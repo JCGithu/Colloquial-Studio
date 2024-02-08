@@ -133,7 +133,7 @@
     }
   }
 
-  let backupClient: Client;
+  let client: Client;
   onMount(async () => {
     //LANGUAGES
     let languageCode = navigator.language.substring(0, 2);
@@ -146,10 +146,9 @@
     //if (onMobile) localKeyboard = false;
 
     //@ts-ignore
-    let client: Client = new tmi.Client({
+    client = new tmi.Client({
       channels: [$storage.twordle.settings.channel],
     });
-    backupClient = client;
 
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
@@ -174,12 +173,14 @@
       client.connect();
     }
   });
-  beforeNavigate(async () => {
-    console.log("bye!");
-    backupClient.disconnect().catch((error: string) => {
+
+  function disconnectChat() {
+    if (!client) return;
+    client.disconnect().catch((error: string) => {
       console.log(error);
     });
-  });
+  }
+  beforeNavigate(disconnectChat);
 </script>
 
 <svelte:head>
@@ -191,10 +192,10 @@
   </style>
 </svelte:head>
 
-{#await gameInit(toastUpdate)}
-  <p>Loading</p>
-{:then run}
-  <main class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
+<main class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
+  {#await gameInit(toastUpdate)}
+    <p>Loading</p>
+  {:then run}
     <span id="return"><a aria-label="Return to home" href="/"><SVGIcon icon="logo" /></a></span>
     <audio bind:this={winSound} src={winSoundSrc} volume={$storage.twordle.settings.volume / 10} />
     <audio bind:this={roundStart} src={roundStartSrc} volume={$storage.twordle.settings.volume / 10} />
@@ -211,21 +212,13 @@
               <h1>rdle</h1>
             {/if}
           </span>
-          <p>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</p>
           <!-- <button class='HowToPlay' on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button> -->
         </div>
-        <Grid>
-          <div id="bottom">
-            <EventBox on:buttonPress={buttonPress} />
-          </div>
-        </Grid>
-        <!-- <div id="bottom">
-          <EventBox on:buttonPress={buttonPress} />
-        </div> -->
+        <Grid on:buttonPress={buttonPress} />
       </div>
     </div>
-  </main>
-{/await}
+  {/await}
+</main>
 
 <style lang="scss">
   @use "../../../css/colours.scss" as *;
@@ -321,20 +314,6 @@
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     a {
       text-decoration: underline;
-    }
-  }
-
-  #bottom {
-    position: absolute;
-    bottom: 0%;
-    transform: translateY(100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: max-content;
-    @media only screen and (max-height: "830px") {
-      flex-direction: row;
     }
   }
 
