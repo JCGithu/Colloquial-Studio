@@ -1,24 +1,27 @@
 <script lang="ts">
   import { storage } from "../../../gameParams";
+  import tooltip from "../../../../js/tooltip";
 </script>
 
 <section class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
   <h2>How to play</h2>
   <p>
     Twordle is a word game to play with Twitch chat. <br /><br />
-    The streamer enters a 5 letter secret word, or selects a random word. Each round chat must guess one letter at a time what the word is. <br /><br />
-    When a round starts any single letters written in chat (upper or lower case) count as a vote. The letter with the most votes gets put on the grid. <br /><br />
-    At the end of each row the blocks will colour in to reveal how close chat is to the secret word. Beige means the letter is not in the word, Orange means it is in the word, and green means that the letter is in the correct place. <br />
+    The streamer enters a secret word, or selects a random word. Each round the chat must guess one letter at a time what the word is. <br /><br />
+    Any single letters written in chat (upper or lower case) count as a vote for the current round. The letter with the most votes goes on the grid. <br /><br />
+    Each row, once complete, will reveal how close that guess is to the secret word.<br />
+    <br />
+    For example:
   </p>
   <div id="boxbox">
-    <span>X</span>
-    <span>O</span>
-    <span>✓</span>
+    <span use:tooltip={"Wrong"}>X</span>
+    <span use:tooltip={"In Word"}>O</span>
+    <span use:tooltip={"Correct"}>✓</span>
   </div>
   <p>
     It's advised that chat <i>try</i> to write <i>actual</i> words. <br />
-    If you want to use this as a handsfree BRB screen, click 'auto mode'!
   </p>
+  <footer>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</footer>
 </section>
 
 <style lang="scss">
@@ -42,10 +45,22 @@
     justify-content: center;
   }
   span {
-    width: 4rem !important;
-    height: 4rem !important;
-    margin: 1rem;
-    background-color: red;
+    width: 3rem !important;
+    height: 3rem !important;
+    margin: 0.7rem;
+  }
+  footer {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+    margin: 0.3rem 0;
+    border-radius: 0.3rem;
+    background-color: $twordlePurple;
+    font-style: italic;
+    a {
+      color: $white;
+      //text-decoration: none;
+    }
   }
   #boxbox {
     width: 100%;
@@ -54,6 +69,7 @@
     color: white;
     font-size: 2.5rem;
     font-weight: bold;
+    user-select: none;
     span {
       display: flex;
       text-align: center;
@@ -71,32 +87,5 @@
     :nth-child(3) {
       background-color: $twordleGreen;
     }
-  }
-
-  ::-webkit-scrollbar-track {
-    background-clip: padding-box;
-    border-radius: 100px;
-    background-color: var(--mainDarken20);
-    padding-right: 0.5rem;
-    margin: 1rem;
-    width: 10px;
-    border: 8px solid rgba(0, 0, 0, 0);
-    cursor: pointer !important;
-  }
-
-  ::-webkit-scrollbar {
-    width: 25px;
-    //background-color: var(--main);
-    margin-right: 1rem;
-    cursor: pointer !important;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    border-radius: 100px;
-    border: 8px solid rgba(0, 0, 0, 0);
-    //border-top: 8px red;
-    background-color: var(--mainDarken10);
-    background-clip: padding-box;
-    cursor: pointer !important;
   }
 </style>
