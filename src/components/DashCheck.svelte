@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { DialogTitle } from "@rgossiaux/svelte-headlessui";
   import { getContext } from "svelte";
-  import type { Writable } from "svelte/store";
 
   //PROPS
   export let name: string;
@@ -11,10 +9,8 @@
   export let value = false;
   export let customClass = "";
   //CONTEXT
-  let appDetails: appDetails = getContext("appDetails");
   let grouped = getContext("grouped");
   let grid = getContext("grid");
-  const store = getContext("store") as Writable<streamToolTotalStorage>;
 
   function EnterFlip(e: KeyboardEvent) {
     console.log(e);
@@ -24,11 +20,11 @@
 </script>
 
 <div class="inputBlock {customClass}" class:grid class:grouped class:faded class:longTitle={name.length > 15} on:keypress={EnterFlip} role="button" tabindex="0">
-  <label style={subtitle ? "flex-direction: column" : ""} class="checkContainer">
+  <label style={subtitle ? "flex-direction: column" : ""} class="checkContainer {customClass}">
     <div>
-      <h2>{name}</h2>
-      <input type="checkbox" {id} aria-label={id} bind:checked={value} on:change />
-      <span class="checkmark" />
+      <h2 class={customClass}>{name}</h2>
+      <input class={customClass} type="checkbox" {id} aria-label={id} bind:checked={value} on:change />
+      <span class="checkmark {customClass}" />
     </div>
     {#if subtitle}
       <p class="inputSubtitle">{subtitle}</p>
