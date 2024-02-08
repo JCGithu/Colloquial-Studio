@@ -2,6 +2,7 @@
   import { RadioGroup, RadioGroupOption } from "@rgossiaux/svelte-headlessui";
   import { getContext, createEventDispatcher } from "svelte";
   import SvgIcon from "./SVGIcon.svelte";
+  import tooltip from "../js/tooltip";
 
   export let name = "";
   export let subtitle = "";
@@ -33,7 +34,7 @@
   {/if}
   <RadioGroup bind:value class="radioGroup" {id}>
     {#each Object.keys(options) as option}
-      <span>
+      <span use:tooltip={options[option].icon ? option : null}>
         <RadioGroupOption value={options[option].value} let:checked class="radioOption">
           <span class:TabChecked={checked} class:iconOption={options[option].icon}>
             {#if options[option].icon}
@@ -80,7 +81,7 @@
       all 0.4s ease-in-out,
       background 0.1s ease;
     position: relative;
-    overflow: hidden;
+    //overflow: hidden;
     &:focus {
       background: white;
     }
