@@ -1,47 +1,53 @@
 <script lang="ts">
   import { getContext, createEventDispatcher } from "svelte";
   import { slide } from "svelte/transition";
-  import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@rgossiaux/svelte-headlessui";
 
   export let name: string;
   export let subtitle = "";
   export let id = name;
   export let options: Record<string, any>;
-  export let value = options[0];
+  export let value: any;
   export let faded = false;
   export let customClass = "";
 
+  let open = false;
+
   let grouped = getContext("grouped");
   let grid = getContext("grid");
-  let currentValue = value;
+  $: currentName = Object.keys(options).find((key) => options[key] === value);
   const dispatch = createEventDispatcher();
-  $: {
-    currentValue = Object.keys(options).find((key) => options[key] === value) || "";
+
+  function keyPress(e: { key: string }) {
+    if (e.key === "Enter") {
+      console.log("wow");
+    }
+  }
+  function changeValue(name: string) {
+    value = options[name];
+    open = false;
     dispatch("change");
   }
 </script>
 
-<div class="inputBlock {customClass} inputBlockSelect" class:grid class:grouped class:faded style:--flex={"row"}>
+<div {id} class="inputBlock {customClass} inputBlockSelect" class:grid class:grouped class:faded style:--flex={"row"}>
   <h2 class="inputName listName">{name}</h2>
   {#if subtitle}
     <p class="inputSubtitle">{subtitle}</p>
   {/if}
-  <Listbox bind:value class="listBox" let:open {id}>
-    <ListboxButton class="listBoxButton {open ? 'boxOpen' : ''}">{currentValue}</ListboxButton>
+  <div class="listBox">
+    <button class="listBoxButton" class:boxOpen={open} on:click={() => (open = !open)}>{currentName}</button>
     {#if open}
       <div class="optionHolder" transition:slide>
-        <ListboxOptions class="listBoxOptions">
-          {#each Object.keys(options) as option}
-            <ListboxOption value={options[option]} disabled={options[option] === value} class={({ active }) => (active ? "listBoxActive listBoxOption" : "listBoxOption")} let:selected>
-              <span class:optionSelected={selected}>
-                {option}
-              </span>
-            </ListboxOption>
-          {/each}
-        </ListboxOptions>
+        {#each Object.keys(options) as option}
+          <div role="button" tabindex="0" class="listBoxOption" on:click={() => changeValue(option)} on:keypress={() => keyPress}>
+            <span>
+              {option}
+            </span>
+          </div>
+        {/each}
       </div>
     {/if}
-  </Listbox>
+  </div>
 </div>
 
 <style lang="scss">
@@ -50,7 +56,7 @@
   @use "../css/dashboard.scss";
 
   //SELECT
-  :global(.listBox) {
+  .listBox {
     padding: 0.5rem 0rem;
     border: none;
     outline: none;
@@ -60,17 +66,18 @@
     align-items: flex-end;
     width: 100%;
   }
-  :global(.listBoxButton) {
+  .listBoxButton {
     position: relative;
     width: 100%;
     outline: none;
     font-family: "Poppins";
     color: $black;
+    text-align: left;
     font-weight: 500;
     cursor: pointer;
     border-width: 0px;
-    border-color: fade-out($colloquial, 0.8) fade-out($colloquial, 0.9);
     border-style: solid;
+    border-color: transparent;
     background: linear-gradient(0deg, $whiteFade, $white);
     background-size: 600% 600%;
     background-position: 50% 100%;
@@ -101,11 +108,11 @@
       background: white;
     }
   }
-  :global(.boxOpen) {
+  .boxOpen {
     // Just to keep this without a warning
     position: relative;
   }
-  :global(.listBoxOptions) {
+  .listBoxOptions {
     margin: 0;
     margin-top: -1rem;
     border-radius: 0 0 0.5rem 0.5rem;
@@ -131,24 +138,36 @@
   .optionHolder {
     padding: 0;
     position: relative;
-    margin-left: 1rem;
-    width: 100%;
+    //margin-left: 1rem;
+    margin-right: 5%;
+    margin-top: -1%;
+    padding-top: 1%;
+    width: 89%;
     max-width: 250px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    border: $whiteFade 2px solid;
+    border-top: none;
+    border-radius: 0 0 0.5rem 0.5rem;
     @media screen and (max-width: d.$phone) {
       max-width: 100%;
     }
   }
-  :global(.listBoxOption) {
+  .listBoxOption {
     list-style-type: none;
     cursor: pointer;
-    padding: 0.2rem 1rem;
+    width: calc(89% - 0.4rem);
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem !important;
+    margin: 0;
     transition: 0.4s all ease-in-out;
     &:nth-child(1) {
       border-width: 0px;
+    }
+    &:last-child {
+      padding-bottom: 0.6rem;
     }
     color: $white;
     border-color: fade-out($white, 0.9);
@@ -157,12 +176,10 @@
     border-radius: 0;
     &:hover,
     &:focus {
-      background-color: lighten($black, 3);
-      //color: $black;
-      font-weight: bold;
+      background-color: $black;
     }
   }
-  :global(.listBoxActive) {
+  .listBoxActive {
     background-color: lighten($black, 3);
     //color: $black;
     font-weight: bold;
@@ -174,8 +191,8 @@
     text-decoration-color: $colloquial;
   }
   .grouped {
-    :global(.listBox) {
-      :global(.listBoxButton) {
+    .listBox {
+      .listBoxButton {
         border-radius: 8px;
       }
     }
