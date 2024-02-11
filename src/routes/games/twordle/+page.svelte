@@ -11,16 +11,12 @@
   //Components
   import SVGIcon from "../../../components/SVGIcon.svelte";
   import Grid from "./game/twordleBody.svelte";
-  import EventBox from "./game/eventBox.svelte";
   //AUDIO
   let winSound: HTMLAudioElement;
   let roundStart: HTMLAudioElement;
   import roundStartSrc from "./round.mp3";
   import winSoundSrc from "./win.mp3";
   import JSConfetti from "js-confetti";
-  import { newWorld } from "../../streamtools/emotedrop/physics";
-  //Variables
-  let userEmote: undefined | string = undefined;
   //Overlays
   let confetti: JSConfetti;
   let canvas: HTMLCanvasElement;
@@ -285,12 +281,6 @@
       color: $white;
       text-shadow: none;
     }
-  }
-
-  .personalised {
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   #return {

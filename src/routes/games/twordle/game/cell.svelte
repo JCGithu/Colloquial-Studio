@@ -14,7 +14,6 @@
   $: letter = $grid[y][x];
   let styleString = getContext("colours");
   let delay = (x + y) * 0.1;
-  //If current round = y and letter = x make selected true;
   afterUpdate(() => {
     selected = $currentGame.round === y && $currentGame.letter === x;
     if ($currentGame.round <= y) return;

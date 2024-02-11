@@ -1,5 +1,4 @@
 import { writable, get } from 'svelte/store';
-import type { Writable } from 'svelte/store';
 import AllWords from "./words/all.txt?raw";
 import Movies from "./words/movies.txt?raw";
 import Food from "./words/food.txt?raw";
@@ -35,11 +34,6 @@ const blankGame: TwordleGame = {
   state: "START",
   connected: false,
 };
-const blankStats: TwordleStats = {
-  play: 0,
-  votes: 0,
-  won: 0
-}
 
 export const currentGame = writable(structuredClone(blankGame));
 
@@ -48,22 +42,6 @@ export const languageList: Record<string, string> = {
   "fr": "Les caractères français sont pris en charge!",
   "de": "Deutsche Schriftzeichen werden unterstützt!",
 }
-
-export let personalisedUsers: Record<string, string> = {
-  //coollike: "https://static-cdn.jtvnw.net/emoticons/v2/305274770/default/light/3.0",
-  lbx0: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_44ede65082fb45ef9473c9966c3cd9ea/default/light/3.0",
-  colloquialowl: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_607ddb2a873f4606b5397997c33b6bbf/default/light/3.0",
-  letsbrock: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_7d127fea0d5d481e886c7161d45b4d78/default/light/3.0",
-  arcasian: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_c889ae6320e74a29baa2e46bd6a6d0d6/default/light/3.0",
-  certainlylaz: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_0f82cf9b2bcb41d3823ab0273c122208/default/dark/3.0",
-  //geo_master: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_46ac106df68b4a5ba4907317b2b0aafa/default/dark/3.0",
-  sskarrlett: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_9860c508ac1843f6a7f84345f97b9cd6/default/dark/3.0",
-  astoldbyangela: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_7d4f4841c28d472cbb3a88c4b5040c27/default/dark/3.0",
-  cozygamerkat: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_75fa29d856ed4c1a979edcfe68c54448/default/light/3.0",
-  hellovonnie: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_4020d73b73714c58aa091c82eb71a4b0/default/light/3.0",
-  elliotisacoolguy: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_6e7b14137a824c1fa175ff2d54d3414c/default/light/3.0",
-  //gamesarehaunted: "https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_b64a784799524986894c9b6110dee173/default/light/3.0",
-};
 
 export let qwerty: Record<string, Array<Array<string>>> = {
   en: [

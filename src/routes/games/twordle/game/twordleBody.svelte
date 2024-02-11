@@ -143,7 +143,6 @@
     &:hover,
     &:has(:focus-visible) {
       background-color: transparent !important;
-      //margin-top: 20px !important;
       transform: translateY(24px) scale(1.1);
     }
     :global(.radioGroup) {
@@ -159,10 +158,8 @@
     }
   }
   #bottom {
-    //position: absolute;
     position: relative;
     bottom: 0%;
-    //transform: translateY(100%);
     display: flex;
     flex-direction: column;
     justify-content: center;

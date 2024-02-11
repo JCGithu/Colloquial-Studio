@@ -52,12 +52,6 @@
     justify-content: center;
     margin-bottom: 4px;
     height: 40px;
-    &:nth-child(3) {
-      * {
-        //margin: 0 0.4em;
-        //width: 2.4em;
-      }
-    }
   }
 
   .keyLetter {
