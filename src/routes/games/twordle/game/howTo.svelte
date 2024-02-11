@@ -37,6 +37,11 @@
       text-decoration-color: $twordlePurple;
       text-decoration-thickness: 3px;
       margin-top: 0.1rem;
+      &::selection {
+        background-color: $twordlePurple;
+        color: $white;
+        text-shadow: none;
+      }
     }
   }
   div {
@@ -54,6 +59,7 @@
     font-size: 0.8rem;
     padding: 0.2rem;
     margin: 0.3rem 0;
+    margin-bottom: 1rem;
     border-radius: 0.3rem;
     background-color: $twordlePurple;
     font-style: italic;

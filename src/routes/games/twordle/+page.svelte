@@ -1,6 +1,6 @@
 <script lang="ts">
   //Functions
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { get } from "svelte/store";
   import * as twordle from "./Twordle";
@@ -18,6 +18,7 @@
   import roundStartSrc from "./round.mp3";
   import winSoundSrc from "./win.mp3";
   import JSConfetti from "js-confetti";
+  import { newWorld } from "../../streamtools/emotedrop/physics";
   //Variables
   let userEmote: undefined | string = undefined;
   //Overlays
@@ -58,13 +59,18 @@
     if (finalResult.length === 1) {
       twordle.changeState("NEXTROUND");
       twordle.updateGame("message", `${finalResult[0]} won with ${finalPoll[finalResult[0]]} votes.`);
-      twordle.gridLetterUpdate(finalResult[0]);
-      twordle.updateGuess();
-      // NEXT LINE
-      if ($currentGame.letter === 4) {
-        twordle.changeState("REVEAL");
+      if ($storage.twordle.settings.mode === "letters") {
+        twordle.gridLetterUpdate(finalResult[0]);
+        twordle.updateGuess();
+        if ($currentGame.letter === 4) {
+          twordle.changeState("REVEAL");
+        } else {
+          twordle.incrementGame({ letter: 1, round: 0, votes: 0 });
+        }
       } else {
-        twordle.incrementGame({ letter: 1, round: 0, votes: 0 });
+        twordle.gridWordUpdate(finalResult[0]);
+        twordle.updateGuess();
+        twordle.changeState("REVEAL");
       }
     }
     autoPress();
@@ -85,7 +91,7 @@
     }, 1000);
   }
 
-  function newLetterRound() {
+  function newRound() {
     console.log("Starting new round");
     usersVoted = [];
     twordle.updateGame("timer", 3);
@@ -129,7 +135,7 @@
         twordle.changeState("FAIL");
       }
     } else {
-      newLetterRound();
+      newRound();
     }
   }
 
@@ -160,8 +166,8 @@
       if (self || !channel || message.length > 5) return;
       if (typeof tags.username === "string") if (usersVoted.includes(tags.username)) return;
       let gameSetting = get(storage).twordle.settings;
-      if ((gameSetting.mode === "letters" && message.length != 1) || (gameSetting.mode === "words" && message.length != 5)) return;
       message = message.replace("ß", "ẞ").toUpperCase();
+      if ((gameSetting.mode === "letters" && message.length != 1) || (gameSetting.mode === "words" && message.length != 5)) return;
       if (!twordle.characterChecker(message)) return;
       poll.set(message, (poll.get(message) ?? 0) + 1);
       twordle.incrementGame({ votes: 1, letter: 0, round: 0 });
@@ -181,6 +187,7 @@
     });
   }
   beforeNavigate(disconnectChat);
+  onDestroy(disconnectChat);
 </script>
 
 <svelte:head>
@@ -202,18 +209,7 @@
     <canvas id="confetti" bind:this={canvas} />
     <div id="twordleBody">
       <div id="twordle">
-        <div class="Title">
-          <span class="personalised">
-            {#if !userEmote}
-              <h1>Twordle</h1>
-            {:else}
-              <h1>Tw</h1>
-              <img style="height:2em" alt="emote" src={userEmote} />
-              <h1>rdle</h1>
-            {/if}
-          </span>
-          <!-- <button class='HowToPlay' on:click={() => (currentGame.howto = !currentGame.howto)}>How to Play</button> -->
-        </div>
+        <h1 class="Title">Twordle</h1>
         <Grid on:buttonPress={buttonPress} />
       </div>
     </div>
@@ -274,46 +270,20 @@
   }
 
   .Title {
-    position: relative;
-    max-height: 115px;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 1vh;
-    justify-content: flex-end;
+    font-family: "Outfit";
+    color: $twordlePurple;
     text-align: center;
-    font-weight: 600;
-    font-size: clamp(0.3rem, 2vh, 1rem);
-    a {
-      color: $twordlePurple;
-      transition: all 0.2s ease-in-out;
-      text-decoration-color: $twordlePurple;
-      &:hover {
-        text-decoration-color: $white;
-      }
-      text-shadow: none;
-    }
-    p {
-      margin: 0;
-    }
-    h1 {
-      font-family: "Outfit";
-      color: $twordlePurple;
-      text-align: center;
-      text-shadow: none;
-      font-size: 3rem;
-      font-weight: bold;
-      text-shadow: var(--titleShadow);
-      letter-spacing: -1px;
-      margin: 0;
-      &::selection {
-        background-color: $twordlePurple;
-        color: $white;
-        text-shadow: none;
-      }
-    }
+    text-shadow: none;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: var(--titleShadow);
+    letter-spacing: -1px;
+    margin: 0 0 0.6rem 0;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-    a {
-      text-decoration: underline;
+    &::selection {
+      background-color: $twordlePurple;
+      color: $white;
+      text-shadow: none;
     }
   }
 

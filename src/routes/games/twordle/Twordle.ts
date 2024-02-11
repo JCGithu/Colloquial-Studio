@@ -3,7 +3,7 @@ import type { Writable } from 'svelte/store';
 import AllWords from "./words/all.txt?raw";
 import Movies from "./words/movies.txt?raw";
 import Food from "./words/food.txt?raw";
-import Gaming from "./words/gaming.txt";
+import Gaming from "./words/gaming.txt?raw";
 
 //Grid
 const blankGrid: Array<Array<string>> = [['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', ''], ['', '', '', '', '']]
@@ -109,17 +109,18 @@ export function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
 }
 
-let wordSelect: Record<TwordleParameters['words'], string> = {
-  'all': AllWords,
-  'movies': Movies,
-  'food': Food,
-  'gaming': Gaming
-}
+const wordSelect: Map<TwordleParameters['words'], string> = new Map([
+  ["all", AllWords],
+  ["movies", Movies],
+  ["food", Food],
+  ["gaming", Gaming]
+])
+
 export function randomWord(currentWords: TwordleParameters['words']) {
-  // I HAVE NO IDEA WHY I NEED TO PUT THIS ''AS'' HERE.
-  let wordCollection: string = wordSelect[currentWords];
+  let wordCollection = wordSelect.get(currentWords)!;
   let TwordleWords = wordCollection.split("\r\n");
-  return TwordleWords[getRandomInt(TwordleWords.length)].toUpperCase();;
+  let randomWord = TwordleWords[getRandomInt(TwordleWords.length)].toUpperCase();
+  return randomWord;
 }
 
 // Gameplay
@@ -135,6 +136,20 @@ export function gridLetterUpdate(value: string) {
     currGrid[currentGameData.round][currentGameData.letter] = value;
     return currGrid;
   });
+}
+
+export function gridWordUpdate(value: string) {
+  for (let i = 0; i < value.length; i++) {
+    currentGame.update(state => {
+      state.guess[state.round][i] = value[i];
+      return state;
+    });
+    grid.update((currGrid) => {
+      let currentGameData = get(currentGame);
+      currGrid[currentGameData.round][i] = value[i];
+      return currGrid;
+    });
+  }
 }
 
 export function undoMove() {

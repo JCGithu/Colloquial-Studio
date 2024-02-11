@@ -20,7 +20,7 @@
   <Dash.Channel id="channel" center={true} on:refresh={resetChannel} placeholder={$storage.twordle.settings.channel} bind:value={channelText} />
   <Dash.Range id="volume" faded={!$storage.twordle.settings.volume} customClass="twordleVolume" thumb={"var(--mainDarken20)"} center={true} name="Volume" max="10" min="0" bind:value={$storage.twordle.settings.volume} />
   <Dash.Number id="roundTimer" center={true} name="Round Timer" bind:value={$storage.twordle.settings.timer} />
-  <!-- <Dash.Select bind:value={$storage.twordle.settings.mode} name="Mode" id="ModeSelect" options={{ Words: "words", Letters: "letters" }} /> -->
+  <Dash.Select bind:value={$storage.twordle.settings.mode} name="Mode" id="ModeSelect" options={{ Letters: "letters", Words: "words" }} />
   <Dash.Select id="wordSelect" bind:value={$storage.twordle.settings.words} name="Words" options={{ All: "all", Food: "food", Gaming: "gaming", Movies: "movies" }} />
   <Dash.Switch name="Dark Mode" id="darkMode" center={true} bind:value={$storage.twordle.settings.dark} />
   <Dash.Switch name="Auto Mode" id="autoMode" center={true} bind:value={$storage.twordle.settings.auto} />

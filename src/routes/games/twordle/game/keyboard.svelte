@@ -33,7 +33,7 @@
   {#each qwerty[$storage.twordle.settings.language] as row}
     <div class="keyRow">
       {#each row as letter}
-        <span class="keyLetter" class:correct={keyMap.correct.includes(letter)} class:maybe={keyMap.maybe.includes(letter)} class:wrong={keyMap.wrong.includes(letter)}>{letter}</span>
+        <span class="keyLetter" aria-label={letter} class:correct={keyMap.correct.includes(letter)} class:maybe={keyMap.maybe.includes(letter)} class:wrong={keyMap.wrong.includes(letter)}>{letter}</span>
       {/each}
     </div>
   {/each}
@@ -50,34 +50,43 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     height: 40px;
     &:nth-child(3) {
       * {
         //margin: 0 0.4em;
-        width: 2.4em;
+        //width: 2.4em;
       }
     }
   }
 
   .keyLetter {
-    width: 2.2em;
+    width: 30px;
     height: 100%;
     display: flex;
     text-align: center;
     justify-content: center;
     align-items: center;
-    margin: 0 0.25em;
+    --letterMargin: 2px;
+    margin: 0px var(--letterMargin);
+    &:nth-child(1) {
+      margin: 0 var(--letterMargin) 0 0;
+    }
+    &:last-child {
+      margin: 0 0 0 var(--letterMargin);
+    }
     border-radius: 0.2rem;
     font-family: "Poppins";
     font-weight: bold;
     background-color: var(--mainDarken10);
+    background-color: fade-out(darken($twordleMain, 20), 0.5);
     color: var(--title);
   }
 
   .wrong {
     opacity: 0.3;
-    filter: brightness(0.9);
+    background-color: gray;
+    filter: brightness(0.7);
   }
   .maybe {
     background-color: $twordleOrange;

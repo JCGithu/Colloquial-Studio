@@ -12,7 +12,7 @@
   let currentMenu = 1;
 </script>
 
-<button on:click={() => (showSettings = !showSettings)}>Help & Settings</button>
+<button class="settingsShow" on:click={() => (showSettings = !showSettings)}>Help & Settings</button>
 <div id="grid" class={$storage.twordle.settings.dark ? "twordleDark" : "twordleLight"}>
   {#if showSettings}
     <section id="settings" transition:slide>
@@ -92,6 +92,10 @@
     cursor: pointer;
     margin-bottom: 0.2rem;
   }
+  .settingsShow {
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+  }
   #settings {
     position: absolute;
     top: 0;
@@ -134,8 +138,13 @@
   }
   :global(.inputBlockTab) {
     padding: 0 !important;
-    &:hover {
+    z-index: 10;
+    transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1) !important;
+    &:hover,
+    &:has(:focus-visible) {
       background-color: transparent !important;
+      //margin-top: 20px !important;
+      transform: translateY(24px) scale(1.1);
     }
     :global(.radioGroup) {
       background-color: darken($twordleMain, 10) !important;
