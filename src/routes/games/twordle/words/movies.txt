@@ -7,10 +7,12 @@ bambi
 alfie
 crash
 dumbo
+alive
 evita
 fargo
 ghost
 greed
+hotel
 gypsy
 mandy
 rambo
@@ -46,6 +48,9 @@ joker
 brave
 twins
 congo
+julia
+cobra
+heidi
 borat
 tenet
 enemy
