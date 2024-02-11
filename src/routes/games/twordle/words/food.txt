@@ -28,6 +28,7 @@ sugar
 stock
 sushi
 syrup
+puree
 taffy
 toast
 candy

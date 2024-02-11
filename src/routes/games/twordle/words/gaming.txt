@@ -29,3 +29,11 @@ heart
 bully
 dante
 steam
+pixel
+poker
+chess
+board
+dodge
+shell
+snipe
+video

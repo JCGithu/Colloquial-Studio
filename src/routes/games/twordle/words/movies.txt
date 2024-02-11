@@ -23,7 +23,6 @@ hitch
 taken
 click
 blade
-settings
 dogma
 doubt
 shame
