@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { RadioGroup, RadioGroupOption } from "@rgossiaux/svelte-headlessui";
   import { getContext, createEventDispatcher } from "svelte";
   import SvgIcon from "./SVGIcon.svelte";
   import tooltip from "../js/tooltip";
@@ -19,9 +18,10 @@
   let grid = getContext("grid");
 
   const dispatch = createEventDispatcher();
-  $: {
+  function onChange(e: Event) {
     dispatch("change");
-    let dudd = value;
+    let target = e.currentTarget as HTMLInputElement;
+    value = parseInt(target.value) ? parseInt(target.value) : target.value;
   }
 </script>
 
@@ -32,21 +32,22 @@
   {#if subtitle.length}
     <p class="inputSubtitle">{subtitle}</p>
   {/if}
-  <RadioGroup bind:value class="radioGroup" {id}>
+  <div class="radioGroup" {id}>
     {#each Object.keys(options) as option}
       <span use:tooltip={options[option].icon ? option : null}>
-        <RadioGroupOption value={options[option].value} let:checked class="radioOption">
-          <span class:TabChecked={checked} class:iconOption={options[option].icon}>
+        <label class="radioOption" class:TabChecked={options[option].value === value}>
+          <input type="radio" {name} on:change={onChange} value={options[option].value} />
+          <span class:iconOption={options[option].icon}>
             {#if options[option].icon}
               <SvgIcon icon={options[option].icon} {fill} rotate={options[option].rotate} />
             {:else}
               {option}
             {/if}
           </span>
-        </RadioGroupOption>
+        </label>
       </span>
     {/each}
-  </RadioGroup>
+  </div>
 </div>
 
 <style lang="scss">
@@ -59,9 +60,15 @@
     justify-content: center;
   }
 
-  :global(.radioGroup) {
+  input {
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    position: absolute;
+  }
+
+  .radioGroup {
     position: relative;
-    //width: 100%;
     width: max-content;
     max-width: 100%;
     display: flex;
@@ -77,32 +84,39 @@
     background-color: $whiteFade;
     border-radius: 10px;
     z-index: 2;
+    height: 40px;
     transition:
       all 0.4s ease-in-out,
       background 0.1s ease;
     position: relative;
-    //overflow: hidden;
     &:focus {
       background: white;
     }
   }
-  :global(.radioOption) {
+  .radioOption {
+    display: block;
     cursor: pointer;
     padding: 0.5em;
+    width: max-content;
+    //width: 20px;
+    height: 20px;
     border-radius: 8px;
     margin: 0.2em;
     opacity: 0.7;
     background-color: rgba(black, 0.05);
     transition: all 0.2s;
-    &:has(.TabChecked) {
+    span {
+      user-select: none;
+    }
+    &.TabChecked {
       opacity: 1;
       background-color: rgba($colloquial, 0.5);
     }
   }
 
   .iconOption {
-    height: 1.5em;
-    max-height: 1.5em;
+    height: 100%;
+    max-height: 100%;
     position: relative;
     display: block;
   }
