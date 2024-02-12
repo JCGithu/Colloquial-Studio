@@ -2,7 +2,6 @@
   import { fly, fade, slide } from "svelte/transition";
   import { onMount, getContext } from "svelte";
   import { get } from "svelte/store";
-  import { Popover, PopoverButton, PopoverPanel } from "@rgossiaux/svelte-headlessui";
 
   import { appInit, loadURL, urlBuild, storage, urlFill, dashReset } from "../toolParams";
   import Dash from "../../components/DashExport";
@@ -17,6 +16,7 @@
   export let showInfo = false;
   export let showButtons = true;
   export let saves = [false, false, false];
+  let showMenu = false;
 
   let baseURL = "";
   let userBackground = "#242423";
@@ -119,27 +119,25 @@
   </div>
   <div class="dashReact">
     <div id="dashTopBar" role="banner" on:mouseenter={() => (showButtons = true)} on:mouseleave={() => (showButtons = false)}>
-      <Popover class="PopOver">
-        <PopoverButton class="PopOverButton">
-          <SVGIcon icon="settings" fill="hsl(40, 26%, 89%)" />
-        </PopoverButton>
-        <PopoverPanel class="PopOverPanel">
-          <div class="panel-contents" transition:slide>
-            <h4>Settings</h4>
-            <button type="button" id="go" on:click={openURL}>Open Link</button>
-            <button type="button" id="copy" on:click={copyURL}>Copy Link</button>
-            <button type="button" id="load" on:click={loadFromURL}>Load existing URL</button>
-            <!-- <h4>Settings</h4> -->
-
-            <button type="button" id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</button>
-            <div class="panelInput">
-              <label for="userBackgroundColour">Background Colour</label>
-              <input id="userBackgroundColour" type="color" bind:value={userBackground} />
+      <div class="PopOver">
+        <button class="PopOverButton" on:click={() => (showMenu = !showMenu)}><SVGIcon icon="settings" fill="hsl(40, 26%, 89%)" /> </button>
+        {#if showMenu}
+          <div class="PopOverPanel">
+            <div class="panel-contents" transition:slide>
+              <h4>Settings</h4>
+              <button type="button" id="go" on:click={openURL}>Open Link</button>
+              <button type="button" id="copy" on:click={copyURL}>Copy Link</button>
+              <button type="button" id="load" on:click={loadFromURL}>Load existing URL</button>
+              <button type="button" id="save" on:click={() => (saveMenu = !saveMenu)}>Saves</button>
+              <div class="panelInput">
+                <label for="userBackgroundColour">Background Colour</label>
+                <input id="userBackgroundColour" type="color" bind:value={userBackground} />
+              </div>
+              <button type="button" on:click={toggleInfoScreen}>Info</button>
             </div>
-            <button type="button" on:click={toggleInfoScreen}>Info</button>
           </div>
-        </PopoverPanel>
-      </Popover>
+        {/if}
+      </div>
       <input id="outputURL" placeholder="URL will be here!" type="text" bind:value={$urlFill[appDetails.name].current} />
     </div>
     <div id="dashApp">
@@ -450,7 +448,7 @@
       }
     }
   }
-  :global(.PopOver) {
+  .PopOver {
     position: relative;
     display: flex;
     align-items: center;
@@ -464,7 +462,7 @@
       transform: rotate(90deg);
     }
   }
-  :global(.PopOverButton) {
+  .PopOverButton {
     border: none;
     outline: none;
     border-radius: 1rem;
@@ -490,20 +488,9 @@
     &:focus:not(:focus-visible) {
       border: none;
     }
-    img {
-      height: 100%;
-      padding: 0;
-      margin: 0;
-    }
     cursor: pointer;
-    svg {
-      fill: $white;
-      &:hover {
-        animation: spinOnce 0.5s cubic-bezier(0.53, 1.5, 0.15, 0.99);
-      }
-    }
   }
-  :global(.PopOverPanel) {
+  .PopOverPanel {
     background-color: transparent;
     background-color: $whiteFade;
     border: solid $black;
@@ -515,8 +502,6 @@
     position: absolute;
     z-index: 10;
     border-radius: 0.7rem;
-
-    //overflow: hidden;
   }
   .panel-contents {
     color: $black;
