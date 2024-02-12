@@ -52,7 +52,6 @@ export const urlFill = writable(defaultURLs) as Writable<Record<streamToolNames,
 /////////
 
 export function urlBuild(appName: streamToolNames) {
-
   // Need to add app name to this so it pulls from storage.
   let toCrush = structuredClone(get(storage)[appName].inProgress);
   let urlCrush = encodeURIComponent(JSONCrush.crush(JSON.stringify(toCrush)));
@@ -96,14 +95,6 @@ export function uncrush(set: string | null) {
 export async function loadingURLData(input: any, app: streamToolNames) {
   let parsedData = updateURLS(input, app);
   let reformatted = await reformatting[app](parsedData);
-  for (const key in defaults[app]) {
-    if (!reformatted.hasOwnProperty(key)) {
-      console.log(`Adding ${key} to URL`);
-      reformatted[key] = defaults[app][key];
-    } else {
-      if (reformatted[key] === null || reformatted[key] === undefined) reformatted[key] = defaults[app][key];
-    }
-  }
   storage.update(currentStorage => {
     currentStorage[app].inProgress = structuredClone(reformatted);
     return currentStorage;
@@ -142,19 +133,9 @@ export async function appInit(toastUpdate: toastUpdate) {
     let jsonParsed = JSON.parse(existingStorage);
     appList.forEach(async appName => {
       jsonParsed[appName].inProgress = await reformatting[appName](jsonParsed[appName].inProgress);
-      // NEED TO TEST THE FOLLOWING PLEASE
-      let appNameDefault = defaults[appName];
-      for (const key in appNameDefault) {
-        if (!jsonParsed[appName].inProgress.hasOwnProperty(key)) {
-          console.log(`${key} is being added to settings`);
-          jsonParsed[appName].inProgress[key] = appNameDefault[key];
-        }
-      }
+      urlBuild(appName);
     })
     storage.set(jsonParsed);
-    appList.forEach(async appName => {
-      urlBuild(appName)
-    })
     toastUpdate('Save Data Found!', 'pass');
   }
 
