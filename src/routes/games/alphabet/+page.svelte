@@ -24,7 +24,7 @@
   let playGame = 0;
   let done = false;
   let easyMode = false;
-  let blurry = false;
+  let alphabetBlurry = false;
   let red = false;
   let shake = false;
   let overlay = false;
@@ -85,7 +85,7 @@
 
   function deBlur(k: KeyboardEvent) {
     if (k.key != "Enter") return;
-    blurry = false;
+    alphabetBlurry = false;
     let button = document.getElementById("button");
     button ? button.focus() : document.body.focus();
   }
@@ -149,20 +149,16 @@
       {#if extraText}<p id="extra" transition:fly={{ y: 200, duration: 500 }}>{extraText}</p>{/if}
     </div>
   {:else if playGame === 2}
-    <div class:blurry>
+    <div class:alphabetBlurry>
       <h1 id="title">Alphabet Challenge</h1>
       <h4 id="credit">Original idea by <a href="https://www.twitch.tv/Lenamoon">Lenamoon</a>, made by <a href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a></h4>
       <p>In order to play with chat you'll need to put in your channel below</p>
     </div>
-    <input type="text" on:keypress={deBlur} on:blur={() => (blurry = false)} on:focus={() => (blurry = true)} bind:value={channelInput} />
+    <input type="text" on:keypress={deBlur} on:blur={() => (alphabetBlurry = false)} on:focus={() => (alphabetBlurry = true)} bind:value={channelInput} />
     <div class="checkDiv">
-      <DashCheck customClass={blurry ? "blurry alphabetCheck" : "alphabetCheck"} name="No Background" bind:value={overlay} />
+      <DashCheck customClass={alphabetBlurry ? "alphabetBlurry alphabetCheck" : "alphabetCheck"} name="No Background" bind:value={overlay} />
     </div>
-    <!-- <label class:blurry>
-    {overlay ? "Swap to traditional background" : "Swap to transparent background"}
-    <input type="checkbox" bind:checked={overlay} />
-  </label> -->
-    <button id="button" class:blurry on:click={reloadGame}>Play</button>
+    <button id="button" class:alphabetBlurry on:click={reloadGame}>Play</button>
   {/if}
 </main>
 
@@ -202,7 +198,8 @@
       color: white;
     }
   }
-  :global(.blurry) {
+
+  :global(.alphabetBlurry) {
     filter: blur(5px);
   }
   :global(h2.alphabetCheck) {
@@ -317,35 +314,6 @@
       zoom: 150%;
       transform: scale(1.5);
       opacity: 1;
-    }
-  }
-  input[type="checkbox"] {
-    padding: 0.7rem 3rem;
-    border-radius: 0.5rem;
-    border: none;
-    outline: none;
-    appearance: none !important;
-    //margin-top: 1rem;
-    font-family: "Poppins";
-    height: 1rem;
-    opacity: 0;
-    &:hover {
-      opacity: 0;
-    }
-  }
-  label {
-    margin-top: 0.5rem;
-    padding: 0.3rem 2rem;
-    background-color: rgba(256, 0, 0, 0.2);
-    text-align: center;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    &:hover {
-      background-color: rgba(256, 0, 0, 0.3);
-    }
-    input {
-      position: absolute;
     }
   }
   button {
