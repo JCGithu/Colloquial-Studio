@@ -1,10 +1,9 @@
 <script lang="ts">
   import "../../../js/tmi";
-  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
-  import { onMount, getContext, afterUpdate, onDestroy } from "svelte";
+  import type { Client } from "tmi.js";
+  import { onMount, getContext, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { storage } from "../../toolParams";
-  import { defaultParams } from "./Chatter";
   import ChatBubble from "./ChatBubble.svelte";
 
   const toastUpdate: toastUpdate = getContext("toast");
@@ -236,10 +235,6 @@
     client.on("ban", (channel, userToBlock) => removeUser(userToBlock));
     client.on("messagedeleted", (channel, username, deletedMessage, userstate) => removeMessage(deletedMessage, username));
 
-    if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version < defaultParams.version) {
-      let testMessageString = "Chatter has an update! Please go back to the site and get a new URL.";
-      testMessage(testMessageString, testMessageString.split(" "), "announcement");
-    }
     if ($storage.chatter.inProgress.channel === "" || !$storage.chatter.inProgress.channel) {
       let testMessageString = "Give me a Twitch channel name to test! 📺";
       testMessage(testMessageString, testMessageString.split(" "), "announcement");

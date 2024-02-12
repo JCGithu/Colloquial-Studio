@@ -9,12 +9,24 @@
   let reload = 0;
 
   import Chatter from "./Chatter.svelte";
-  import { setContext } from "svelte";
-  import { storage } from "../../toolParams";
+  import { defaultParams } from "./Chatter";
+  import { setContext, getContext } from "svelte";
+  import { storage, compareObjects } from "../../toolParams";
   import "../../../css/default.scss";
   import Dashboard from "../Dashboard.svelte";
   setContext("appDetails", appDetails);
   setContext("store", storage);
+  const toastUpdate: toastUpdate = getContext("toast");
+
+  $: if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version < defaultParams.version) {
+    //Different from locked version
+    if (window.confirm("This URL is from an older version. Want Chatter to update?")) {
+      compareObjects($storage.chatter.inProgress, defaultParams);
+      $storage.chatter.inProgress.version = defaultParams.version;
+      toastUpdate(`URL updated to Chatter V${$storage.chatter.inProgress.version}`, "info");
+    }
+    reload++;
+  }
 </script>
 
 <svelte:head>
