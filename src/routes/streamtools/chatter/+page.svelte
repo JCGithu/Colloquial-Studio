@@ -18,12 +18,11 @@
   setContext("store", storage);
   const toastUpdate: toastUpdate = getContext("toast");
 
-  $: if (!$storage.chatter.inProgress.version || $storage.chatter.inProgress.version < defaultParams.version) {
-    //Different from locked version
-    if (window.confirm("This URL is from an older version. Want Chatter to update?")) {
-      compareObjects($storage.chatter.inProgress, defaultParams);
-      $storage.chatter.inProgress.version = defaultParams.version;
-      toastUpdate(`URL updated to Chatter V${$storage.chatter.inProgress.version}`, "info");
+  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
+    if (window.confirm(`This URL is from an older version. Want ${[appDetails.title]} to update?`)) {
+      compareObjects($storage[appDetails.name].inProgress, defaultParams);
+      $storage[appDetails.name].inProgress.version = defaultParams.version;
+      toastUpdate(`URL updated to ${appDetails.title} V${$storage[appDetails.name].inProgress.version}`, "info");
     }
     reload++;
   }

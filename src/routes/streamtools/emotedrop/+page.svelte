@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { storage } from "../../toolParams";
-  import { setContext } from "svelte";
+  import { defaultParams } from "./EmoteDrop";
+  import { storage, compareObjects } from "../../toolParams";
+  import { setContext, getContext } from "svelte";
   import "../../../css/default.scss";
 
   let appDetails: appDetails = {
@@ -22,6 +23,16 @@
   import EmoteDrop from "./EmoteDrop.svelte";
   setContext("appDetails", appDetails);
   setContext("store", storage);
+  const toastUpdate: toastUpdate = getContext("toast");
+
+  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
+    if (window.confirm(`This URL is from an older version. Want ${[appDetails.name]} to update?`)) {
+      compareObjects($storage[appDetails.name].inProgress, defaultParams);
+      $storage[appDetails.name].inProgress.version = defaultParams.version;
+      toastUpdate(`URL updated to ${appDetails.title} V${$storage[appDetails.name].inProgress.version}`, "info");
+    }
+    reload++;
+  }
 </script>
 
 <svelte:head>
