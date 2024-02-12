@@ -84,7 +84,6 @@
     background-color: $whiteFade;
     border-radius: 10px;
     z-index: 2;
-    height: 40px;
     transition:
       all 0.4s ease-in-out,
       background 0.1s ease;
