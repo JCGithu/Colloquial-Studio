@@ -11,10 +11,9 @@
     toastArray.push({ message: message, id: toastID, code: code });
     toastArray = toastArray;
     setTimeout(() => {
-      if ((toastArray.length = 0)) return;
-      //toastArray.shift();
+      toastArray.shift();
       toastArray = toastArray;
-    }, 5000);
+    }, 10000);
   }
   function removeToast(id: number) {
     let index = toastArray.findIndex((item) => item.id === id);
