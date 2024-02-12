@@ -3,6 +3,7 @@
   import { slide } from "svelte/transition";
 
   import logo from "../img/logo.svg";
+  import Noise from "../components/Noise.svelte";
 
   interface Folder {
     title: string;
@@ -39,7 +40,7 @@
   </style>
 </svelte:head>
 
-<main id="homePage">
+<main id="homePage" class="addNoise">
   <img src={logo} alt="logo" id="logo" />
   <h1>colloquial</h1>
   {#each structure as folder}
@@ -67,6 +68,7 @@
       </ul>
     {/if}
   {/each}
+  <Noise />
 </main>
 
 <style lang="scss" global>

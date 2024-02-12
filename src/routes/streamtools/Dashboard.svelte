@@ -8,6 +8,7 @@
   import SVGIcon from "../../components/SVGIcon.svelte";
   import SaveMenu from "./saveMenu.svelte";
   import JSONCrush from "jsoncrush";
+  import Noise from "../../components/Noise.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
@@ -99,7 +100,7 @@
     </div>
   </div>
 {/if}
-<main style:--userBackground={userBackground} class:blur={showInfo}>
+<main style:--userBackground={userBackground} class:blur={showInfo} class="addNoise">
   {#if saveMenu}
     <SaveMenu {saves} on:savemenu={() => (saveMenu = !saveMenu)} />
   {/if}
@@ -148,11 +149,7 @@
       {/await}
     </div>
   </div>
-  <svg viewBox="0 0 500 500" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <filter id="noiseFilter">
-      <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" stitchTiles="stitch" />
-    </filter>
-  </svg>
+  <Noise />
 </main>
 
 <style lang="scss">
@@ -186,19 +183,6 @@
     background-color: var(--userBackground);
     background-image: radial-gradient(at 18% 25%, rbga(255, 255, 255, 0.5) 0px, transparent 50%), radial-gradient(at 91% 63%, rbga(0, 0, 0, 0.5) 0px, transparent 50%), radial-gradient(at 35% 29%, hsla(0, 0%, 15%, 0.2) 0px, transparent 50%), radial-gradient(at 48% 44%, hsla(0, 0%, 48%, 0.2) 0px, transparent 50%), radial-gradient(at 34% 77%, hsla(0, 0%, 100%, 0.2) 0px, transparent 50%), radial-gradient(at 63% 54%, hsla(0, 0%, 100%, 0.1) 0px, transparent 50%),
       radial-gradient(at 72% 11%, hsla(0, 0%, 0%, 1) 0px, transparent 50%);
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      filter: url(#noiseFilter);
-      opacity: 0.3;
-      mix-blend-mode: overlay;
-      pointer-events: none;
-      z-index: 1;
-    }
     $mainEase: cubic-bezier(0.13, 1.08, 0.67, 1);
     transition:
       4s transform $mainEase,
