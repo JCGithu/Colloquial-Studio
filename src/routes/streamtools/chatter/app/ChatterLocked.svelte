@@ -1,6 +1,6 @@
 <script lang="ts">
   import "../../../../js/tmi";
-  import type { Client, ChatUserstate, SubUserstate } from "tmi.js";
+  import type { Client } from "tmi.js";
   import { onMount, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { storage } from "../../../toolParams";
