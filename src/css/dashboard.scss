@@ -93,12 +93,6 @@ div {
 
 //CONTAINERS
 @container (max-width: 350px){
-  .inputBlock:has(.radioGroup){
-    :global(.radioOption) {
-      padding: 0.4em;
-      margin: 0.1em;
-    }
-  }
   .inputSubtitle {
     font-size: 0.7rem;
   }
