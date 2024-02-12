@@ -62,25 +62,4 @@
     text-underline-offset: 4px;
     margin: 0.4rem;
   }
-  :global(.switch) {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    border-radius: 9999px;
-    border-width: 0px;
-    height: 1.5rem;
-    width: 2.75rem;
-    cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  :global(.switch-enabled) {
-    /* Blue */
-    background-color: $twordlePurple;
-  }
-
-  :global(.switch-disabled) {
-    /* Gray */
-    background-color: var(--settingsDetail);
-  }
 </style>
