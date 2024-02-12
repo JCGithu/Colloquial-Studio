@@ -269,16 +269,24 @@
     font-family: "Outfit";
     color: $twordlePurple;
     text-align: center;
-    text-shadow: none;
     font-size: 3rem;
     font-weight: bold;
     text-shadow: var(--titleShadow);
     letter-spacing: -1px;
     margin: 0 0 0.6rem 0;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    text-shadow:
+      1px 1px $white,
+      2px 2px $white,
+      3px 3px $white;
     &::selection {
       background-color: $twordlePurple;
       color: $white;
+      text-shadow: none;
+    }
+  }
+
+  .twordleDark {
+    h1 {
       text-shadow: none;
     }
   }
