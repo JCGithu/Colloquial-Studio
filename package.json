@@ -1,6 +1,6 @@
 {
   "name": "colloquial.studio-svelte",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
