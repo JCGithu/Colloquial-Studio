@@ -1,5 +1,5 @@
 
-import type { ColliderHandle, Vector2, World } from "@dimforge/rapier2d";
+import type { World } from "@dimforge/rapier2d";
 
 export function newWorld(rap: RAPIER, width: number, height: number): World {
   let world = regenWorld(rap);
