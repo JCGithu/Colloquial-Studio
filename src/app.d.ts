@@ -169,7 +169,7 @@ interface appDetails {
 
 //Emote Drop
 type RAPIER = typeof import("@dimforge/rapier2d");
-type mappedEmote = { shape: Collider, body: RigidBody, curr: PIXI.Sprite, time: number }
+type mappedEmote = { shape: Collider, body: RigidBody, curr: PIXI.Sprite, time: number, scale: number, code: string, img: string }
 
 //Games
 interface gameSelect {
