@@ -1,15 +1,21 @@
 <script lang="ts">
-  import { defaultParams } from "./EmoteDrop";
-  import { storage, compareObjects } from "../../toolParams";
-  import { setContext, getContext } from "svelte";
-  import "../../../css/default.scss";
-
   let appDetails: appDetails = {
     name: "emotedrop",
     title: "Emote Drop",
     description: `Make emotes fall from the sky.`,
   };
   let reload = 0;
+
+  import Dashboard from "../Dashboard.svelte";
+  import EmoteDrop from "./EmoteDrop.svelte";
+  import { defaultParams } from "./EmoteDrop";
+  import { storage, compareObjects } from "../../toolParams";
+  import { setContext, getContext } from "svelte";
+  import "../../../css/default.scss";
+
+  setContext("appDetails", appDetails);
+  setContext("store", storage);
+  const toastUpdate: toastUpdate = getContext("toast");
 
   let resizeTimeout: NodeJS.Timeout;
   const resize = () => {
@@ -19,14 +25,8 @@
     }, 500);
   };
 
-  import Dashboard from "../Dashboard.svelte";
-  import EmoteDrop from "./EmoteDrop.svelte";
-  setContext("appDetails", appDetails);
-  setContext("store", storage);
-  const toastUpdate: toastUpdate = getContext("toast");
-
-  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
-    if (window.confirm(`This URL is from an older version. Want ${[appDetails.name]} to update?`)) {
+  $: if ($storage[appDetails.name].inProgress.version < defaultParams.version) {
+    if (window.confirm(`This URL is from an older version. Want ${[appDetails.title]} to update?`)) {
       compareObjects($storage[appDetails.name].inProgress, defaultParams);
       $storage[appDetails.name].inProgress.version = defaultParams.version;
       toastUpdate(`URL updated to ${appDetails.title} V${$storage[appDetails.name].inProgress.version}`, "info");

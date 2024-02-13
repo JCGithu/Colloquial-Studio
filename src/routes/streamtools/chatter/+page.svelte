@@ -9,16 +9,17 @@
   let reload = 0;
 
   import Chatter from "./Chatter.svelte";
+  import Dashboard from "../Dashboard.svelte";
   import { defaultParams } from "./Chatter";
   import { setContext, getContext } from "svelte";
   import { storage, compareObjects } from "../../toolParams";
   import "../../../css/default.scss";
-  import Dashboard from "../Dashboard.svelte";
+
   setContext("appDetails", appDetails);
   setContext("store", storage);
   const toastUpdate: toastUpdate = getContext("toast");
 
-  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
+  $: if ($storage[appDetails.name].inProgress.version < defaultParams.version) {
     if (window.confirm(`This URL is from an older version. Want ${[appDetails.title]} to update?`)) {
       compareObjects($storage[appDetails.name].inProgress, defaultParams);
       $storage[appDetails.name].inProgress.version = defaultParams.version;
