@@ -189,10 +189,12 @@
   function suikaGame(emote1: mappedEmote, emote2: mappedEmote, handle1: number, handle2: number) {
     let whichEmote = emote1.scale >= emote2.scale;
     let scale = whichEmote ? emote1.scale : emote2.scale;
+    let emote1Position = emote1.body.translation();
+    let emote2Position = emote2.body.translation();
     if (scale < 10) scale++;
     let img = emote1.img;
     let code = emote1.code;
-    let { x, y } = findCenter(emote1.body.translation(), emote2.body.translation());
+    let { x, y } = findCenter(emote1Position, emote2Position);
     deleteThisEmote(emote1, handle1);
     deleteThisEmote(emote2, handle2);
     let scaleMap = scaleChart[scale];
