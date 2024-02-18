@@ -80,7 +80,6 @@ prawn
 thyme
 perch
 wheat
-fetta
 gouda
 booze
 cider
