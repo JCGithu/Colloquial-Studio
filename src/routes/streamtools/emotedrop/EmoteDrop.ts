@@ -14,6 +14,7 @@ export const defaultParams: EmoteDropParameters = {
   random: false,
   timeon: true,
   modWipe: true,
+  suika: false,
   intro: false,
 };
 
