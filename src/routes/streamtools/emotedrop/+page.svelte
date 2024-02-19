@@ -65,6 +65,7 @@
     {/if}
     <Dash.CheckBox name="Allow animated emotes" subtitle="Will lower performance" bind:value={$storage.emotedrop.inProgress.animated} />
     <Dash.CheckBox name="Let Mods Reset" subtitle="Mods can wipe all emotes with command !emotewipe" bind:value={$storage.emotedrop.inProgress.modWipe} />
+    <Dash.CheckBox name="Suika Mode" subtitle="Similar emotes will combine and grow" bind:value={$storage.emotedrop.inProgress.suika} />
   </slot>
 </Dashboard>
 
