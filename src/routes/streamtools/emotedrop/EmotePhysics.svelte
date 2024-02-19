@@ -9,7 +9,7 @@
 
   import * as PIXI from "pixi.js";
   import { AnimatedGIF } from "@pixi/gif";
-  import { Sprite, onTick, Container } from "svelte-pixi";
+  import { onTick, Container } from "svelte-pixi";
 
   import type { World, Collider, RigidBody } from "@dimforge/rapier2d";
   import { loadWorld } from "./physics";
@@ -27,7 +27,6 @@
       deleteThisEmote(item, elt.handle);
     });
     loadWorld(rapier2d, world, width, height, true);
-    eventQueue = new rapier2d.EventQueue(true);
   }
 
   function getRandomInt(max: number) {
@@ -77,7 +76,6 @@
     return emojiArray;
   }
 
-  //const check = (headers, options = { offset: 0 }) => buffers => headers.every((header, index) => header === buffers[options.offset + index]);
   function isPNG(uint8Array: Uint8Array) {
     return uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4e && uint8Array[3] === 0x47 && uint8Array[4] === 0x0d && uint8Array[5] === 0x0a && uint8Array[6] === 0x1a && uint8Array[7] === 0x0a;
   }
@@ -180,7 +178,6 @@
     deleteThisEmote(emote, emoteKey);
   }
 
-  type coordinate = { x: number; y: number };
   function findCenter(A: coordinate, B: coordinate): coordinate {
     let y = A.y === B.y ? A.y + 4 : (A.y + B.y) / 2;
     return { x: (A.x + B.x) / 2, y };
@@ -206,6 +203,7 @@
     if (delta > 0.6) world.step(eventQueue);
     if (delta > 0.9) world.step(eventQueue);
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      if (!$storage.emotedrop.inProgress.suika) return;
       let emote1 = emoteMap.get(handle1);
       let emote2 = emoteMap.get(handle2);
       if (!emote1 || !emote2) return;
