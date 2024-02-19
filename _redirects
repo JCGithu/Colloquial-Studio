@@ -1,2 +1,6 @@
 # Redirects from what the browser requests to what we serve
-/wow                /games/twordle
+/twordle                /games/twordle
+/alphabet               /games/alphabet
+/emotedrop              /streamtools/emotedrop
+/chatter                /streamtools/chatter
+/donate                 https://ko-fi.com/colloquial
