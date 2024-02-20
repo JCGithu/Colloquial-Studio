@@ -2,7 +2,8 @@
   let appDetails: appDetails = {
     name: "emotedrop",
     title: "Emote Drop",
-    description: `Make emotes fall from the sky.`,
+    description: `Make emotes fall from the sky. \n
+    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Start customising. `,
   };
   let reload = 0;
 

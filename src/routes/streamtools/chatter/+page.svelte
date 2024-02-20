@@ -3,8 +3,7 @@
     name: "chatter",
     title: "Chatter",
     description: `Chatter is an on-screen chat for OBS/SLOBS. \n
-    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style Chatter how you like! \n
-    At the top you can find other settings, copy the URL, and save layouts.`,
+    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style how you like!`,
   };
   let reload = 0;
 
