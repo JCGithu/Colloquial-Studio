@@ -98,7 +98,7 @@
           <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
         </span>
       </div>
-      <Dash.Button text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
+      <button on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>🗙</button>
     </div>
   </div>
 {/if}
@@ -354,6 +354,22 @@
     p {
       margin: 0;
     }
+    button {
+      position: absolute;
+      right: 25px;
+      top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      background-color: transparent;
+      color: $white;
+      transition: 1s color;
+      margin: -5px;
+      padding: 0;
+      &:hover {
+        color: $colloquial;
+      }
+    }
   }
 
   #credits {
@@ -369,9 +385,9 @@
     background-color: fade-out($white, 0.9);
     a {
       margin-top: 0.5rem;
-      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
       color: $white;
       text-decoration-color: $colloquial;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
     }
     span {
       height: 40px;
