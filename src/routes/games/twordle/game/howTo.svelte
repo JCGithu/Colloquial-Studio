@@ -21,6 +21,7 @@
   <p>
     It's advised that chat <i>try</i> to write <i>actual</i> words. <br />
   </p>
+  <a class="kofi" aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
   <footer>Made by <a aria-label="Twitch Account" href="https://www.twitch.tv/colloquialowl">ColloquialOwl</a>, Inspired by <a href="https://www.powerlanguage.co.uk/wordle/">Wordle</a>.</footer>
 </section>
 
@@ -92,6 +93,17 @@
     }
     :nth-child(3) {
       background-color: $twordleGreen;
+    }
+  }
+
+  .kofi {
+    height: 40px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    img {
+      height: 100%;
     }
   }
 </style>
