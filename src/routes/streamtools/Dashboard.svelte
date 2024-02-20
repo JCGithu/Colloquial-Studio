@@ -98,7 +98,7 @@
           <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
         </span>
       </div>
-      <button on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>🗙</button>
+      <button class="closeButton" on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>🗙</button>
     </div>
   </div>
 {/if}
@@ -354,21 +354,23 @@
     p {
       margin: 0;
     }
-    button {
-      position: absolute;
-      right: 25px;
-      top: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      border: none;
-      background-color: transparent;
-      color: $white;
-      transition: 1s color;
-      margin: -5px;
-      padding: 0;
-      &:hover {
-        color: $colloquial;
-      }
+  }
+
+  :global(.closeButton) {
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    color: $white;
+    transition: 1s color;
+    margin: -5px;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      color: $colloquial;
     }
   }
 

@@ -1,9 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { getContext, createEventDispatcher } from "svelte";
-  import { get } from "svelte/store";
   import SVGIcon from "../../components/SVGIcon.svelte";
-  import Button from "../../components/DashButton.svelte";
   import { loadSave, urlBuild, save, storage } from "../toolParams";
   export let saves: boolean[];
 
@@ -50,13 +48,13 @@
         <span class:blank={!save}>
           <p>{!save ? "Empty" : `Save ${i + 1}:`}</p>
           <div>
-            <button type="button" on:click={() => checkSave(saves[i], i)}> <SVGIcon icon="save" /></button>
-            <button type="button" on:click={() => loadData(i)}> <SVGIcon icon="play" /></button>
+            <button class="dataButton" on:click={() => checkSave(saves[i], i)}> <SVGIcon icon="save" /></button>
+            <button class="dataButton" on:click={() => loadData(i)}> <SVGIcon icon="play" /></button>
           </div>
         </span>
       {/each}
+      <button class="closeButton" type="button" on:click={() => dispatch("savemenu")} on:submit={() => dispatch("savemenu")}>🗙</button>
     </div>
-    <button class="close" type="button" on:click={() => dispatch("savemenu")} on:submit={() => dispatch("savemenu")}> Close</button>
   </div>
 </div>
 
@@ -99,6 +97,7 @@
 
   .saveCollection {
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: center;
     padding: 1rem;
@@ -121,7 +120,7 @@
       border-color: $white;
       border-style: solid;
     }
-    button {
+    .dataButton {
       //font-weight: bold;
       font-size: large;
       padding: 0.5rem;
@@ -145,13 +144,6 @@
         //box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
       }
     }
-  }
-
-  .close {
-    margin-top: 0.3rem !important;
-    font-family: "Poppins";
-    //background-color: red !important;
-    opacity: 0.5;
   }
 
   .blank {
