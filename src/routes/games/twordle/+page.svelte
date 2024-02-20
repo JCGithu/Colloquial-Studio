@@ -214,10 +214,12 @@
 
 <style lang="scss">
   @use "../../../css/colours.scss" as *;
+  @use "../../../css/default.scss" as d;
 
   main {
     font-family: "Poppins";
     background-color: var(--main);
+    height: 100vh;
   }
   canvas {
     width: 100vw;
@@ -227,7 +229,6 @@
   #twordleBody {
     display: flex;
     justify-content: center;
-    //align-items: center;
     height: 100vh;
     width: 100vw;
     margin: 0;
@@ -236,6 +237,10 @@
     overflow: hidden;
     background-color: var(--main);
     transition: all 500ms ease-in-out;
+    @media only screen and (max-width: d.$phone) {
+      padding-top: 1vh;
+      height: 98vh;
+    }
   }
 
   #twordle {
