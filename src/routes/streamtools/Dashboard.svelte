@@ -9,6 +9,7 @@
   import SaveMenu from "./saveMenu.svelte";
   import JSONCrush from "jsoncrush";
   import Noise from "../../components/Noise.svelte";
+  import DashTab from "../../components/DashTab.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");
@@ -136,7 +137,7 @@
                 <label for="userBackgroundColour">Background Colour</label>
                 <input id="userBackgroundColour" type="color" bind:value={userBackground} />
               </div>
-              <a href="https://docs.colloquial.studio/"><button id="docs">Documentation</button></a>
+              <a href="https://docs.colloquial.studio/"><button id="docs">Documentation 🡥</button></a>
               <button type="button" on:click={toggleInfoScreen}>Info</button>
             </div>
           </div>
