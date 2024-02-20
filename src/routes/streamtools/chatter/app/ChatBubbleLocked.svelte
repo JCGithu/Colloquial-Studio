@@ -52,13 +52,12 @@
   class:vip={message.tags.badges?.vip}
   style="font-family: {inProgress.font}; border-radius: {inProgress.border / 100}rem;"
   style:--animTime={`${inProgress.animTime}s`}
-  style:--animTimeSlow={`${inProgress.animTime * 1}s`}
   style:--animEase={inProgress.animEase}
   style:--userCol={inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={inProgress.togglecol ? userColAlpha : inProgress.highcolour}
   style:--animHeight={animHeight}
 >
-  <div class="bubbleContent">
+  <div class="chatContent">
     <span style="color: {inProgress.fontcolour};">
       {#if inProgress.badges}
         {#each badges as badge}
@@ -124,7 +123,6 @@
     }
 
     span {
-      //display: contents;
       align-items: center;
     }
     .twitchBadge:first-of-type {
@@ -132,7 +130,7 @@
     }
   }
 
-  .bubbleContent {
+  .chatContent {
     overflow: hidden;
     display: block;
     margin: 0;
@@ -152,7 +150,6 @@
   }
 
   .dropShadow {
-    //transform: translateX(-8px) translateY(-8px);
     box-shadow:
       1px 1px var(--shadowCol),
       2px 2px var(--shadowCol),
@@ -172,7 +169,7 @@
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
-    .bubbleContent {
+    .chatContent {
       animation: bubblePad var(--animTime) var(--animEase) forwards;
     }
   }
@@ -294,7 +291,6 @@
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
-    //height: 100% !important;
     color: var(--userColour);
     font-weight: bold;
     transform: translateY(-1px) !important;
@@ -308,7 +304,6 @@
     border-width: 2px;
     border-width: calc(var(--fontSize) * 0.15);
     border-style: solid;
-    //margin-bottom: calc(var(--fontSize) * 1);
     border-color: var(--userColour);
   }
   .customText {

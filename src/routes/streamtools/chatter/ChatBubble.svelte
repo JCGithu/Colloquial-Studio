@@ -51,13 +51,12 @@
   class:vip={message.tags.badges?.vip}
   style="font-family: {$storage.chatter.inProgress.font}; border-radius: {$storage.chatter.inProgress.border / 100}rem;"
   style:--animTime={`${$storage.chatter.inProgress.animTime}s`}
-  style:--animTimeSlow={`${$storage.chatter.inProgress.animTime * 1}s`}
   style:--animEase={$storage.chatter.inProgress.animEase}
   style:--userCol={$storage.chatter.inProgress.bubbleCustom ? userCol : chatBackgroundCalc}
   style:--shadowCol={$storage.chatter.inProgress.togglecol ? userColAlpha : $storage.chatter.inProgress.highcolour}
   style:--animHeight={animHeight}
 >
-  <div class="bubbleContent">
+  <div class="chatContent">
     <span style="color: {$storage.chatter.inProgress.fontcolour};">
       {#if $storage.chatter.inProgress.badges}
         {#each badges as badge}
@@ -115,7 +114,6 @@
     position: relative;
     display: grid;
     grid-template-rows: 1fr;
-    //transition: grid-template-rows var(--animTime) var(--animEase);
     flex-direction: row;
     flex-wrap: nowrap;
     justify-self: end;
@@ -125,14 +123,11 @@
     font-weight: 500;
     overflow-wrap: break-word;
     z-index: 1;
-    //padding: 0 var(--paddingX) 0 var(--paddingX);
-    //margin: 0 var(--marginX) 0 var(--marginX);
     b {
       white-space: pre;
     }
 
     span {
-      //display: contents;
       align-items: center;
     }
     .twitchBadge:first-of-type {
@@ -140,7 +135,7 @@
     }
   }
 
-  .bubbleContent {
+  .chatContent {
     overflow: hidden;
     display: block;
     margin: 0;
@@ -160,7 +155,6 @@
   }
 
   .dropShadow {
-    //transform: translateX(-8px) translateY(-8px);
     box-shadow:
       1px 1px var(--shadowCol),
       2px 2px var(--shadowCol),
@@ -180,7 +174,7 @@
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
-    .bubbleContent {
+    .chatContent {
       animation: bubblePad var(--animTime) var(--animEase) forwards;
     }
   }
@@ -307,7 +301,6 @@
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
-    //height: 100% !important;
     color: var(--userColour);
     font-weight: bold;
     transform: translateY(-1px) !important;
@@ -321,7 +314,6 @@
     border-width: 2px;
     border-width: calc(var(--fontSize) * 0.15);
     border-style: solid;
-    //margin-bottom: calc(var(--fontSize) * 1);
     border-color: var(--userColour);
   }
   .customText {
