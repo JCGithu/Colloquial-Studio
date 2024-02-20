@@ -46,7 +46,7 @@
   class="chatBubble {message.type} {inProgress.animation.replace(' ', '_')} {inProgress.align} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}"
   class:dropShadow={inProgress.highlight}
   class:bubbleBanner={inProgress.banner}
-  class:first={message.tags["first-msg"]}
+  class:first={message.tags["first-msg"] || message.type === "first"}
   class:bits={message.tags.bits}
   class:mod={message.tags.mod}
   class:vip={message.tags.badges?.vip}

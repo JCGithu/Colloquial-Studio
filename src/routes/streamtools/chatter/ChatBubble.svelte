@@ -45,7 +45,7 @@
   class="chatBubble {message.type} {$storage.chatter.inProgress.animation.replace(' ', '_')} {$storage.chatter.inProgress.align} {message.tags.username} {message.tags['msg-id'] || ''} {message.tags['custom-reward-id'] || ''}"
   class:dropShadow={$storage.chatter.inProgress.highlight}
   class:bubbleBanner={$storage.chatter.inProgress.banner}
-  class:first={message.tags["first-msg"]}
+  class:first={message.tags["first-msg"] || message.type === "first"}
   class:bits={message.tags.bits}
   class:mod={message.tags.mod}
   class:vip={message.tags.badges?.vip}
