@@ -120,6 +120,15 @@
 
   function testMessage(message: string, splitText: Array<string>, type: string) {
     console.log("Test Message:", message, type);
+    let tempUser = "Chatter";
+    if (splitText.length === 1) splitText[1] = tempUser;
+    if (type != "announcement") {
+      splitText.shift();
+      if (splitText.length > 1) {
+        tempUser = splitText[0];
+        splitText.shift();
+      }
+    }
     let messageArray = formatEmotes(message, splitText, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits);
     let newChat: Message = {
       message: messageArray,
@@ -130,6 +139,7 @@
       pronoun: "Any",
       time: Date.now(),
     };
+
     if (type === "sub") Object.assign(newChat.tags, { badges: { subscriber: 0 } });
     if (type === "vip") Object.assign(newChat.tags, { badges: { vip: 1 } });
     if (type === "partner") Object.assign(newChat.tags, { badges: { partner: 1 } });
@@ -138,11 +148,7 @@
       Object.assign(newChat.tags, { badges: { moderator: 1 } });
       newChat.tags.mod = true;
     }
-    if (type === "user") {
-      Object.assign(newChat.tags, { "display-name": messageArray[0].text, username: messageArray[0].text });
-      messageArray.shift();
-      newChat.message = messageArray;
-    }
+    if (type != "announcement") Object.assign(newChat.tags, { "display-name": tempUser, username: tempUser });
     messageWrap(newChat);
   }
 
@@ -303,7 +309,6 @@
     padding: var(--padding);
     flex-direction: var(--flex);
     overflow: hidden;
-    //align-items: var(--align);
     justify-content: end;
   }
   .up {
