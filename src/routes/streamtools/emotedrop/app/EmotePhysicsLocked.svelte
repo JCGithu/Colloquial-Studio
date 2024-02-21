@@ -126,7 +126,7 @@
     body.setAngularDamping(2);
     if (inProgress.gravity === 1) body.setGravityScale(0.5, true);
     body.setRotation(rotation, true);
-    let colliderDesc = inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(emoteChart[scale][0]) : rapier2d.ColliderDesc.cuboid(emoteChart[scale][0], emoteChart[scale][0]);
+    let colliderDesc = inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(scaleMap[0]) : rapier2d.ColliderDesc.cuboid(scaleMap[0], scaleMap[0]);
     colliderDesc.setCollisionGroups(0x10001);
     let shape = world.createCollider(colliderDesc, body);
     shape.setActiveEvents(rapier2d.ActiveEvents.COLLISION_EVENTS);
