@@ -98,6 +98,7 @@
 
 <style lang="scss">
   @use "../../../../css/colours.scss" as *;
+  @use "../../../../css/default.scss" as d;
   .eventbox {
     position: relative;
     display: flex;
@@ -113,16 +114,15 @@
     border-radius: 1rem;
     margin-top: 0.5em;
     font-size: clamp(1px, 100%, 16px);
-    @media only screen and (max-height: "800px") {
-      margin-top: 0;
-    }
-    @media only screen and (max-height: "700px") {
-      font-size: clamp(1px, 60%, 16px);
-    }
     padding: 0.2em 0.5em;
     transition: 0.5s all;
     ::selection {
       background-color: var(--purple);
+    }
+    @media only screen and (max-width: d.$phone) {
+      margin-top: 0;
+      font-size: 12px;
+      padding-bottom: 12px;
     }
   }
   .boxFull {
@@ -196,7 +196,6 @@
     border: none;
     color: white;
     font-family: "Poppins";
-    //font-weight: 600;
     font-size: large;
     background-color: var(--buttons);
     border-radius: 1rem;
@@ -208,6 +207,10 @@
     &:hover {
       transform: scale(1.02);
       box-shadow: 0px 0px 10px inset rgba(255, 255, 255, 0.2);
+    }
+    @media only screen and (max-width: d.$phone) {
+      margin: 0.2rem;
+      font-size: 12px;
     }
   }
   .disable {
