@@ -20,8 +20,8 @@
   }
 
   //ANIMATIONS
-  $: chatBackgroundCalc = `rgba(${parseInt(inProgress.chatcolour.slice(-6, -4), 16)},${parseInt(inProgress.chatcolour.slice(-4, -2), 16)},${parseInt(inProgress.chatcolour.slice(-2), 16)},${inProgress.chatopacity / 100})`;
-  $: userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${inProgress.chatopacity / 100})`;
+  let chatBackgroundCalc = `rgba(${parseInt(inProgress.chatcolour.slice(-6, -4), 16)},${parseInt(inProgress.chatcolour.slice(-4, -2), 16)},${parseInt(inProgress.chatcolour.slice(-2), 16)},${inProgress.chatopacity / 100})`;
+  let userCol = `rgba(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)}, ${inProgress.chatopacity / 100})`;
   let userColAlpha = `rgb(${parseInt(message.color.slice(-6, -4), 16)}, ${parseInt(message.color.slice(-4, -2), 16)}, ${parseInt(message.color.slice(-2), 16)})`;
 
   let bigEmote = inProgress.emoteOnly;
