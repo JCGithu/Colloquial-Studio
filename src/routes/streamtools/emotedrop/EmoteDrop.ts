@@ -25,7 +25,7 @@ let booleans: Array<keyof EmoteDropParameters> = ['random', 'timeon', 'modWipe',
 //Individual Functions
 
 // Main Reformat
-export async function paramReformat(params: EmoteDropParameters, id: keyof EmoteDropParameters) {
+export async function paramReformat(params: EmoteDropParameters) {
   // If the function is provided an ID it only changes that value then returns nothing
   if (params.version < defaultParams.version) compareObjects(params, defaultParams);
   booleans.forEach((b) => {

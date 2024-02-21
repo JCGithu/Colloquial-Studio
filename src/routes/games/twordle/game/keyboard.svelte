@@ -13,7 +13,7 @@
   afterUpdate(() => {
     if ($currentGame.round <= 0) return;
     let revealRound = $currentGame.round - 1;
-    $currentGame.guess[revealRound].forEach((guessLetter, i) => {
+    $currentGame.guess[revealRound].forEach((guessLetter: string, i: number) => {
       if ($currentGame.guess[revealRound][i] === $currentGame.answer[i]) {
         if (keyMap.correct.includes(guessLetter)) return;
         keyMap.correct.push(guessLetter);

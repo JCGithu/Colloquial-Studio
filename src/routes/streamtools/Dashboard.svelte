@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fly, fade, slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import { onMount, getContext } from "svelte";
   import { get } from "svelte/store";
 
@@ -9,7 +9,6 @@
   import SaveMenu from "./saveMenu.svelte";
   import JSONCrush from "jsoncrush";
   import Noise from "../../components/Noise.svelte";
-  import DashTab from "../../components/DashTab.svelte";
 
   //CONTEXT
   let appDetails: appDetails = getContext("appDetails");

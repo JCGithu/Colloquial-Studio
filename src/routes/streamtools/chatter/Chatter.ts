@@ -1,4 +1,3 @@
-import { compareObjects } from "../../toolParams";
 export const defaultParams: ChatterParameters = {
   channel: '',
   font: "Poppins",
@@ -62,7 +61,7 @@ function addHashtoColour(input: string) {
 }
 
 // FULL REFORMATTER
-export async function paramReformat(params: ChatterParameters, id?: keyof ChatterParameters) {
+export async function paramReformat(params: ChatterParameters) {
   // If the function is provided an ID it only changes that value then returns nothing
   if (!params.version) params.fontsize = params.fontsize * 16;
 

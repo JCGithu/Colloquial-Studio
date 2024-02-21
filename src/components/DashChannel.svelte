@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, createEventDispatcher, afterUpdate, setContext } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
 
   //PROPS
   export let name = "Channel Name";

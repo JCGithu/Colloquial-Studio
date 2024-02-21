@@ -200,7 +200,7 @@ interface TwordleGame {
 	timer: number,
 	message: string,
 	currentGuess: string,
-	guess: Array<Array<string>>,
+	guess: [Array<string>, Array<string>, Array<string>, Array<string>, Array<string>, Array<string>],
 	answer: string,
 	votes: number,
 	menu: number,
