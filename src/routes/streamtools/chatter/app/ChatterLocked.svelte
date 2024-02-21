@@ -9,8 +9,8 @@
 
   let messageIndex = 0;
 
-  let bttvEmoteCache: Array<bttvEmote> = [];
-  let ffzCache: Array<ffzEmote> = [];
+  let bttvEmoteCache = new Map<string, string>();
+  let ffzCache = new Map<string, string>();
   import { formatEmotes } from "../messageParser";
   import { badge_sets } from "../badges.json";
   import { initialFetches } from "../apiFetching";
@@ -71,36 +71,8 @@
     badgeData[k] = (badge_sets as unknown as BadgeData)[k];
   });
 
-  if (inProgress.ffz) {
-    fetch(`https://api.frankerfacez.com/v1/room/${inProgress.channel}`)
-      .then((response) => response.json())
-      .then((data) => {
-        for (let [key, value] of Object.entries(data.sets as ffzData)) {
-          ffzCache = ffzCache.concat(value.emoticons);
-        }
-      })
-      .catch((error) => console.error(error));
-    fetch(`https://api.frankerfacez.com/v1/set/global`)
-      .then((response) => response.json())
-      .then((data) => {
-        for (let [key, value] of Object.entries(data.sets as ffzData)) {
-          ffzCache = ffzCache.concat(value.emoticons);
-        }
-      })
-      .catch((error) => console.error(error));
-  }
-
-  if (inProgress.bttv) {
-    fetch("https://api.betterttv.net/3/cached/emotes/global")
-      .then((response) => response.json())
-      .then((data) => {
-        bttvEmoteCache = data;
-      })
-      .catch((error) => console.error(error));
-  }
-
   let removeTimeS = inProgress.removeTime * 1000;
-  // This is broken out because the test and regular message use this.
+
   function messageWrap(newChat: Message) {
     newChat.tags.id = `${newChat.message[0].text || "null"}${messageIndex}`;
     messageIndex++;
@@ -147,7 +119,7 @@
   function runMessage(channel: ChatterParameters["channel"], tags: Tags, message: string, self: boolean, type: string) {
     if (self || !channel || !message) return;
     if (typeof inProgress.hidebot === "object" && inProgress.hidebot.includes(tags.username)) return;
-    if (inProgress.links && (message.includes("http://") || message.includes("https://"))) return;
+    if (inProgress.links && /https?:\/\//.test(message)) return;
     if (inProgress.points && tags["custom-reward-id"]) return;
     if (inProgress.replies && tags["reply-parent-display-name"]) return;
 
@@ -187,10 +159,7 @@
   function removeMessage(messageToRemove: string, messageUser: string) {
     messageList.forEach((msg, msgI) => {
       if (msg.user != messageUser) return;
-      let fullMessage = "";
-      msg.message.forEach((v) => {
-        fullMessage = (fullMessage.length ? fullMessage + " " : "") + v.text;
-      });
+      let fullMessage = msg.message.map((v) => v.text).join(" ");
       if (fullMessage === messageToRemove) messageList.splice(msgI, 1);
     });
     messageList = messageList;
@@ -201,6 +170,12 @@
   onMount(async () => {
     console.log("Chatter has Loaded", inProgress);
     window.onunhandledrejection = (e) => console.log("Error:", e);
+
+    if (inProgress.channel === "" || !inProgress.channel) {
+      let testMessageString = "I don't have a Twitch account inputted! 📺";
+      testMessage(testMessageString, testMessageString.split(" "), "announcement");
+      return;
+    }
 
     //@ts-ignore
     // It can't seem to find the export from the custom TMI.js
@@ -236,15 +211,14 @@
       let testMessageString = "Chatter has an update! Please go back to the site and get a new URL.";
       testMessage(testMessageString, testMessageString.split(" "), "announcement");
     }
-    if (inProgress.channel === "" || !inProgress.channel) {
-      let testMessageString = "Give me a Twitch channel name to test! 📺";
-      testMessage(testMessageString, testMessageString.split(" "), "announcement");
-    } else {
-      console.log("Attempting Twitch Connection...");
-      client.connect().catch((error: string) => {
-        console.log(error);
-      });
+
+    try {
+      await client.connect();
+    } catch (error) {
+      console.error(error);
+      testMessage(`Error connecting to ${inProgress.channel}`, ["Error", "connecting", "to", inProgress.channel], "error");
     }
+
     if (inProgress.removeChats) {
       setTimeout(() => {
         let current = Date.now();
@@ -273,7 +247,7 @@
     {#each messageList as message (message.tags.id)}
       <ChatBubble {message} {badgeData} {inProgress} />
     {/each}
-    <div id="chatBackground" style="opacity:{inProgress.bgopacity / 100}; --bgColour:{inProgress.bgcolour}; height:{inProgress.shrink ? '0px !important' : 'auto'}" />
+    <div id="chatBackground" style:opacity={inProgress.bgopacity / 100} style:--bgColour={inProgress.bgcolour} style:height={inProgress.shrink ? "0px !important" : "auto"} />
   </div>
 </section>
 
@@ -291,7 +265,6 @@
     padding: var(--padding);
     flex-direction: var(--flex);
     overflow: hidden;
-    //align-items: var(--align);
     justify-content: end;
   }
   .up {

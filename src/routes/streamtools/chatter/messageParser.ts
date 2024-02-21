@@ -43,35 +43,21 @@ function checkBits(splitText: Array<MessageChunk>) {
   })
 }
 
-function checkBTTV(bttvEmoteCache: Array<bttvEmote>, splitText: Array<MessageChunk>) {
-  return splitText.map(chunk => {
-    bttvEmoteCache.forEach((BTTVE) => {
-      if (chunk.text === BTTVE.code) {
-        return {
-          code: `https://cdn.betterttv.net/emote/${BTTVE.id}/3x`,
-          text: chunk.text,
-        };
-      }
-    });
-    return chunk;
-  });
+function checkBTTV(bttvEmoteCache: Map<string, string>, splitText: Array<MessageChunk>) {
+  return splitText.map(chunk => ({
+    ...chunk,
+    code: bttvEmoteCache.has(chunk.text) ? bttvEmoteCache.get(chunk.text) : chunk.code
+  }));
 }
 
-function checkFFZ(ffzCache: Array<ffzEmote>, splitText: Array<MessageChunk>) {
-  return splitText.map(chunk => {
-    ffzCache.forEach((FFZE) => {
-      if (chunk.text === FFZE.name) {
-        return {
-          code: FFZE.urls[Object.keys(FFZE.urls).length - 1],
-          text: chunk.text,
-        };
-      }
-    });
-    return chunk;
-  });
+function checkFFZ(ffzCache: Map<string, string>, splitText: Array<MessageChunk>) {
+  return splitText.map(chunk => ({
+    ...chunk,
+    code: ffzCache.has(chunk.text) ? ffzCache.get(chunk.text) : chunk.code
+  }));
 }
 
-export function formatEmotes(text: string, splitText: Array<string>, emotes: ChatUserstate['emotes'], bttvEmoteCache: Array<bttvEmote>, ffzCache: Array<ffzEmote>, bits: number | undefined): Array<MessageChunk> {
+export function formatEmotes(text: string, splitText: Array<string>, emotes: ChatUserstate['emotes'], bttvEmoteCache: Map<string, string>, ffzCache: Map<string, string>, bits: number | undefined): Array<MessageChunk> {
   let textArray: Array<MessageChunk> = splitText.map(text => ({ code: undefined, text, num: undefined }));
   if (emotes) textArray = checkEmotes(emotes, textArray, text);
   if (bits) textArray = checkBits(textArray);

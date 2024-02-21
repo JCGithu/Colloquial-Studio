@@ -1,6 +1,19 @@
 type ChatterWorker = Record<string, Record<string, string>>;
 
-export async function initialFetches(channel: string, bttvEmoteCache: Array<bttvEmote>, ffzCache: Array<ffzEmote>, badgeData: BadgeData) {
+function storeBTTVEmotes(data: Array<bttvEmote>, bttvEmoteCache: Map<string, string>) {
+  data.forEach((e) => {
+    bttvEmoteCache.set(e.code, `https://cdn.betterttv.net/emote/${e.id}/3x`)
+  })
+}
+
+function storeFFZEmotes(data: Array<ffzEmote>, ffzCache: Map<string, string>) {
+  data.forEach(e => {
+    ffzCache.set(e.name, e.urls[2]);
+  })
+}
+
+
+export async function initialFetches(channel: string, bttvEmoteCache: Map<string, string>, ffzCache: Map<string, string>, badgeData: BadgeData) {
   const chatterWorker = await fetch(`https://chatter-worker.colloquial.workers.dev/c/${channel}`)
     .then((res) => res.json())
     .then((data) => {
@@ -30,15 +43,33 @@ export async function initialFetches(channel: string, bttvEmoteCache: Array<bttv
       }
     });
   }
+  await fetch("https://api.betterttv.net/3/cached/emotes/global")
+    .then((response) => response.json())
+    .then((data: Array<bttvEmote>) => {
+      storeBTTVEmotes(data, bttvEmoteCache)
+    })
+    .catch((error) => console.error(error));
   await fetch(`https://api.betterttv.net/3/cached/users/twitch/${userID}`)
     .then((res) => res.json())
     .then((data) => {
-      for (let i in data.channelEmotes) {
-        bttvEmoteCache.push(data.channelEmotes[i]);
-      }
-      for (let i in data.sharedEmotes) {
-        bttvEmoteCache.push(data.sharedEmotes[i]);
-      }
+      storeBTTVEmotes(data.channelEmotes, bttvEmoteCache)
+      storeBTTVEmotes(data.sharedEmotes, bttvEmoteCache)
     })
     .catch(error => console.error(error));
+  await fetch(`https://api.frankerfacez.com/v1/room/${channel}`)
+    .then((response) => response.json())
+    .then((data) => {
+      for (let [key, value] of Object.entries(data.sets as ffzData)) {
+        storeFFZEmotes(value.emoticons, ffzCache);
+      }
+    })
+    .catch((error) => console.error(error));
+  fetch(`https://api.frankerfacez.com/v1/set/global`)
+    .then((response) => response.json())
+    .then((data) => {
+      for (let [key, value] of Object.entries(data.sets as ffzData)) {
+        storeFFZEmotes(value.emoticons, ffzCache);
+      }
+    })
+    .catch((error) => console.error(error));
 }
