@@ -74,7 +74,7 @@
 
   function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, scaleMap: number[], shape: Collider, body: RigidBody, x: number, y: number, rotation: number, code: string, img: string) {
     curr.anchor.set(0.5);
-    curr.scale.set(scaleChart[scale][1]);
+    curr.scale.set(scaleMap[1]);
     curr.x = x;
     curr.y = y;
     curr.rotation = -rotation;
