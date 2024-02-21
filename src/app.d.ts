@@ -73,6 +73,7 @@ type EmoteDropParameters = {
 	animated: boolean;
 	modWipe: boolean;
 	version: number;
+	suika: boolean;
 	intro: boolean
 }
 
@@ -169,7 +170,8 @@ interface appDetails {
 
 //Emote Drop
 type RAPIER = typeof import("@dimforge/rapier2d");
-type mappedEmote = { shape: Collider, body: RigidBody, curr: PIXI.Sprite, time: number }
+type mappedEmote = { shape: Collider, body: RigidBody, curr: PIXI.Sprite, time: number, scale: number, code: string, img: string }
+type coordinate = { x: number; y: number };
 
 //Games
 interface gameSelect {
@@ -198,7 +200,7 @@ interface TwordleGame {
 	timer: number,
 	message: string,
 	currentGuess: string,
-	guess: Array<Array<string>>,
+	guess: [Array<string>, Array<string>, Array<string>, Array<string>, Array<string>, Array<string>],
 	answer: string,
 	votes: number,
 	menu: number,

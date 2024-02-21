@@ -26,17 +26,18 @@
 <div class="cell {$storage.twordle.settings.dark ? 'twordleDark' : 'twordleLight'}" class:maybe class:correct class:wrong class:selected style="{styleString} --delay:{delay}s;">{letter}</div>
 
 <style lang="scss">
+  @use "../../../../css/default.scss" as d;
   @use "../../../../css/colours.scss" as *;
+
   .cell {
     border-color: var(--cellBorder);
     border-radius: 2px;
     border-style: solid;
-    width: 6vh;
-    height: 6vh;
-    max-width: 60px;
-    max-height: 60px;
+    width: clamp(30px, 5vh, 60px);
+    height: clamp(30px, 5vh, 60px);
     font-size: 2rem;
     display: flex;
+    margin-right: 6px;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -47,6 +48,9 @@
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
     animation-delay: var(--delay);
+    &:nth-child(5) {
+      margin-right: 0px;
+    }
   }
   .selected {
     filter: brightness(1.5);

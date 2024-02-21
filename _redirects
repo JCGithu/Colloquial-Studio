@@ -1,0 +1,10 @@
+# Redirects from what the browser requests to what we serve
+
+/twordle /games/twordle
+/alphabet /games/alphabet
+/emotedrop /streamtools/emotedrop
+/chatter /streamtools/chatter
+/donate https://ko-fi.com/colloquial
+/changelog https://docs.colloquial.studio/changelog
+/docs https://docs.colloquial.studio
+/twitch https://www.twitch.tv/colloquialowl

@@ -13,7 +13,7 @@
   afterUpdate(() => {
     if ($currentGame.round <= 0) return;
     let revealRound = $currentGame.round - 1;
-    $currentGame.guess[revealRound].forEach((guessLetter, i) => {
+    $currentGame.guess[revealRound].forEach((guessLetter: string, i: number) => {
       if ($currentGame.guess[revealRound][i] === $currentGame.answer[i]) {
         if (keyMap.correct.includes(guessLetter)) return;
         keyMap.correct.push(guessLetter);
@@ -41,6 +41,7 @@
 
 <style lang="scss">
   @use "../../../../css/colours.scss" as *;
+  @use "../../../../css/default.scss" as d;
   #keyboard {
     font-size: 13px;
     transition: all 0.5s;
@@ -52,6 +53,9 @@
     justify-content: center;
     margin-bottom: 4px;
     height: 40px;
+    @media only screen and (max-width: d.$phone) {
+      height: 35px;
+    }
   }
 
   .keyLetter {
@@ -75,6 +79,9 @@
     background-color: var(--mainDarken10);
     background-color: fade-out(darken($twordleMain, 20), 0.5);
     color: var(--title);
+    @media only screen and (max-width: d.$phone) {
+      width: 23px;
+    }
   }
 
   .wrong {

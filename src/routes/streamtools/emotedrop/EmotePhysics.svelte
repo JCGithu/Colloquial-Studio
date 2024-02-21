@@ -9,13 +9,14 @@
 
   import * as PIXI from "pixi.js";
   import { AnimatedGIF } from "@pixi/gif";
-  import { Sprite, onTick, Container, Graphics } from "svelte-pixi";
+  import { onTick, Container } from "svelte-pixi";
 
-  import type { World, Collider, RigidBody, Ball } from "@dimforge/rapier2d";
+  import type { World, Collider, RigidBody } from "@dimforge/rapier2d";
   import { loadWorld } from "./physics";
 
   export let rapier2d: RAPIER;
   export let world: World;
+  let eventQueue = new rapier2d.EventQueue(true);
   let emoteMap: Map<number, mappedEmote> = new Map();
   let container: PIXI.Container;
 
@@ -75,18 +76,17 @@
     return emojiArray;
   }
 
-  //const check = (headers, options = { offset: 0 }) => buffers => headers.every((header, index) => header === buffers[options.offset + index]);
   function isPNG(uint8Array: Uint8Array) {
     return uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4e && uint8Array[3] === 0x47 && uint8Array[4] === 0x0d && uint8Array[5] === 0x0a && uint8Array[6] === 0x1a && uint8Array[7] === 0x0a;
   }
 
-  function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, shape: Collider, body: RigidBody, x: number, y: number, rotation: number) {
+  function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, scaleMap: number[], shape: Collider, body: RigidBody, x: number, y: number, rotation: number, code: string, img: string) {
     curr.anchor.set(0.5);
-    curr.scale.set(scaleChart[scale][1]);
+    curr.scale.set(scaleMap[1]);
     curr.x = x;
     curr.y = y;
     curr.rotation = -rotation;
-    emoteMap.set(shape.handle, { shape, body, curr, time: Date.now() });
+    emoteMap.set(shape.handle, { shape, body, curr, time: Date.now(), scale, code, img });
     //@ts-ignore
     container.addChild(curr);
   }
@@ -109,56 +109,62 @@
 
       for (let i in tags.emotes) {
         for (let k in tags.emotes[i]) {
-          addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`, "twitch");
+          addNewEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${$storage.emotedrop.inProgress.quality}.0`, "twitch", i);
         }
       }
 
       let emojis = extractEmojisFromString(message);
-      if (emojis.length) emojis.forEach((e) => addEmote(e, "emoji"));
+      if (emojis.length) emojis.forEach((e) => addNewEmote(e, "emoji"));
     });
 
-    async function addEmote(img: string, type: string) {
-      let scale = $storage.emotedrop.inProgress.random ? getRandomInt(10) : $storage.emotedrop.inProgress.scale;
+    async function addNewEmote(img: string, type: string, code?: string) {
+      let scaleSetting = $storage.emotedrop.inProgress.random ? getRandomInt(10) : $storage.emotedrop.inProgress.scale;
       let emoteChart = type === "twitch" ? scaleChart : x2_5Chart;
+      let scaleMap = emoteChart[scaleSetting];
       let x = Math.random() * (width - 100) + 50;
       let y = Math.random() * -50;
-      let rotation = Math.random() * 360;
-      let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y);
-      let body = world.createRigidBody(bodyDesc);
-      body.setAngularDamping(2);
-      if ($storage.emotedrop.inProgress.gravity === 1) body.setGravityScale(0.5, true);
-      body.setRotation(rotation, true);
-      let colliderDesc = $storage.emotedrop.inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(emoteChart[scale][0]) : rapier2d.ColliderDesc.cuboid(emoteChart[scale][0], emoteChart[scale][0]);
-      let shape = world.createCollider(colliderDesc, body);
-      shape.setDensity(2);
-      shape.setFriction($storage.emotedrop.inProgress.friction / 5);
-      shape.setRestitution($storage.emotedrop.inProgress.bounce / 8.5);
-      if ($storage.emotedrop.inProgress.animated) {
-        fetch(img)
-          .then((res) => res.arrayBuffer())
-          .then((buff) => {
-            const uint8Array = new Uint8Array(buff);
-            let png = isPNG(uint8Array);
-            return [buff, png];
-          })
-          .then(([buff, png]) => {
-            if (png) {
-              return PIXI.Sprite.from(img);
-            } else {
-              //@ts-ignore
-              return AnimatedGIF.fromBuffer(buff);
-            }
-          })
-          .then((curr) => {
-            applyImgStats(curr, scale, shape, body, x, y, rotation);
-          });
-      } else {
-        let curr = PIXI.Sprite.from(img);
-        applyImgStats(curr, scale, shape, body, x, y, rotation);
-      }
+      addEmote(img, scaleSetting, scaleMap, x, y, code);
     }
-    //setInterval(async () => await addEmote(gifURL), 1000);
   });
+
+  async function addEmote(img: string, scale: number, scaleMap: number[], x: number, y: number, code?: string) {
+    let rotation = Math.random() * 360;
+    let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y).setCcdEnabled(true);
+    let body = world.createRigidBody(bodyDesc);
+    body.setAngularDamping(2);
+    if ($storage.emotedrop.inProgress.gravity === 1) body.setGravityScale(0.5, true);
+    body.setRotation(rotation, true);
+    let colliderDesc = $storage.emotedrop.inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(scaleMap[0]) : rapier2d.ColliderDesc.cuboid(scaleMap[0], scaleMap[0]);
+    colliderDesc.setCollisionGroups(0x10001);
+    let shape = world.createCollider(colliderDesc, body);
+    shape.setActiveEvents(rapier2d.ActiveEvents.COLLISION_EVENTS);
+    shape.setDensity(2);
+    shape.setFriction($storage.emotedrop.inProgress.friction / 5);
+    shape.setRestitution($storage.emotedrop.inProgress.bounce / 8.5);
+    if ($storage.emotedrop.inProgress.animated) {
+      fetch(img)
+        .then((res) => res.arrayBuffer())
+        .then((buff) => {
+          const uint8Array = new Uint8Array(buff);
+          let png = isPNG(uint8Array);
+          return [buff, png];
+        })
+        .then(([buff, png]) => {
+          if (png) {
+            return PIXI.Sprite.from(img);
+          } else {
+            //@ts-ignore
+            return AnimatedGIF.fromBuffer(buff);
+          }
+        })
+        .then((curr) => {
+          applyImgStats(curr, scale, scaleMap, shape, body, x, y, rotation, code || "", img);
+        });
+    } else {
+      let curr = PIXI.Sprite.from(img);
+      applyImgStats(curr, scale, scaleMap, shape, body, x, y, rotation, code || "", img);
+    }
+  }
 
   function deleteThisEmote(mappedEmote: mappedEmote, key: number) {
     emoteMap.delete(key);
@@ -172,10 +178,37 @@
     deleteThisEmote(emote, emoteKey);
   }
 
+  function findCenter(A: coordinate, B: coordinate): coordinate {
+    let y = A.y === B.y ? A.y + 4 : (A.y + B.y) / 2;
+    return { x: (A.x + B.x) / 2, y };
+  }
+
+  function suikaGame(emote1: mappedEmote, emote2: mappedEmote, handle1: number, handle2: number) {
+    let whichEmote = emote1.scale >= emote2.scale;
+    let scale = whichEmote ? emote1.scale : emote2.scale;
+    let emote1Position = emote1.body.translation();
+    let emote2Position = emote2.body.translation();
+    if (scale < 10) scale++;
+    let img = emote1.img;
+    let code = emote1.code;
+    let { x, y } = findCenter(emote1Position, emote2Position);
+    deleteThisEmote(emote1, handle1);
+    deleteThisEmote(emote2, handle2);
+    let scaleMap = scaleChart[scale];
+    addEmote(img, scale, scaleMap, x, y, code);
+  }
+
   onTick((delta) => {
-    world.step();
-    if (delta > 0.6) world.step();
-    if (delta > 0.9) world.step();
+    world.step(eventQueue);
+    if (delta > 0.6) world.step(eventQueue);
+    if (delta > 0.9) world.step(eventQueue);
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      if (!$storage.emotedrop.inProgress.suika) return;
+      let emote1 = emoteMap.get(handle1);
+      let emote2 = emoteMap.get(handle2);
+      if (!emote1 || !emote2) return;
+      if (emote1.code === emote2.code) suikaGame(emote1, emote2, handle1, handle2);
+    });
     world.forEachCollider((elt) => {
       let translation = elt.translation();
       let rotation = elt.rotation();
@@ -185,9 +218,6 @@
       item.curr.y = translation.y;
       item.curr.rotation = rotation;
       if ($storage.emotedrop.inProgress.timeon && item.time < Date.now() - removeTime) deleteThisEmote(item, elt.handle);
-      // graphics.beginFill(0xde3249);
-      // graphics.drawCircle(translation.x, translation.y, 20);
-      // graphics.endFill();
     });
     if (emoteMap.size > $storage.emotedrop.inProgress.limit) deleteFirstEmote();
   });

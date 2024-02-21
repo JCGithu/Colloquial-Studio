@@ -1,15 +1,22 @@
 <script lang="ts">
+  let appDetails: appDetails = {
+    name: "emotedrop",
+    title: "Emote Drop",
+    description: `Make emotes fall from the sky. \n
+    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Start customising. `,
+  };
+  let reload = 0;
+
+  import Dashboard from "../Dashboard.svelte";
+  import EmoteDrop from "./EmoteDrop.svelte";
   import { defaultParams } from "./EmoteDrop";
   import { storage, compareObjects } from "../../toolParams";
   import { setContext, getContext } from "svelte";
   import "../../../css/default.scss";
 
-  let appDetails: appDetails = {
-    name: "emotedrop",
-    title: "Emote Drop",
-    description: `Make emotes fall from the sky.`,
-  };
-  let reload = 0;
+  setContext("appDetails", appDetails);
+  setContext("store", storage);
+  const toastUpdate: toastUpdate = getContext("toast");
 
   let resizeTimeout: NodeJS.Timeout;
   const resize = () => {
@@ -19,14 +26,8 @@
     }, 500);
   };
 
-  import Dashboard from "../Dashboard.svelte";
-  import EmoteDrop from "./EmoteDrop.svelte";
-  setContext("appDetails", appDetails);
-  setContext("store", storage);
-  const toastUpdate: toastUpdate = getContext("toast");
-
-  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
-    if (window.confirm(`This URL is from an older version. Want ${[appDetails.name]} to update?`)) {
+  $: if ($storage[appDetails.name].inProgress.version < defaultParams.version) {
+    if (window.confirm(`This URL is from an older version. Want ${[appDetails.title]} to update?`)) {
       compareObjects($storage[appDetails.name].inProgress, defaultParams);
       $storage[appDetails.name].inProgress.version = defaultParams.version;
       toastUpdate(`URL updated to ${appDetails.title} V${$storage[appDetails.name].inProgress.version}`, "info");
@@ -65,6 +66,7 @@
     {/if}
     <Dash.CheckBox name="Allow animated emotes" subtitle="Will lower performance" bind:value={$storage.emotedrop.inProgress.animated} />
     <Dash.CheckBox name="Let Mods Reset" subtitle="Mods can wipe all emotes with command !emotewipe" bind:value={$storage.emotedrop.inProgress.modWipe} />
+    <Dash.CheckBox name="Suika Mode" subtitle="Similar emotes will combine and grow" bind:value={$storage.emotedrop.inProgress.suika} />
   </slot>
 </Dashboard>
 

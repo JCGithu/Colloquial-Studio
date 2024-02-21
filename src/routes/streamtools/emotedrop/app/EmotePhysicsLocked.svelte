@@ -16,6 +16,7 @@
 
   export let rapier2d: RAPIER;
   export let world: World;
+  let eventQueue = new rapier2d.EventQueue(true);
   let emoteMap: Map<number, mappedEmote> = new Map();
   let container: PIXI.Container;
 
@@ -32,7 +33,7 @@
     return Math.floor(Math.random() * max);
   }
 
-  $: defaultChart = [
+  const defaultChart = [
     [5.5, inProgress.shape === 1 ? 0.15 : 0.1],
     [10, inProgress.shape === 1 ? 0.2 : 0.17],
     [13, inProgress.shape === 1 ? 0.25 : 0.225],
@@ -46,20 +47,12 @@
     [47.5, inProgress.shape === 1 ? 0.9 : 0.85],
   ];
   let scaleChart = defaultChart;
-  $: x2Chart = defaultChart.map(([x, y]) => [x, 2 * y]);
-  $: x2_5Chart = defaultChart.map(([x, y]) => [x, 2.5 * y]);
-  $: x4Chart = defaultChart.map(([x, y]) => [x, 4 * y]);
-
-  $: {
-    if (inProgress.quality === 2) {
-      scaleChart = x2Chart;
-    } else if (inProgress.quality === 1) {
-      scaleChart = x4Chart;
-    } else {
-      scaleChart = defaultChart;
-    }
-  }
-  $: removeTime = inProgress.time * 1000;
+  let x2Chart = defaultChart.map(([x, y]) => [x, 2 * y]);
+  let x2_5Chart = defaultChart.map(([x, y]) => [x, 2.5 * y]);
+  let x4Chart = defaultChart.map(([x, y]) => [x, 4 * y]);
+  if (inProgress.quality === 2) scaleChart = x2Chart;
+  if (inProgress.quality === 1) scaleChart = x4Chart;
+  let removeTime = inProgress.time * 1000;
 
   const fullEmojiRegex = /[\u{1F300}-\u{1F6FF}]/gu;
   function extractEmojisFromString(inputString: string): Array<string> {
@@ -75,18 +68,17 @@
     return emojiArray;
   }
 
-  //const check = (headers, options = { offset: 0 }) => buffers => headers.every((header, index) => header === buffers[options.offset + index]);
   function isPNG(uint8Array: Uint8Array) {
     return uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4e && uint8Array[3] === 0x47 && uint8Array[4] === 0x0d && uint8Array[5] === 0x0a && uint8Array[6] === 0x1a && uint8Array[7] === 0x0a;
   }
 
-  function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, shape: Collider, body: RigidBody, x: number, y: number, rotation: number) {
+  function applyImgStats(curr: PIXI.Sprite | AnimatedGIF, scale: number, scaleMap: number[], shape: Collider, body: RigidBody, x: number, y: number, rotation: number, code: string, img: string) {
     curr.anchor.set(0.5);
-    curr.scale.set(scaleChart[scale][1]);
+    curr.scale.set(scaleMap[1]);
     curr.x = x;
     curr.y = y;
     curr.rotation = -rotation;
-    emoteMap.set(shape.handle, { shape, body, curr, time: Date.now() });
+    emoteMap.set(shape.handle, { shape, body, curr, time: Date.now(), scale, code, img });
     //@ts-ignore
     container.addChild(curr);
   }
@@ -109,55 +101,62 @@
 
       for (let i in tags.emotes) {
         for (let k in tags.emotes[i]) {
-          addEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${inProgress.quality}.0`, "twitch");
+          addNewEmote(`https://static-cdn.jtvnw.net/emoticons/v2/${i}/default/light/${inProgress.quality}.0`, "twitch", i);
         }
       }
 
       let emojis = extractEmojisFromString(message);
-      if (emojis.length) emojis.forEach((e) => addEmote(e, "emoji"));
+      if (emojis.length) emojis.forEach((e) => addNewEmote(e, "emoji"));
     });
 
-    async function addEmote(img: string, type: string) {
-      let scale = inProgress.random ? getRandomInt(10) : inProgress.scale;
+    async function addNewEmote(img: string, type: string, code?: string) {
+      let scaleSetting = inProgress.random ? getRandomInt(10) : inProgress.scale;
       let emoteChart = type === "twitch" ? scaleChart : x2_5Chart;
+      let scaleMap = emoteChart[scaleSetting];
       let x = Math.random() * (width - 100) + 50;
       let y = Math.random() * -50;
-      let rotation = Math.random() * 360;
-      let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y);
-      let body = world.createRigidBody(bodyDesc);
-      body.setAngularDamping(2);
-      if (inProgress.gravity === 1) body.setGravityScale(0.5, true);
-      body.setRotation(rotation, true);
-      let colliderDesc = inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(emoteChart[scale][0]) : rapier2d.ColliderDesc.cuboid(emoteChart[scale][0], emoteChart[scale][0]);
-      let shape = world.createCollider(colliderDesc, body);
-      shape.setDensity(2);
-      shape.setFriction(inProgress.friction / 5);
-      shape.setRestitution(inProgress.bounce / 8.5);
-      if (inProgress.animated) {
-        fetch(img)
-          .then((res) => res.arrayBuffer())
-          .then((buff) => {
-            const uint8Array = new Uint8Array(buff);
-            let png = isPNG(uint8Array);
-            return [buff, png];
-          })
-          .then(([buff, png]) => {
-            if (png) {
-              return PIXI.Sprite.from(img);
-            } else {
-              //@ts-ignore
-              return AnimatedGIF.fromBuffer(buff);
-            }
-          })
-          .then((curr) => {
-            applyImgStats(curr, scale, shape, body, x, y, rotation);
-          });
-      } else {
-        let curr = PIXI.Sprite.from(img);
-        applyImgStats(curr, scale, shape, body, x, y, rotation);
-      }
+      addEmote(img, scaleSetting, scaleMap, x, y, code);
     }
   });
+
+  async function addEmote(img: string, scale: number, scaleMap: number[], x: number, y: number, code?: string) {
+    let rotation = Math.random() * 360;
+    let bodyDesc = rapier2d.RigidBodyDesc.dynamic().setTranslation(x, y).setCcdEnabled(true);
+    let body = world.createRigidBody(bodyDesc);
+    body.setAngularDamping(2);
+    if (inProgress.gravity === 1) body.setGravityScale(0.5, true);
+    body.setRotation(rotation, true);
+    let colliderDesc = inProgress.shape === 1 ? rapier2d.ColliderDesc.ball(scaleMap[0]) : rapier2d.ColliderDesc.cuboid(scaleMap[0], scaleMap[0]);
+    colliderDesc.setCollisionGroups(0x10001);
+    let shape = world.createCollider(colliderDesc, body);
+    shape.setActiveEvents(rapier2d.ActiveEvents.COLLISION_EVENTS);
+    shape.setDensity(2);
+    shape.setFriction(inProgress.friction / 5);
+    shape.setRestitution(inProgress.bounce / 8.5);
+    if (inProgress.animated) {
+      fetch(img)
+        .then((res) => res.arrayBuffer())
+        .then((buff) => {
+          const uint8Array = new Uint8Array(buff);
+          let png = isPNG(uint8Array);
+          return [buff, png];
+        })
+        .then(([buff, png]) => {
+          if (png) {
+            return PIXI.Sprite.from(img);
+          } else {
+            //@ts-ignore
+            return AnimatedGIF.fromBuffer(buff);
+          }
+        })
+        .then((curr) => {
+          applyImgStats(curr, scale, scaleMap, shape, body, x, y, rotation, code || "", img);
+        });
+    } else {
+      let curr = PIXI.Sprite.from(img);
+      applyImgStats(curr, scale, scaleMap, shape, body, x, y, rotation, code || "", img);
+    }
+  }
 
   function deleteThisEmote(mappedEmote: mappedEmote, key: number) {
     emoteMap.delete(key);
@@ -171,10 +170,37 @@
     deleteThisEmote(emote, emoteKey);
   }
 
+  function findCenter(A: coordinate, B: coordinate): coordinate {
+    let y = A.y === B.y ? A.y + 4 : (A.y + B.y) / 2;
+    return { x: (A.x + B.x) / 2, y };
+  }
+
+  function suikaGame(emote1: mappedEmote, emote2: mappedEmote, handle1: number, handle2: number) {
+    let whichEmote = emote1.scale >= emote2.scale;
+    let scale = whichEmote ? emote1.scale : emote2.scale;
+    let emote1Position = emote1.body.translation();
+    let emote2Position = emote2.body.translation();
+    if (scale < 10) scale++;
+    let img = emote1.img;
+    let code = emote1.code;
+    let { x, y } = findCenter(emote1Position, emote2Position);
+    deleteThisEmote(emote1, handle1);
+    deleteThisEmote(emote2, handle2);
+    let scaleMap = scaleChart[scale];
+    addEmote(img, scale, scaleMap, x, y, code);
+  }
+
   onTick((delta) => {
-    world.step();
-    if (delta > 0.6) world.step();
-    if (delta > 0.9) world.step();
+    world.step(eventQueue);
+    if (delta > 0.6) world.step(eventQueue);
+    if (delta > 0.9) world.step(eventQueue);
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      if (!inProgress.suika) return;
+      let emote1 = emoteMap.get(handle1);
+      let emote2 = emoteMap.get(handle2);
+      if (!emote1 || !emote2) return;
+      if (emote1.code === emote2.code) suikaGame(emote1, emote2, handle1, handle2);
+    });
     world.forEachCollider((elt) => {
       let translation = elt.translation();
       let rotation = elt.rotation();

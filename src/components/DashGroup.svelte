@@ -1,7 +1,7 @@
 <script lang="ts">
   //import collapse from "svelte-collapse";
   import collapse from "../js/collapse";
-  import { setContext, getContext } from "svelte";
+  import { setContext } from "svelte";
   import { fly, slide } from "svelte/transition";
   import Dash from "./DashExport";
   setContext("grouped", true);

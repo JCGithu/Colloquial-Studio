@@ -78,6 +78,10 @@
       />
     {:else if icon === "play"}
       <path style:fill fill-rule="evenodd" d="M5.9 355.4q0 21 17.9 33.3 9.9 5.6 21 5.6 8.6 0 17.3-4.4l311.6-155.5q9.2-4.9 15.4-14.1 6.2-9.3 5.5-21-.6-11.7-5.5-20.4-5-8.6-15.4-14.2L62.1 9.2q-8.7-4.3-17.3-4.3-10.5 0-21 5.6Q5.9 22.2 5.9 43.8z" />
+    {:else if icon === "twitch"}
+      <path fill-rule="evenodd" d="m343.3 185.7-57.2 57.2H229l-50 50v-50h-64.3V28.6h228.6z" style="fill:transparent" />
+      <path fill-rule="evenodd" style:fill d="M100.4 0 29 71.4v257.2h85.7V400l71.4-71.4h57.2L371.9 200V0zm242.8 185.7-57.1 57.2h-57.2l-50 50v-50h-64.3V28.6h228.6z" />
+      <path fill-rule="evenodd" style:fill d="M271.9 78.6h28.5v85.7h-28.5zm-78.6 0h28.6v85.7h-28.6z" />
     {/if}
   </svg>
 </span>

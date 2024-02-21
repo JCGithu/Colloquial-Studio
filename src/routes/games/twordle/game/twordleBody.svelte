@@ -77,10 +77,13 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    max-height: 70px;
+    height: clamp(30px, 5vh, 60px);
     max-width: calc(70px * 5);
-    justify-content: space-between;
-    padding: 0.3rem 0rem;
+    justify-content: center;
+    padding: 6px 0rem;
+  }
+  #row5 {
+    margin-bottom: 10px;
   }
   button {
     border: 0;

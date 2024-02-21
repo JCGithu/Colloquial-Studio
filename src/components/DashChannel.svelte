@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, createEventDispatcher, afterUpdate, setContext } from "svelte";
+  import { getContext, createEventDispatcher } from "svelte";
 
   //PROPS
   export let name = "Channel Name";
@@ -42,7 +42,7 @@
       {id}
       bind:value
     />
-    <span use:tooltip={"reload"} on:click={refresh} on:keypress={refresh} role="button" tabindex="0">
+    <span use:tooltip={"Reload"} on:click={refresh} on:keypress={refresh} role="button" tabindex="0">
       <div bind:this={rotate} class="reloadButton">
         <SvgIcon icon="refresh" fill="black" />
       </div>

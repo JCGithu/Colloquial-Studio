@@ -74,15 +74,13 @@ export function save(app: streamToolNames, slot: number) {
 
 //Updating Standard V1 issues
 export function updateURLS(input: streamToolParameters, app: streamToolNames) {
-  if (!input.version || input.version === 1) {
-    if ('fontsize' in input) {
-      input.fontsize = input.fontsize * 5;
-      input.nameCustom = input.togglecol;
-      input.bgopacity = input.bgopacity * 10;
-      input.proOutline = 2;
-      input.proColour = input.chatcolour;
-      input.proUseCol = false;
-    }
+  if (app != 'chatter') return input;
+  if (!input.version && 'fontsize' in input || input.version === 1 && 'fontsize' in input) {
+    input.fontsize = input.fontsize * 5;
+    input.nameCustom = input.togglecol;
+    input.bgopacity = input.bgopacity * 10;
+    input.proOutline = 2;
+    input.proColour = input.chatcolour;
   }
   return input;
 }

@@ -3,22 +3,22 @@
     name: "chatter",
     title: "Chatter",
     description: `Chatter is an on-screen chat for OBS/SLOBS. \n
-    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style Chatter how you like! \n
-    At the top you can find other settings, copy the URL, and save layouts.`,
+    1. Enter a Twitch channel name. \n 2. Click Reload. \n 3. Style how you like!`,
   };
   let reload = 0;
 
   import Chatter from "./Chatter.svelte";
+  import Dashboard from "../Dashboard.svelte";
   import { defaultParams } from "./Chatter";
   import { setContext, getContext } from "svelte";
   import { storage, compareObjects } from "../../toolParams";
   import "../../../css/default.scss";
-  import Dashboard from "../Dashboard.svelte";
+
   setContext("appDetails", appDetails);
   setContext("store", storage);
   const toastUpdate: toastUpdate = getContext("toast");
 
-  $: if (!$storage[appDetails.name].inProgress.version || $storage[appDetails.name].inProgress.version < defaultParams.version) {
+  $: if ($storage[appDetails.name].inProgress.version < defaultParams.version) {
     if (window.confirm(`This URL is from an older version. Want ${[appDetails.title]} to update?`)) {
       compareObjects($storage[appDetails.name].inProgress, defaultParams);
       $storage[appDetails.name].inProgress.version = defaultParams.version;
@@ -90,7 +90,7 @@
       <Dash.CheckBox name="Wide Emote Command" subtitle="Chatters can put w! before emotes" id="wideEmotes" bind:value={$storage.chatter.inProgress.wideEmotes} />
       <Dash.CheckBox subtitle="If a message is only emotes those will be shown larger" name="Big Emote Only Messages" id="emoteOnly" bind:value={$storage.chatter.inProgress.emoteOnly} />
     </Dash.Group>
-    <Dash.CheckBox name="Show Badges" id="badges" subtitle="Currently broken for custom subs! Working on it..." bind:value={$storage.chatter.inProgress.badges} />
+    <Dash.CheckBox name="Show Badges" id="badges" bind:value={$storage.chatter.inProgress.badges} />
     <Dash.CheckBox on:change={() => reload++} name="Set Chat On-Screen Duration" id="removeChats" bind:value={$storage.chatter.inProgress.removeChats} />
     {#if $storage.chatter.inProgress.removeChats}
       <Dash.Group title="Remove Chats">

@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-  <title>Colloquial Studios</title>
+  <title>Colloquial</title>
   <style>
     body {
       background-color: #fe5f55;

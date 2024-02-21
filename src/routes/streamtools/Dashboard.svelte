@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { fly, fade, slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import { onMount, getContext } from "svelte";
   import { get } from "svelte/store";
 
@@ -93,10 +93,12 @@
       <h1>{appDetails.title}</h1>
       <p><span>{appDetails.description}</span></p>
       <div id="credits">
-        <span>Made on stream over at <a href="https://twitch.tv/colloquialowl">ColloquialOwl</a></span>
-        <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
+        <a href="https://docs.colloquial.studio/">Read the docs for more info</a>
+        <span>
+          <a aria-label="KoFi Link" href="https://ko-fi.com/K3K2231Z8" target="_blank" rel="noreferrer"><img src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" alt="Buy Me a Coffee at ko-fi.com" /></a>
+        </span>
       </div>
-      <Dash.Button text="close" on:click={toggleInfoScreen} on:submit={toggleInfoScreen} />
+      <button class="closeButton" on:click={toggleInfoScreen} on:submit={toggleInfoScreen}>🗙</button>
     </div>
   </div>
 {/if}
@@ -134,6 +136,7 @@
                 <label for="userBackgroundColour">Background Colour</label>
                 <input id="userBackgroundColour" type="color" bind:value={userBackground} />
               </div>
+              <a href="https://docs.colloquial.studio/"><button id="docs">Documentation 🡥</button></a>
               <button type="button" on:click={toggleInfoScreen}>Info</button>
             </div>
           </div>
@@ -251,9 +254,6 @@
     overflow-x: hidden;
     scrollbar-gutter: stable;
     container-type: inline-size;
-    // background-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0), radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0.2rem, transparent 0);
-    // background-size: 1.3rem 1.3rem;
-    // background-position: 0 0, 0.65rem 0.65rem;
 
     @media only screen and (max-width: d.$phone) {
       padding: 3rem 1rem 1rem 1rem;
@@ -356,6 +356,24 @@
     }
   }
 
+  :global(.closeButton) {
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    color: $white;
+    transition: 1s color;
+    margin: -5px;
+    padding: 0;
+    cursor: pointer;
+    &:hover {
+      color: $colloquial;
+    }
+  }
+
   #credits {
     border: 0.2rem solid $white;
     border-radius: 1rem;
@@ -367,18 +385,26 @@
     max-width: 90%;
     padding: 0.5rem 1rem;
     background-color: fade-out($white, 0.9);
-    img {
-      margin-top: 0.5rem;
-      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
-      height: 35px;
-      width: max-content;
-      &:hover {
-        transform: scale(1.05) rotate(2deg);
-      }
-    }
     a {
+      margin-top: 0.5rem;
       color: $white;
       text-decoration-color: $colloquial;
+      transition: all 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+    span {
+      height: 40px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      img {
+        height: 100%;
+      }
+      a {
+        padding: 0 0.2rem;
+        &:hover {
+          transform: scale(1.05) rotate(2deg);
+        }
+      }
     }
   }
 
@@ -489,7 +515,9 @@
   }
   .panel-contents {
     color: $black;
-
+    a {
+      text-decoration: none;
+    }
     h4 {
       color: $white;
       margin: 0rem;
