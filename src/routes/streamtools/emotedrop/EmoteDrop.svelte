@@ -9,7 +9,6 @@
 
   import { Application } from "svelte-pixi";
   import EmotePhysics from "./EmotePhysics.svelte";
-  export let runApp = false;
 
   let appHeight: number, appWidth: number;
 
@@ -33,6 +32,8 @@
   onMount(async () => {
     console.log("EmoteDrop has Loaded", $storage.emotedrop.inProgress);
 
+    if (!$storage.emotedrop.inProgress.channel.length) return;
+
     // @ts-ignore
     client = new tmi.Client({
       channels: [$storage.emotedrop.inProgress.channel],
@@ -46,13 +47,10 @@
       console.log("Disconnected from Twitch");
     });
 
-    if ($storage.emotedrop.inProgress.channel.length) {
-      console.log("Attempting Twitch Connection...");
-      client.connect().catch((error: string) => {
-        console.log(error);
-        if (!runApp) toastUpdate(`Error connecting to ${$storage.emotedrop.inProgress.channel}`, "error");
-      });
-    }
+    client.connect().catch((error: string) => {
+      console.log(error);
+      toastUpdate(`Error connecting to ${$storage.emotedrop.inProgress.channel}`, "error");
+    });
   });
 
   function disconnectChat() {
@@ -65,7 +63,7 @@
   onDestroy(disconnectChat);
 </script>
 
-<section class:runApp class:testApp={!runApp} id="emoteDrop">
+<section class="testApp" id="emoteDrop">
   <div id="appBoundary" bind:clientHeight={appHeight} bind:clientWidth={appWidth}>
     {#await rapierPromise}
       <p>Loading Physics</p>
@@ -78,9 +76,6 @@
 </section>
 
 <style lang="scss">
-  .runApp {
-    height: 100vh !important;
-  }
   section {
     min-width: 100%;
     min-height: calc(100% - 0.5rem);

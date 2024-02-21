@@ -31,25 +31,20 @@
 
   onMount(async () => {
     console.log("EmoteDrop has Loaded", inProgress);
-
+    if (!inProgress.channel.length) return;
     // @ts-ignore
     client = new tmi.Client({
       channels: [inProgress.channel],
     });
-
     client.on("connected", () => {
       console.log("Reading from Twitch! ✅");
     });
     client.on("disconnected", () => {
       console.log("Disconnected from Twitch");
     });
-
-    if (inProgress.channel.length) {
-      console.log("Attempting Twitch Connection...");
-      client.connect().catch((error: string) => {
-        console.log(error);
-      });
-    }
+    client.connect().catch((error: string) => {
+      console.error(error);
+    });
   });
 
   function disconnectChat() {
