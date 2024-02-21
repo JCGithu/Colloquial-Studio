@@ -14,10 +14,6 @@
   let grid = getContext("grid");
 
   const dispatch = createEventDispatcher();
-  $: {
-    dispatch("change");
-    let dudd = value;
-  }
 
   function toggleButton() {
     value = !value;
