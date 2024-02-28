@@ -167,8 +167,8 @@
 
   //Animations
   .Pop_In {
-    padding: 0 var(--paddingX) 0 var(--paddingX);
-    margin: 0 var(--marginX) 0 var(--marginX);
+    padding: 0 var(--paddingX);
+    margin: 0 var(--marginX);
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
     animation-delay: 1ms;
     &.bubbleBanner {
@@ -180,26 +180,26 @@
   }
   @keyframes PopInAnimation {
     0% {
-      padding: 0 var(--paddingX) 0 var(--paddingX) !important;
-      margin: 0 var(--marginX) 0 var(--marginX) !important;
+      padding: 0 var(--paddingX);
+      margin: 0 var(--marginX);
       max-height: 0;
     }
     100% {
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      padding: var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX);
       max-height: var(--animHeight);
     }
   }
   @keyframes PopInBanner {
     0% {
       grid-template-columns: 0fr;
-      padding: 0 0 0 0;
-      margin: 0 0 0 0;
+      padding: 0;
+      margin: 0;
     }
     100% {
       grid-template-columns: 1fr;
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      padding: var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX);
     }
   }
   .Fade_In {
@@ -241,8 +241,8 @@
   .Grow,
   .Fade_In,
   .None {
-    padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-    margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+    padding: var(--paddingY) var(--paddingX);
+    margin: var(--marginY) var(--marginX);
   }
   @keyframes slideAnimation {
     from {
@@ -296,7 +296,7 @@
 
   //Pronouns
   .pronoun {
-    --proColour: #ffffff;
+    --proColour: #fff;
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;
