@@ -43,7 +43,7 @@
     <Dash.Grid>
       <Dash.Tab id="align" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.align} name="Align" options={{ Left: { value: "flex-start", icon: "align-left" }, Center: { value: "center", icon: "align-center" }, Right: { value: "flex-end", icon: "align-right" } }} />
       {#if !$storage.chatter.inProgress.banner}
-        <Dash.Tab on:change={() => reload++} id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Down: { value: "Down", icon: "arrow" }, Up: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
+        <Dash.Tab on:change={() => reload++} id="direction" fill="rgb(36, 36, 35)" bind:value={$storage.chatter.inProgress.direction} name="Chat Direction" options={{ Up: { value: "Down", icon: "arrow" }, Down: { value: "Up", icon: "arrow", rotate: 180 } }} faded={$storage.chatter.inProgress.banner} />
         <Dash.CheckBox name="Fit to Chat" id="shrink" bind:value={$storage.chatter.inProgress.shrink} />
       {/if}
       <Dash.CheckBox name="Banner Mode" id="banner" faded={$storage.chatter.inProgress.shrink} bind:value={$storage.chatter.inProgress.banner} />
