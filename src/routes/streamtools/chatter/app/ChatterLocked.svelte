@@ -88,6 +88,15 @@
 
   function testMessage(message: string, splitText: Array<string>, type: string) {
     console.log("Test Message:", message, type);
+    let tempUser = "Chatter";
+    if (splitText.length === 1) splitText[1] = tempUser;
+    if (type != "announcement") {
+      splitText.shift();
+      if (splitText.length > 1) {
+        tempUser = splitText[0];
+        splitText.shift();
+      }
+    }
     let messageArray = formatEmotes(message, splitText, exampleTags.emotes, bttvEmoteCache, ffzCache, exampleTags.bits);
     let newChat: Message = {
       message: messageArray,
@@ -106,11 +115,7 @@
       Object.assign(newChat.tags, { badges: { moderator: 1 } });
       newChat.tags.mod = true;
     }
-    if (type === "user") {
-      Object.assign(newChat.tags, { "display-name": messageArray[0].text, username: messageArray[0].text });
-      messageArray.shift();
-      newChat.message = messageArray;
-    }
+    if (type != "announcement") Object.assign(newChat.tags, { "display-name": tempUser, username: tempUser });
     messageWrap(newChat);
   }
 
@@ -219,13 +224,13 @@
       testMessage(`Error connecting to ${inProgress.channel}`, ["Error", "connecting", "to", inProgress.channel], "error");
     }
 
+    let Up = inProgress.direction === "Up";
     if (inProgress.removeChats) {
-      setTimeout(() => {
+      setInterval(() => {
         let current = Date.now();
-        if (inProgress.direction === "Up") {
-          if (messageList[0].time > current + removeTimeS) messageList.shift();
-        } else {
-          if (messageList[messageList.length - 1].time > current + removeTimeS) messageList.pop();
+        if (messageList[Up ? 0 : messageList.length - 1].time + removeTimeS < current) {
+          Up ? messageList.shift() : messageList.pop();
+          messageList = messageList;
         }
       }, 1000);
     }

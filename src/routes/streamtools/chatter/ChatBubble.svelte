@@ -167,8 +167,8 @@
 
   //Animations
   .Pop_In {
-    padding: 0 var(--paddingX) 0 var(--paddingX);
-    margin: 0 var(--marginX) 0 var(--marginX);
+    padding: 0 var(--paddingX);
+    margin: 0 var(--marginX);
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
     animation-delay: 1ms;
     &.bubbleBanner {
@@ -180,26 +180,26 @@
   }
   @keyframes PopInAnimation {
     0% {
-      padding: 0 var(--paddingX) 0 var(--paddingX) !important;
-      margin: 0 var(--marginX) 0 var(--marginX) !important;
+      padding: 0 var(--paddingX);
+      margin: 0 var(--marginX);
       max-height: 0;
     }
     100% {
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      padding: var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX);
       max-height: var(--animHeight);
     }
   }
   @keyframes PopInBanner {
     0% {
       grid-template-columns: 0fr;
-      padding: 0 0 0 0;
-      margin: 0 0 0 0;
+      padding: 0;
+      margin: 0;
     }
     100% {
       grid-template-columns: 1fr;
-      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+      padding: var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX);
     }
   }
   .Fade_In {
@@ -214,7 +214,7 @@
     }
   }
   .Grow {
-    --transformAmount: scale(1);
+    transform-origin: center;
     animation: GrowAnimation var(--animTime) var(--animEase) forwards;
   }
   @keyframes GrowAnimation {
@@ -223,29 +223,28 @@
       font-size: 1px;
     }
     100% {
-      transform: var(--transformAmount);
+      transform: scale(1);
     }
   }
   .Slide_Left {
-    --transformAmount: translateX(-100%);
+    --transformAmount: translateX(-120%);
   }
   .Slide_Right {
-    --transformAmount: translateX(100%);
+    --transformAmount: translateX(120%);
+  }
+  .Slide_Left,
+  .Slide_Right {
+    animation: slideAnimation var(--animTime) var(--animEase) forwards;
   }
   .Slide_Left,
   .Slide_Right,
+  .Grow,
   .Fade_In,
-  .None,
-  .Grow {
-    transform-origin: center;
-    padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
-    margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
+  .None {
+    padding: var(--paddingY) var(--paddingX);
+    margin: var(--marginY) var(--marginX);
   }
-  .Slide_Left,
-  .Slide_Right {
-    animation: singleAnimation var(--animTime) var(--animEase) forwards;
-  }
-  @keyframes singleAnimation {
+  @keyframes slideAnimation {
     from {
       transform: var(--transformAmount);
     }
@@ -297,7 +296,7 @@
 
   //Pronouns
   .pronoun {
-    --proColour: #ffffff;
+    --proColour: #fff;
     border-radius: 2rem;
     width: fit-content;
     vertical-align: baseline;

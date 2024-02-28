@@ -216,17 +216,15 @@
       console.error(error);
       toastUpdate(`Error connecting to ${$storage.chatter.inProgress.channel}`, "error");
     }
-
-    if ($storage.chatter.inProgress.removeChats) {
-      setTimeout(() => {
-        let current = Date.now();
-        if ($storage.chatter.inProgress.direction === "Up") {
-          if (messageList[0].time > current + removeTimeS) messageList.shift();
-        } else {
-          if (messageList[messageList.length - 1].time > current + removeTimeS) messageList.pop();
-        }
-      }, 1000);
-    }
+    setInterval(() => {
+      if (!$storage.chatter.inProgress.removeChats || !messageList.length) return;
+      let current = Date.now();
+      let Up = $storage.chatter.inProgress.direction === "Up";
+      if (messageList[Up ? 0 : messageList.length - 1].time + removeTimeS < current) {
+        Up ? messageList.shift() : messageList.pop();
+        messageList = messageList;
+      }
+    }, 1000);
   });
 
   function destroyChatter() {
