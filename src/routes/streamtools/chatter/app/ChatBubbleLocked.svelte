@@ -118,6 +118,7 @@
     font-weight: 500;
     overflow-wrap: break-word;
     z-index: 1;
+    animation-delay: 1ms;
     b {
       white-space: pre;
     }
@@ -162,13 +163,15 @@
 
   //Animations
   .Pop_In {
-    padding: 0 var(--paddingX) 0 var(--paddingX);
-    margin: 0 var(--marginX) 0 var(--marginX);
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
-    animation-delay: 1ms;
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
+  }
+  .Pop_In,
+  .Grow {
+    padding: 0 var(--paddingX) 0 var(--paddingX);
+    margin: 0 var(--marginX) 0 var(--marginX);
     .chatContent {
       animation: bubblePad var(--animTime) var(--animEase) forwards;
     }
@@ -214,10 +217,14 @@
   }
   @keyframes GrowAnimation {
     0% {
+      padding: 0 var(--paddingX) 0 var(--paddingX) !important;
+      margin: 0 var(--marginX) 0 var(--marginX) !important;
       transform: scale(0);
       font-size: 1px;
     }
     100% {
+      padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
+      margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
       transform: var(--transformAmount);
     }
   }
