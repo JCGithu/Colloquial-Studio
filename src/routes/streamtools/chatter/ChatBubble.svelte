@@ -174,6 +174,9 @@
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
+  }
+  .Pop_In,
+  .Grow {
     .chatContent {
       animation: bubblePad var(--animTime) var(--animEase) forwards;
     }
