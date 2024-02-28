@@ -174,9 +174,6 @@
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
-  }
-  .Pop_In,
-  .Grow {
     .chatContent {
       animation: bubblePad var(--animTime) var(--animEase) forwards;
     }
@@ -217,7 +214,7 @@
     }
   }
   .Grow {
-    --transformAmount: scale(1);
+    transform-origin: center;
     animation: GrowAnimation var(--animTime) var(--animEase) forwards;
   }
   @keyframes GrowAnimation {
@@ -226,29 +223,28 @@
       font-size: 1px;
     }
     100% {
-      transform: var(--transformAmount);
+      transform: scale(1);
     }
   }
   .Slide_Left {
-    --transformAmount: translateX(-100%);
+    --transformAmount: translateX(-120%);
   }
   .Slide_Right {
-    --transformAmount: translateX(100%);
+    --transformAmount: translateX(120%);
+  }
+  .Slide_Left,
+  .Slide_Right {
+    animation: slideAnimation var(--animTime) var(--animEase) forwards;
   }
   .Slide_Left,
   .Slide_Right,
+  .Grow,
   .Fade_In,
-  .None,
-  .Grow {
-    transform-origin: center;
+  .None {
     padding: var(--paddingY) var(--paddingX) var(--paddingY) var(--paddingX);
     margin: var(--marginY) var(--marginX) var(--marginY) var(--marginX);
   }
-  .Slide_Left,
-  .Slide_Right {
-    animation: singleAnimation var(--animTime) var(--animEase) forwards;
-  }
-  @keyframes singleAnimation {
+  @keyframes slideAnimation {
     from {
       transform: var(--transformAmount);
     }
