@@ -166,6 +166,7 @@
     padding: 0 var(--paddingX) 0 var(--paddingX);
     margin: 0 var(--marginX) 0 var(--marginX);
     animation: PopInAnimation var(--animTime) var(--animEase) forwards;
+    animation-delay: 1ms;
     &.bubbleBanner {
       animation: PopInBanner var(--animTime) var(--animEase) forwards;
     }
