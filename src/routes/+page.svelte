@@ -29,6 +29,11 @@
       on: false,
     },
   ];
+  let footerLinks = [
+    { slug: "changelog", title: "ChangeLog" },
+    { slug: "donate", title: "Donate" },
+    { slug: "newsletter", title: "Newsletter" },
+  ];
 </script>
 
 <svelte:head>
@@ -68,6 +73,11 @@
       </ul>
     {/if}
   {/each}
+  <footer>
+    {#each footerLinks as link}
+      <a href="/{link.slug}">{link.title}</a>
+    {/each}
+  </footer>
   <Noise />
 </main>
 
@@ -142,6 +152,27 @@
     opacity: 0.5;
     &:hover {
       opacity: 0.7;
+    }
+  }
+  footer {
+    position: absolute;
+    bottom: 5px;
+    a {
+      opacity: 0.6;
+      transition: opacity 0.3s;
+      padding: 0 10px;
+      &:hover {
+        opacity: 0.8;
+      }
+      // &::before {
+      //   content: "  |  ";
+      // }
+
+      &:first-child {
+        &::before {
+          content: "";
+        }
+      }
     }
   }
 </style>
