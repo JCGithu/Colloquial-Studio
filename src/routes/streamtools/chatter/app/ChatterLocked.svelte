@@ -33,35 +33,43 @@
 
   let userPronouns = new Map<string, string>();
   let messageList: Array<Message> = [];
-  const pronouns: { [key: string]: string } = {
-    aeaer: "Ae/Aer",
-    any: "Any",
-    eem: "E/Em",
-    faefaer: "Fae/Faer",
-    hehim: "He/Him",
-    heshe: "He/She",
-    hethem: "He/They",
-    itits: "It/Its",
-    other: "Other",
-    perper: "Per/Per",
-    sheher: "She/Her",
-    shethem: "She/They",
-    theythem: "They/Them",
-    vever: "Ve/Ver",
-    xexem: "Xe/Xem",
-    ziehir: "Zie/Hir",
+  const pronouns: { [key: string]: string[] } = {
+    aeaer: ["Ae", "Aer"],
+    any: ["Any", "Any"],
+    eem: ["E", "Em"],
+    faefaer: ["Fae", "Faer"],
+    hehim: ["He", "Him"],
+    itits: ["It", "Its"],
+    other: ["Other", "Other"],
+    perper: ["Per", "Per"],
+    sheher: ["She", "Her"],
+    theythem: ["They", "Them"],
+    vever: ["Ve", "Ver"],
+    xexem: ["Xe", "Xem"],
+    ziehir: ["Zie", "Hir"],
   };
 
   async function fetchPronoun(username: string) {
-    fetch(`https://pronouns.alejo.io/api/users/${username}`)
-      .then((res) => res.json())
+    fetch(`https://api.pronouns.alejo.io/v1/users/${username}`)
+      .then((res) => {
+        if (!res.ok) {
+          userPronouns.set(username, "");
+          return Promise.reject(new Error("No pronouns for user"));
+        } else {
+          return res.json();
+        }
+      })
       .then((proData) => {
-        let newPronoun = !proData.length ? "" : pronouns[proData[0].pronoun_id];
+        let newPronoun = pronouns[proData.pronoun_id][1] ? `${pronouns[proData.pronoun_id][0]}/${pronouns[proData.pronoun_id][1]}` : pronouns[proData.pronoun_id][0];
+        if (proData.alt_pronoun_id) {
+          newPronoun = `${pronouns[proData.pronoun_id][0]}/${pronouns[proData.alt_pronoun_id][1]}`;
+        }
         userPronouns.set(username, newPronoun);
         if (newPronoun.length) console.log(`${username} has been set ${newPronoun} pronouns`);
         messageList.forEach((msg) => {
           if (msg.user === username) msg.pronoun = newPronoun;
         });
+        messageList = messageList;
         return;
       });
   }
@@ -224,7 +232,7 @@
       testMessage(`Error connecting to ${inProgress.channel}`, ["Error", "connecting", "to", inProgress.channel], "error");
     }
 
-    let Up = inProgress.direction === "Up";
+    let Up = inProgress.direction != "Up";
     if (inProgress.removeChats) {
       setInterval(() => {
         let current = Date.now();
