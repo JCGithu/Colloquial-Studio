@@ -3,20 +3,21 @@
   import { onMount, getContext, onDestroy } from "svelte";
   import { beforeNavigate } from "$app/navigation";
   import { get } from "svelte/store";
-  import * as twordle from "./Twordle";
-  import { currentGame } from "./Twordle";
-  import { gameInit, storage } from "../../gameParams";
-  import "../../../js/tmi";
+  import * as twordle from "../Twordle";
+  import { currentGame } from "../Twordle";
+  import { gameInit, storage } from "../../../gameParams";
+  import "../../../../js/tmi";
   import type { Client } from "tmi.js";
   //Components
-  import SVGIcon from "../../../components/SVGIcon.svelte";
-  import Grid from "./game/twordleBody.svelte";
+  import SVGIcon from "../../../../components/SVGIcon.svelte";
+  import Grid from "../game/twordleBody.svelte";
   //AUDIO
   let winSound: HTMLAudioElement;
   let roundStart: HTMLAudioElement;
-  import roundStartSrc from "./round.mp3";
-  import winSoundSrc from "./win.mp3";
+  import roundStartSrc from "../round.mp3";
+  import winSoundSrc from "../win.mp3";
   import JSConfetti from "js-confetti";
+  import { settings } from "pixi.js";
   //Overlays
   let confetti: JSConfetti;
   let canvas: HTMLCanvasElement;
@@ -27,17 +28,6 @@
 
   const toastUpdate: toastUpdate = getContext("toast");
 
-  //GAME LOOP
-  //START - This is not specified if it's random or not now - need to fix that dispatch up
-  // THIS Needs to check if we're connected or not as well.
-  //ROUND STARTING - 3 Second countdown
-  //ROUND RUN - A timer length countdown that runs the poll
-  //ROUND SUMMARY - BRANCHES OUT
-  // DRAW - Make button go back to roundstarting;
-  // NO ENTER - Make button go back to round starting;
-  // ROUND DONE - Up the letter count, add to grid, make button start round;
-  // ROW DONE - Reveal word
-
   function finishPoll() {
     let finalPoll = Object.fromEntries(poll);
     let finalResult = twordle.getMax(finalPoll);
@@ -46,7 +36,7 @@
     // REDO
     if (!finishPoll.length) {
       twordle.changeState("RETRY");
-      twordle.updateGame("message", "No one entered! Redo?");
+      twordle.updateGame("message", "No one entered!");
     } else if (!finalPoll.length || finalPoll[finalResult[0]] === 0 || finalResult.length > 1) {
       twordle.changeState("RETRY");
       twordle.updateGame("message", `${finalResult.join(", ")} with ${finalPoll[finalResult[0]]} votes.`);
@@ -69,6 +59,7 @@
         twordle.changeState("REVEAL");
       }
     }
+    autoPress();
   }
 
   function startPoll() {
@@ -101,6 +92,22 @@
     }, 1000);
   }
 
+  let autoOn = false;
+  function autoPress() {
+    if (autoOn) return;
+    autoOn = true;
+    setTimeout(() => {
+      autoOn = false;
+      buttonPress();
+    }, 3000);
+  }
+
+  function delayReload() {
+    setTimeout(() => {
+      location.reload();
+    }, 15000);
+  }
+
   function buttonPress() {
     if ($currentGame.state === "REVEAL") {
       if ($currentGame.currentGuess === $currentGame.answer) {
@@ -110,13 +117,16 @@
         twordle.changeState("SUCCESS");
         confetti.addConfetti();
         winSound.play();
+        delayReload();
       } else if ($currentGame.round != 5) {
         twordle.incrementGame({ round: 1, letter: -1, votes: 0 });
         twordle.changeState("NEXTLINE");
+        autoPress();
       } else {
         // Fail
         twordle.incrementGame({ round: 1, letter: 0, votes: 0 });
         twordle.changeState("FAIL");
+        delayReload();
       }
     } else {
       newRound();
@@ -125,6 +135,10 @@
 
   let client: Client;
   onMount(async () => {
+    let URLdata = new URLSearchParams(window.location.search);
+    let channel = URLdata.get("channel") || "";
+    if (channel.length) $storage.twordle.settings.channel = channel;
+
     //LANGUAGES
     let languageCode = navigator.language.substring(0, 2);
     if (Object.keys(twordle.languageList).includes(languageCode)) {
@@ -132,8 +146,6 @@
     }
 
     confetti = new JSConfetti({ canvas });
-
-    //if (onMobile) localKeyboard = false;
 
     //@ts-ignore
     client = new tmi.Client({
@@ -144,6 +156,11 @@
       console.log("Reading from Twitch! ✅");
       twordle.updateGame("connected", true);
       toastUpdate(`Connected to ${$storage.twordle.settings.channel} chat`, "pass");
+      // Starting game BRB
+      twordle.updateGame("answer", twordle.randomWord($storage.twordle.settings.words));
+      storage.incrementStat("twordle", "play", 1);
+      twordle.incrementGame({ round: -1, letter: -1, votes: 0 });
+      buttonPress();
     });
 
     client.on("chat", (channel, tags, message, self) => {
@@ -194,15 +211,15 @@
     <div id="twordleBody">
       <div id="twordle">
         <h1 class="Title">Twordle</h1>
-        <Grid on:buttonPress={buttonPress} />
+        <Grid auto={true} on:buttonPress={buttonPress} />
       </div>
     </div>
   {/await}
 </main>
 
 <style lang="scss">
-  @use "../../../css/colours.scss" as *;
-  @use "../../../css/default.scss" as d;
+  @use "../../../../css/colours.scss" as *;
+  @use "../../../../css/default.scss" as d;
 
   main {
     font-family: "Poppins";

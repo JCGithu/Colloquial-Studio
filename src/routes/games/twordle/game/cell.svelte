@@ -30,18 +30,20 @@
   @use "../../../../css/colours.scss" as *;
 
   .cell {
+    --size: clamp(30px, 5vh, 60px);
+    --borderSize: 3px;
     border-color: var(--cellBorder);
     border-radius: 2px;
     border-style: solid;
-    width: clamp(30px, 5vh, 60px);
-    height: clamp(30px, 5vh, 60px);
+    width: var(--size);
+    height: var(--size);
     font-size: 2rem;
     display: flex;
     margin-right: 6px;
     text-align: center;
     justify-content: center;
     align-items: center;
-    border-width: 3px;
+    border-width: var(--borderSize);
     transform: scale(0);
     transition: all 0.3s ease-in-out !important;
     animation-name: popIn;
@@ -56,28 +58,26 @@
     filter: brightness(1.5);
     transform: scale(1.05) translateY(-1px);
   }
+  .wrong,
+  .correct,
+  .maybe {
+    border-width: 0;
+    height: calc(var(--size) + (var(--borderSize) * 2));
+    width: calc(var(--size) + (var(--borderSize) * 2));
+  }
   .wrong {
     background-color: var(--cellBackdrop);
-    border-width: 0;
     opacity: 0.6;
-    width: calc(6vh + 6px);
-    height: calc(6vh + 6px);
   }
 
   .maybe {
     background-color: $twordleOrange;
-    border-width: 0;
-    width: calc(6vh + 6px);
-    height: calc(6vh + 6px);
     color: white;
   }
 
   .correct {
     background-color: $twordleGreen;
-    border-width: 0;
     color: white;
-    width: calc(6vh + 6px);
-    height: calc(6vh + 6px);
   }
   @keyframes popIn {
     from {

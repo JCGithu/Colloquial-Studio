@@ -10,6 +10,7 @@
   import EventBox from "./eventBox.svelte";
   let showSettings = false;
   let currentMenu = 1;
+  export let auto = false;
 </script>
 
 <button class="settingsShow" on:click={() => (showSettings = !showSettings)}>Help & Settings</button>
@@ -54,7 +55,7 @@
     </div>
   {/if}
   <div id="bottom" class:fade={showSettings}>
-    <EventBox on:buttonPress />
+    <EventBox {auto} on:buttonPress />
   </div>
 </div>
 

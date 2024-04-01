@@ -18,12 +18,12 @@
 
 <div class="innerMenu {$storage.twordle.settings.dark ? 'twordleDark' : 'twordleLight'}">
   <Dash.Channel id="channel" center={true} on:refresh={resetChannel} placeholder={$storage.twordle.settings.channel} bind:value={channelText} />
+  <p>To run the game without input just add <a href="/games/twordle/brb?channel={$storage.twordle.settings.channel}"><code>/brb</code></a> to the URL!</p>
   <Dash.Range id="volume" faded={!$storage.twordle.settings.volume} customClass="twordleVolume" thumb={"var(--mainDarken20)"} center={true} name="Volume" max="10" min="0" bind:value={$storage.twordle.settings.volume} />
   <Dash.Number id="roundTimer" center={true} name="Round Timer" subtitle="In Seconds" bind:value={$storage.twordle.settings.timer} />
   <Dash.Select bind:value={$storage.twordle.settings.mode} name="Mode" id="ModeSelect" options={{ Letters: "letters", Words: "words" }} />
   <Dash.Select id="wordSelect" bind:value={$storage.twordle.settings.words} name="Word List" options={{ All: "all", "Food/Drink": "food", Gaming: "gaming", Movies: "movies" }} />
   <Dash.Switch name="Dark Mode" id="darkMode" center={true} bind:value={$storage.twordle.settings.dark} />
-  <Dash.Switch name="Auto Mode" subtitle="New rounds start automatically" id="autoMode" center={true} bind:value={$storage.twordle.settings.auto} />
   <Dash.Switch name="Keyboard" id="Keyboard" center={true} bind:value={$storage.twordle.settings.keyboard} />
   {#if revealed}
     <h3 transition:slide>{$currentGame.answer || "No Word Yet"}</h3>
@@ -61,5 +61,20 @@
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
     margin: 0.4rem;
+  }
+  p {
+    text-align: center;
+  }
+  code {
+    background-color: $twordleDark;
+    padding: 3px;
+    border-radius: 0.4rem;
+    overflow: hidden;
+    width: fit-content;
+    display: inline-block;
+    transform: translateY(5px);
+  }
+  a {
+    color: inherit;
   }
 </style>
