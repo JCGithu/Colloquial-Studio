@@ -204,6 +204,7 @@ interface TwordleGame {
 	answer: string,
 	votes: number,
 	menu: number,
+	firstWin: string,
 	state: 'START' | 'OPENING' | 'POLL' | 'RETRY' | 'NEXTROUND' | 'REVEAL' | 'NEXTLINE' | 'SUCCESS' | 'FAIL',
 	connected: boolean
 }
