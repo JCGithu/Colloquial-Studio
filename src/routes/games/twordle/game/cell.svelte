@@ -15,7 +15,8 @@
   let styleString = getContext("colours");
   let delay = (x + y) * 0.1;
   afterUpdate(() => {
-    selected = $currentGame.round === y && $currentGame.letter === x;
+    selected = $currentGame.round === y;
+    if ($storage.twordle.settings.mode === "letters") selected = $currentGame.round === y && $currentGame.letter === x;
     if ($currentGame.round <= y) return;
     correct = $currentGame.guess[y][x] === $currentGame.answer[x];
     maybe = $currentGame.answer.includes($currentGame.guess[y][x]) && !correct;
