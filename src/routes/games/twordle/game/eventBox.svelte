@@ -10,6 +10,7 @@
   let boxFull = false;
   let errorClass = false;
   let disable = false;
+  export let auto = false;
 
   // This is just to prevent doubleclicks;
   function sendButton() {
@@ -50,7 +51,7 @@
 </script>
 
 <div class="eventbox {$storage.twordle.settings.dark ? 'twordleDark' : 'twordleLight'}">
-  {#if $currentGame.state === "START"}
+  {#if $currentGame.state === "START" && !auto}
     <h2>Pick a 5 letter word</h2>
     <input bind:value={inputValue} class:boxFull class:errorClass type="password" placeholder="I'll hide it, I promise!" maxlength="5" on:keyup={wordCheck} />
     <div>
@@ -58,6 +59,7 @@
       <button id="random" on:click={() => userStart(true)}>Random Word</button>
     </div>
   {/if}
+
   {#if $currentGame.state === "OPENING"}
     <h2>Round starting in...</h2>
     <p>{$currentGame.timer}</p>
@@ -68,31 +70,41 @@
   {/if}
   {#if $currentGame.state === "RETRY"}
     <p>{$currentGame.message}</p>
-    <div>
-      <button on:click={sendButton} class:disable>Try Again?{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
-    </div>
+    {#if !auto}
+      <button on:click={sendButton} class:disable>Try Again?</button>
+    {/if}
   {/if}
   {#if $currentGame.state === "NEXTROUND"}
     <p>{$currentGame.message}</p>
-    <button on:click={sendButton} class:disable>Next Round{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
+    {#if !auto}
+      <button on:click={sendButton} class:disable>Next Round</button>
+    {/if}
   {/if}
   {#if $currentGame.state === "REVEAL"}
     <h2>{$currentGame.currentGuess}</h2>
-    <button on:click={sendButton} class:disable>Check Word{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
+    {#if !auto}
+      <button on:click={sendButton} class:disable>Check Word</button>
+    {/if}
   {/if}
   {#if $currentGame.state === "NEXTLINE"}
     <h2>Nope!</h2>
-    <button on:click={sendButton} class:disable>Guess Again{$storage.twordle.settings.auto ? " (Auto)" : ""}</button>
+    {#if !auto}
+      <button on:click={sendButton} class:disable>Guess Again</button>
+    {/if}
   {/if}
   {#if $currentGame.state === "SUCCESS"}
     <h2>Congrats!</h2>
-    <p>You guessed it in {$currentGame.round} tries!</p>
-    <button on:click={() => location.reload()} class:disable>Play Again?</button>
+    <p><i>{$currentGame.firstWin}</i> guessed it first!</p>
+    {#if !auto}
+      <button on:click={() => location.reload()} class:disable>Play Again?</button>
+    {/if}
   {/if}
   {#if $currentGame.state === "FAIL"}
     <h2>{$currentGame.answer}</h2>
     <p>You failed to guess the word...</p>
-    <button on:click={() => location.reload()} class:disable>Play Again?</button>
+    {#if !auto}
+      <button on:click={() => location.reload()} class:disable>Play Again?</button>
+    {/if}
   {/if}
 </div>
 
@@ -163,6 +175,9 @@
   }
   p {
     margin: 0.2rem;
+    i {
+      color: $twordlePurple;
+    }
   }
   input {
     font-family: "Poppins";

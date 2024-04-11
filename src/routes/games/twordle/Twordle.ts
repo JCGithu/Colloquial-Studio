@@ -33,6 +33,7 @@ const blankGame: TwordleGame = {
   answer: "",
   state: "START",
   connected: false,
+  firstWin: '',
 };
 
 export const currentGame = writable(structuredClone(blankGame));
@@ -149,7 +150,7 @@ export function updateGame(targetSetting: string, value: any) {
   currentGame.update(state => ({ ...state, [targetSetting]: value }))
 }
 export function updateGuess() {
-  currentGame.update((state) => ({ ...state, currentGuess: state.guess[state.round].join("") }))
+  currentGame.update((state) => ({ ...state, currentGuess: state.guess[state.round] ? state.guess[state.round].join("") : '' }))
 }
 export function incrementGame(toAdd: { 'round': number, 'letter': number, 'votes': number }) {
   currentGame.update((state) => {

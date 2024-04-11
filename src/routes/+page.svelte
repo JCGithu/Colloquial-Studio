@@ -18,14 +18,21 @@
       title: "Games",
       sub: "games",
       list: ["twordle", "alphabet challenge"],
-      links: ["twordle", "alphabet"],
+      links: ["/games/twordle", "/games/alphabet"],
       on: false,
     },
     {
       title: "Stream Tools",
       sub: "streamtools",
       list: ["chatter", "emotedrop"],
-      links: ["chatter", "emotedrop"],
+      links: ["/streamtools/chatter", "/streamtools/emotedrop"],
+      on: false,
+    },
+    {
+      title: "Chrome Extensions",
+      sub: "chromeextensions",
+      list: ["Storygraph Printer"],
+      links: ["https://chromewebstore.google.com/detail/storygraph-printer/piamaldolnicniajehjlgnmnlljnfcal"],
       on: false,
     },
   ];
@@ -65,7 +72,7 @@
       <ul transition:slide|local>
         {#each folder.list as page, j}
           <li>
-            <a aria-label={page} href={`/${folder.sub}/${folder.links[j]}`}>
+            <a aria-label={page} href={folder.links[j]}>
               {page}
             </a>
           </li>
