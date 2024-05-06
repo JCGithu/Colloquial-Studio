@@ -68,12 +68,13 @@ export let qwerty: Record<string, Array<Array<string>>> = {
 };
 
 export function characterChecker(inputString: string) {
-  for (var i = 0; i < inputString.length; i++) {
-    let value = inputString.charCodeAt(i)
-    if (value >= 65 && value <= 91) break;
-    if (value >= 192 && value <= 221) break;
-    if (value === 338 || value === 7838) break;
-    return false;
+  for (const char of inputString) {
+    const value = char.charCodeAt(0);
+    if (!((value >= 65 && value <= 91) ||
+      (value >= 192 && value <= 221) ||
+      value === 338 || value === 7838)) {
+      return false;
+    }
   }
   return true;
 }
@@ -97,12 +98,9 @@ const wordSelect: Map<TwordleParameters['words'], string> = new Map([
 
 export function randomWord(currentWords: TwordleParameters['words']) {
   let wordCollection = wordSelect.get(currentWords)!;
-  console.log(wordCollection);
   let TwordleWords = wordCollection.split("\r\n");
   if (TwordleWords.length === 1) TwordleWords = wordCollection.split("\n");
-  console.log(TwordleWords);
   let randomWord = TwordleWords[getRandomInt(TwordleWords.length)].toUpperCase();
-  console.log(randomWord);
   return randomWord;
 }
 
