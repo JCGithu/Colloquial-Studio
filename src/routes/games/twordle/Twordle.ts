@@ -97,8 +97,11 @@ const wordSelect: Map<TwordleParameters['words'], string> = new Map([
 
 export function randomWord(currentWords: TwordleParameters['words']) {
   let wordCollection = wordSelect.get(currentWords)!;
+  console.log(wordCollection);
   let TwordleWords = wordCollection.split("\r\n");
+  console.log(TwordleWords);
   let randomWord = TwordleWords[getRandomInt(TwordleWords.length)].toUpperCase();
+  console.log(randomWord);
   return randomWord;
 }
 

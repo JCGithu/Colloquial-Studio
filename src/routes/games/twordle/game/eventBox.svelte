@@ -94,7 +94,7 @@
   {/if}
   {#if $currentGame.state === "SUCCESS"}
     <h2>Congrats!</h2>
-    <p><i>{$currentGame.firstWin}</i> guessed it first!</p>
+    <p><i class="user">{$currentGame.firstWin}</i> guessed it first!</p>
     {#if !auto}
       <button on:click={() => location.reload()} class:disable>Play Again?</button>
     {/if}
@@ -175,9 +175,11 @@
   }
   p {
     margin: 0.2rem;
-    i {
-      color: $twordlePurple;
-    }
+  }
+  .user {
+    text-decoration: underline;
+    text-decoration-color: $twordlePurple;
+    font-weight: bold;
   }
   input {
     font-family: "Poppins";
